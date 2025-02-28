@@ -1,5 +1,5 @@
 import React from 'react';
-import './QuizCard.css';  // Import the CSS file
+import './quizCard.css';  // Import the CSS file
 import { auth } from '../../firebaseConfig';
 
 const QuizCard = ({ quiz, handleStartQuiz }) => {
