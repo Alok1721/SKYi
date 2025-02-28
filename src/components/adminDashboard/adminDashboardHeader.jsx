@@ -6,10 +6,10 @@ import "./adminDashboardComponents.css";
 
 const AdminDashboardHeader=({toggleSidebar}) => {
   return (
-    <div className="dashboard-header">
-      <FiMenu className="menu-icon" onClick={toggleSidebar}/>
+    <div className="admin-dashboard-header">
+      <FiMenu className="admin-menu-icon" onClick={toggleSidebar}/>
       <h2>Admin Dashboard</h2>
-      <FaUserCircle className="profile-icon" />
+      <FaUserCircle className="admin-profile-icon" />
     </div>
   )
 }

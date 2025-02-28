@@ -1,5 +1,5 @@
 import React,{useState} from "react";
-import "../styles/dashboard.css";
+import "../styles/adminDashboard.css";
 import AdminDashboardHeader from "../components/adminDashboard/adminDashboardHeader";
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from "../components/adminDashboard/adminSidebar";
@@ -15,79 +15,39 @@ const Dashboard = () => {
     
     <AdminDashboardHeader toggleSidebar={toggleSidebar} />
     <AdminSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-    <div className={`dashboard ${isSidebarOpen ? "shift" : ""}`}>
-      <div className="stats">
-        <div className="stat-card">
+    <div className={`admin-dashboard ${isSidebarOpen ? "shift" : ""}`}>
+      <div className="admin-stats">
+        <div className="admin-stat-card">
           <span>20</span>
           <p>Total Subscribers</p>
         </div>
-        <div className="stat-card">
+        <div className="admin-stat-card">
           <span>5</span>
           {/* <p>Today Assessments</p> */}
-        <button className="btn" onClick={() => navigate('/adminQuizMaker')}>Quiz Maker</button>
+        <button className="admin-btn" onClick={() => navigate('/adminQuizMaker')}>Quiz Maker</button>
         </div>
-        <div className="stat-card">
+        <div className="admin-stat-card">
           <span>10</span>
           <p>Practice Creation</p>
         </div>
       </div>
 
-      <div className="progress-chart-container">
+      <div className="admin-progress-chart-container">
         {/* Progress Overview */}
-        <div className="progress-overview">
-          <div className="progress-circle">
-            <div className="circle">
+        <div className="admin-progress-overview">
+          <div className="admin-progress-circle">
+            <div className="admin-circle">
               <p>60%<br />Solving Rate</p>
             </div>
           </div>
-          <div className="progress-list">
-            <p><span className="correct"></span> Polity</p>
-            <p><span className="correct"></span> History</p>
-            <p><span className="incorrect"></span> Geo</p>
-            <p><span className="incorrect"></span> CA</p>
+          <div className="admin-progress-list">
+            <p><span className="admin-correct"></span> Polity</p>
+            <p><span className="admin-correct"></span> History</p>
+            <p><span className="admin-incorrect"></span> Geo</p>
+            <p><span className="admin-incorrect"></span> CA</p>
           </div>
         </div>
-
-        
       </div>
-      <div className="progress-chart-container">
-        {/* Progress Overview */}
-        <div className="progress-overview">
-          <div className="progress-circle">
-            <div className="circle">
-              <p>60%<br />POD Solved</p>
-            </div>
-          </div>
-          <div className="progress-list">
-            <p><span className="correct"></span> Polity</p>
-            <p><span className="correct"></span> History</p>
-            <p><span className="incorrect"></span> Geo</p>
-            <p><span className="incorrect"></span> CA</p>
-          </div>
-        </div>
-
-        
-      </div>
-      <div className="progress-chart-container">
-        {/* Progress Overview */}
-        <div className="progress-overview">
-          <div className="progress-circle">
-            <div className="circle">
-              <p>60%<br />Correct</p>
-            </div>
-          </div>
-          <div className="progress-list">
-            <p><span className="correct"></span> Polity</p>
-            <p><span className="correct"></span> History</p>
-            <p><span className="incorrect"></span> Geo</p>
-            <p><span className="incorrect"></span> CA</p>
-          </div>
-        </div>
-
-        
-      </div>
-
-      
     </div>
     </>
   );

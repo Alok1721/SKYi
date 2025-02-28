@@ -1,10 +1,8 @@
 // src/Routes.jsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
-import SignupPage from './pages/SignupPage';
 import AuthPage from './pages/AuthPage';
 import TodayChallenges from './pages/TodayChallenges';
 import TestZone from './pages/TestZone';
@@ -20,8 +18,6 @@ function AppRoutes() {
       <Route path="/" element={<AuthPage />} />
       <Route path="/userDashboard" element={<Dashboard />} />
       <Route path="/adminDashboard" element={<AdminDashboard />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
       <Route path="/todayChallenges" element={<TodayChallenges />} />
       <Route path="/testZone" element={<TestZone />} />
       <Route path="/quizResult" element={<QuizResult />} />

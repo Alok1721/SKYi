@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React,{ useEffect, useState } from "react";
 import "../styles/allActiveQuiz.css"; // Import CSS file
 import { useNavigate } from 'react-router-dom';
 import QuizCard from "../components/quiz/quizCard";

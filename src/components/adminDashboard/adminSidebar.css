@@ -97,3 +97,37 @@
         margin-left: 200px;
     }
 } */
+
+.admin-bottom-section {
+  position: absolute; /* Change to relative to avoid overlap */
+  width: 80%;
+  text-align: center;
+  
+  bottom: 120px;
+}
+
+.admin-logout-btn {
+  width: 100%;
+  background: #ff4b5c;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto; /* Center the button */
+  transition: background 0.3s;
+}
+
+.admin-logout-btn:hover {
+  background: #e04350;
+}
+
+.admin-logout-icon {
+  margin-right: 8px;
+  font-size: 20px;
+}

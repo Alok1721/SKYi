@@ -1,36 +1,53 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FiX, FiUser, FiUsers, FiFileText, FiHelpCircle, FiBookOpen, FiBarChart2 } from "react-icons/fi";
+import { FiX, FiUser, FiUsers, FiFileText, FiHelpCircle, FiBookOpen, FiBarChart2,FiLogOut } from "react-icons/fi";
 import "./adminSidebar.css";
-
+import {signOut} from "firebase/auth"
+import {auth} from "../../firebaseConfig"
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
-
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/"); // Redirect to login page
+    } catch (err) {
+      console.error("Failed to log out:", err.message);
+    }
+  };
   return (
-    <div className={`sidebar ${isOpen ? "open" : ""}`}>
-      <div className="close-btn" onClick={toggleSidebar}><FiX /></div>
+    <div className={`admin-sidebar ${isOpen ? "open" : ""}`}>
+      <div className="admin-close-btn" onClick={toggleSidebar}><FiX /></div>
       <ul>
         <li onClick={() => navigate("/adminDashboard")}>
-          <FiBarChart2 className="icon" /> Dashboard
+          <FiBarChart2 className="admin-icon" /> Dashboard
         </li>
         <li onClick={() => navigate("/totalSubscriber")}>
-          <FiUsers className="icon" /> Subscribers
+          <FiUsers className="admin-icon" /> Subscribers
         </li>
         <li onClick={() => navigate("/adminQuizMaker")}>
-          <FiFileText className="icon" /> Quiz-Maker
+          <FiFileText className="admin-icon" /> Quiz-Maker
         </li>
         <li onClick={() => navigate("/problem-of-day")}>
-          <FiHelpCircle className="icon" /> Problem of Day
+          <FiHelpCircle className="admin-icon" /> Problem of Day
         </li>
         <li onClick={() => navigate("/practice")}>
-          <FiBookOpen className="icon" /> Practice
+          <FiBookOpen className="admin-icon" /> Practice
         </li> 
       </ul>
 
-      <div className="profile">
-        <FiUser className="profile-icon" />
-        <p className="profile-name">Alok Kumar</p>
-        <p className="profile-email">alokkhinjit123@gmail.com</p>
+      <div className="admin-profile">
+        <FiUser className="admin-profile-icon" />
+        <p className="admin-profile-name">Alok Kumar</p>
+        <p className="admin-profile-email">alokkhinjit123@gmail.com</p>
+      </div>
+      <div className="admin-bottom-section">
+              
+      
+              <button className="admin-logout-btn" onClick={handleLogout}>
+                <FiLogOut className="admin-logout-icon"/>
+              </button>
+      
+      
       </div>
     </div>
   );
