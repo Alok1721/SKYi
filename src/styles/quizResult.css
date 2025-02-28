@@ -1,0 +1,208 @@
+/* General container for the quiz result page */
+.quiz-result-container {
+  /* margin: 40px auto; */
+  max-width: 1200px;
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+  }
+
+/* Header Section with title and back button */
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.result-header h2 {
+  font-size: 2rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.back-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: #0056b3;
+}
+
+.result-body {
+  display: flex;
+  gap: 30px;
+  justify-content: space-between;
+}
+
+/* Analysis card for quick summary */
+.analysis-card {
+  flex: 0 0 30%;
+  padding: 25px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.analysis-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.analysis-info {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+/* .analysis-info div {
+  margin-bottom: 10px;
+  font-weight: 500;
+} */
+.analysis-item {
+  /* margin-bottom: 12px;
+  font-weight: 500;
+  display: flex;*/
+  justify-content: space-between; 
+  margin-bottom: 12px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  transition: background-color 0.3s ease;
+}
+.analysis-item span {
+  color: #777;
+}
+
+.analysis-item strong {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Styling for question-wise analysis area */
+.question-analysis {
+  flex: 1;
+  padding: 25px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  max-height: 70vh; /* Adds scroll behavior if content overflows */
+}
+
+/* Individual Question Card */
+.question-card {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  transition: background-color 0.3s ease;
+}
+
+.question-card:hover {
+  background-color: #f1f1f1;
+}
+
+.question-content p {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.answer-banner {
+  padding: 8px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 6px;
+  color: white;
+  text-transform: capitalize;
+  font-size: 1rem;
+}
+
+.answer-banner.correct {
+  background-color: #28a745;
+}
+
+.answer-banner.incorrect {
+  background-color: #dc3545;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Styling for individual options */
+.option {
+  padding: 12px;
+  background-color: #f1f1f1;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.option:hover {
+  background-color: #e9ecef;
+  transform: scale(1.05);
+}
+
+/* Correct option and selected answer styling */
+.option.correct-option {
+  background-color: #28a745;
+  color: white;
+}
+
+.option.selected-correct {
+  background-color: #28a745;
+  color: white;
+}
+
+.option.selected-incorrect {
+  background-color: #dc3545;
+  color: white;
+}
+
+.option.selected-correct:hover,
+.option.selected-incorrect:hover {
+  transform: scale(1);
+}
+
+.question-card .your-answer {
+  margin-top: 15px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+/* Back to quiz button */
+.question-analysis h3 {
+  font-size: 1.4rem;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .result-body {
+    flex-direction: column;
+  }
+
+  .analysis-card, .question-analysis {
+    flex: 1;
+    margin-bottom: 20px;
+  }
+}
+

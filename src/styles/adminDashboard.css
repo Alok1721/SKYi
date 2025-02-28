@@ -1,0 +1,39 @@
+/* src/styles/AdminDashboard.css */
+.admin-dashboard {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    
+    background-color: #282c34;
+    color: #fff;
+  }
+  
+  .quiz-management, .analytics, .notifications {
+    margin-top: 30px;
+  }
+  
+  button {
+    background-color: #4CAF50;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  .quiz-management ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .quiz-management li {
+    margin: 10px 0;
+  }
+  .dashboard.shift {
+    margin-left: 270px;
+    transition: margin-left 0.3s ease-in-out;
+  }

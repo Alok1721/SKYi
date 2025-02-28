@@ -1,0 +1,212 @@
+/* Container */
+body {
+    background: #f5f5f5 !important; /* Override any black background */
+}
+
+.test-container {
+    width: 90%;
+    height: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    
+  }
+  
+  /* Header */
+  .test-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    background-color: white;
+    color: black;
+    padding-right: 20px;
+  }
+  
+  /* Body */
+  .test-body {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  /* Left Section - Question Area */
+  .question-section {
+    width: 70%;
+    height: 550px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    color: black;
+    overflow-y: auto;
+    /* min-height: 550px; */
+}
+  
+  /* Question Header */
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    background: #007bff;
+    color: white;
+    height: 40px;
+    /* padding: 10px; */
+    font-weight: bold;
+    border-radius: 8px;
+  }
+  
+  /* Question Content */
+  .question-content {
+    padding: 15px 0;
+    max-height: 300px; 
+    overflow-y: auto;
+    word-wrap: break-word;
+  }
+  
+  .question-content ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .question-content ul li {
+    padding: 5px 0;
+  }
+  
+  /* Options */
+  .options {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .option-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    color: #888;
+}
+  
+  .option-btn.selected {
+    background: green;
+    color: white;
+  }
+  .important-btn:hover,.skip-btn:hover,.option-btn:hover,.save-next-btn:hover {
+    background: #0095ff;
+    color: white ;
+}
+
+  
+  /* Bottom Buttons */
+  .bottom-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    border: none;
+  }
+  
+  
+  .important-btn,
+  .skip-btn {
+    padding: 10px 20px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    color:#999;
+}
+  
+  .important-btn {
+    background: white;
+    /* border: 1px solid black; */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    
+}
+  
+  .skip-btn {
+    background: white;
+    /* border: 1px solid black; */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  .save-next-btn {
+    background: white;
+    /* border: 1px solid black; */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    color:#888;
+}
+
+  .navigation-section {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    color: black;
+    margin: 0 10px;
+    position: relative;
+  }
+  
+  /* Question Grid */
+  .question-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+    
+  }
+  
+  .question-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    color:black;
+  }
+  .question-btn.attempted {
+    background: lightgreen !important;
+    color: white;
+}
+
+.question-btn.skipped {
+    background: lightbrown !important;
+    color: white;
+}
+
+  
+  .marked {
+    background: lightblue;
+    color:white;
+  }
+  
+  .skipped {
+    background: pink;
+    color:white;
+  }
+  
+  /* Submit Button */
+  .submit-btn {
+    width: 100%;
+    padding: 10px;
+    background: green;
+    color: white;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    position:absolute;
+    bottom: 0;
+    margin: 3px;
+    border-radius: 10px;
+    
+}
+
+  

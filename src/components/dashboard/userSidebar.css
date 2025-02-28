@@ -1,0 +1,130 @@
+.user-sidebar {
+  position: fixed;
+  top: 65px;
+  left: -290px;
+  width: 230px;
+  height: 100%;
+  background: #fff;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: left 0.3s ease-in-out;
+  padding: 20px;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.user-sidebar ul{
+  list-style: none;
+  padding: 0;
+  margin-top: 30px;
+}
+.user-sidebar ul li{
+  display: flex;
+  align-items: center;
+  padding: 12px 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 5px;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.user-sidebar ul li .user-icon{
+  margin-right:10px;
+  font-size: 20px;
+}
+.user-sidebar ul li:hover{
+  transform: translateX(5px);
+}
+.user-sidebar ul li.active {
+  background:#d6b5ff;
+  border-radius: 5px;
+}
+.user-sidebar.open {
+  left: 0;
+}
+
+.user-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #888;
+  transition: 0.3s;
+}
+.user-close-btn:hover {
+  color: #f7866c;
+}
+/* Menu Icon Styling */
+.user-menu-icon {
+  font-size: 30px;
+  cursor: pointer;
+}
+
+/* Shift dashboard content when sidebar opens */
+.user-dashboard.shift {
+  margin-left: 270px;
+  transition: margin-left 0.3s ease-in-out;
+}
+.user-profile{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px solid #7f8c8d;
+  position: absolute;
+  padding-top: 10px;
+  bottom: 150px;
+  width: 80%;
+}
+.user-profile-icon {
+  font-size: 40px;
+  color: #dbd3c5;
+}
+.user-profile-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 5px 0;
+}
+.user-profile-email {
+  text-align: center;
+  font-size: 14px;
+  color: #bdc3c7;
+  margin: 5px 0;
+  padding-bottom: 10px;
+}
+.user-bottom-section {
+  position: absolute; /* Change to relative to avoid overlap */
+  width: 80%;
+  text-align: center;
+  
+  bottom: 120px;
+}
+
+.user-logout-btn {
+  width: 100%;
+  background: #ff4b5c;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto; /* Center the button */
+  transition: background 0.3s;
+}
+
+.user-logout-btn:hover {
+  background: #e04350;
+}
+
+.user-logout-icon {
+  margin-right: 8px;
+  font-size: 20px;
+}

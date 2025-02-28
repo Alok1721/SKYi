@@ -1,0 +1,38 @@
+
+.dashboard-header {
+    position:sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 20px;
+    margin-right: 20px;
+    background-color: white;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .menu-icon {
+    font-size: 24px;
+    cursor: pointer;
+    color: #888;
+  }
+  
+  h2 {
+    flex: 1;
+    padding-top: 10px;
+    margin-left: 10px;
+    text-align: left;
+    color: #000;
+  }
+  
+  .profile-icon {
+    font-size: 30px;
+    color: #ccc; /* Light gray */
+    cursor: pointer;
+    padding-right: 30px;
+  }
+
+  /* Sidebar Styles */

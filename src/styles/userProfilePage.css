@@ -1,0 +1,117 @@
+/* Profile Page Styling */
+.profile-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    color: #888;
+  }
+  
+  .profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .profile-picture {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #3b82f6;
+    object-fit: cover;
+  }
+  
+  .profile-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0 5px;
+  }
+  
+  .profile-username {
+    font-size: 16px;
+    color: gray;
+  }
+  
+  .profile-details {
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  
+  .profile-details p {
+    font-size: 16px;
+    padding: 5px 0;
+  }
+  
+  .profile-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .stat-card {
+    padding: 15px;
+    border-radius: 10px;
+    background: #f8f9fa;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-settings {
+    text-align: left;
+    margin-top: 20px;
+  }
+  
+  .profile-settings h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .settings-option {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .settings-option button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background: #3b82f6;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .settings-option button:hover {
+    background: #2563eb;
+  }
+  
+  /* Dark Mode */
+  .dark-mode {
+    background: #1a1a1a;
+    color: white;
+  }
+  
+  .dark-mode .profile-container {
+    background: #2a2a2a;
+  }
+  
+  .dark-mode .stat-card {
+    background: #3a3a3a;
+  }
+  
+  .dark-mode .settings-option button {
+    background: #ff9800;
+  }
+  
+  .dark-mode .settings-option button:hover {
+    background: #e68900;
+  }
+  

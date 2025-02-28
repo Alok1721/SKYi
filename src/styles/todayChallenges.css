@@ -1,0 +1,84 @@
+/* Main Container */
+.container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Title */
+  .title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  
+  /* Challenge Card List */
+  .challenge-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Challenge Card */
+  .challenge-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Gradient Backgrounds */
+  .gradient-blue {
+    background: linear-gradient(to right, #a2d2ff, #eff6ff);
+  }
+  
+  .gradient-brown {
+    background: linear-gradient(to right, #d2b48c, #f5deb3);
+  }
+  
+  .gradient-lightblue {
+    background: linear-gradient(to right, #87ceeb, #b0e0e6);
+  }
+  
+  .gradient-green {
+    background: linear-gradient(to right, #98fb98, #d0f0c0);
+  }
+  
+  /* Challenge Content */
+  .challenge-content h3 {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .challenge-content p {
+    font-size: 14px;
+    color: #444;
+  }
+  
+  /* Button Styles */
+  .btn {
+    margin-top: 10px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    background: black;
+    color: white;
+  }
+  
+  .btn.completed {
+    background: green;
+    color: white;
+  }
+  
+  /* Placeholder for the icon */
+  .icon-placeholder {
+    width: 50px;
+    height: 50px;
+    border: 2px solid gray;
+    border-radius: 10%;
+    opacity: 0.7;
+  }
+  

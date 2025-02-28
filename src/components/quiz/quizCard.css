@@ -1,0 +1,44 @@
+.quiz-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: #888;
+  }
+  
+  .quiz-icon {
+    width: 50px;
+    height: 50px;
+    background: lightblue;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+  }
+  
+  .quiz-title {
+    font-weight: bold;
+    font-size: 16px;
+    color: #888;
+  }
+  
+  .quiz-subtitle {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .quiz-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  
+  .disabled-btn {
+    width: 48%;
+    padding: 8px;
+    background: #ccc;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  

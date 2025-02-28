@@ -1,0 +1,11 @@
+.user-subscriptions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    background: linear-gradient(to bottom, #e0c3fc, #8ec5fc);
+    min-height: 100vh;
+    justify-items: center;
+  }
+  
+  
