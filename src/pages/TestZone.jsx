@@ -161,58 +161,55 @@ const TestZone = () => {
     ? currentQuestion.options
     : ["1", "2", "3", "4"];
 
-  return (
-    <>
-      <div className="test-header">
-        <h2>Test Zone</h2>
-        <span>Time Left: {formatTime(timeLeft)}</span>
-      </div>
-
-      <div className="test-container">
-        <div className="test-body">
-          <div className="question-section">
-            <div className="question-header">
-              <span className="question-title">
-                Question {currentQuestionIndex + 1}: {currentQuestion.subject || "Unknown Subject"}
-              </span>
-            </div>
-
-            <div className="question-content">
-              <p>{questionText}</p>
-              {currentQuestion.questionImage && (
-                <img src={currentQuestion.questionImage} alt="Question" className="question-image" />
-              )}
-            </div>
-
-            {isQuiz ? (
-              <div className="options">
-                {optionsToShow.map((opt, index) => (
-                  <button
-                    key={index}
-                    className={`option-btn ${selectedOptions[currentQuestionIndex] === opt ? "selected" : ""}`}
-                    onClick={() => handleOptionClick(opt)}
+    return (
+      <>
+        <div className="test-header">
+          <h2>Test Zone</h2>
+          <span>Time Left: {formatTime(timeLeft)}</span>
+        </div>
+    
+        <div className="test-container">
+          <div className="test-body">
+            <div className="question-panel">
+              <div className="question-header">
+                <span className="question-title">
+                  Question {currentQuestionIndex + 1}: {currentQuestion.subject || "Unknown Subject"}
+                </span>
+              </div>
+    
+              <div className="question-content">
+                <p>{questionText}</p>
+                {currentQuestion.questionImage && (
+                  <img src={currentQuestion.questionImage} alt="Question" className="question-image" />
+                )}
+              </div>
+    
+              {isQuiz ? (
+                <div className="options">
+                  {optionsToShow.map((opt, index) => (
+                    <button
+                      key={index}
+                      className={`option-btn ${selectedOptions[currentQuestionIndex] === opt ? "selected" : ""}`}
+                      onClick={() => handleOptionClick(opt)}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="resource-card">
+                  <a
+                    href={questionText}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link-button"
                   >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="resource-card">
-                <a
-                  href={questionText}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="link-button"
-                >
-                  Click Me
-                </a>
-              </div>
-            )}
-
-            
-          </div>
-          <div className="bottom-buttons-wrapper">
-            <div className="bottom-buttons">
+                    Click Me
+                  </a>
+                </div>
+              )}
+    
+              <div className="bottom-buttons">  {/* Merged bottom-buttons-wrapper with bottom-buttons */}
                 <button className="important-btn">Mark as Important</button>
                 <button className="skip-btn" onClick={handleSkip}>
                   Skip
@@ -221,30 +218,28 @@ const TestZone = () => {
                   Save & Next
                 </button>
               </div>
-          </div>
-
-          <div className="navigation-section">
-            <div className="question-grid">
-              {questions.map((_, i) => (
-                <button
-                  key={i}
-                  className={`question-btn ${i === currentQuestionIndex ? "active" : ""}
-                  ${questionStatus[i] === "attempted" ? "attempted" : ""}
-                  ${questionStatus[i] === "skipped" ? "skipped" : ""}`}
-                  onClick={() => setCurrentQuestionIndex(i)}
-                >
-                  {i + 1}
-                </button>
-              ))}
             </div>
-            <button className="submit-btn" onClick={calculateScore}>
-              SUBMIT
-            </button>
+    
+            <div className="navigation-section">
+              <div className="question-grid">
+                {questions.map((_, i) => (
+                  <button
+                    key={i}
+                    className={`question-btn ${i === currentQuestionIndex ? "active" : ""}
+                    ${questionStatus[i] === "attempted" ? "attempted" : ""}
+                    ${questionStatus[i] === "skipped" ? "skipped" : ""}`}
+                    onClick={() => setCurrentQuestionIndex(i)}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+              <button className="submit-btn" onClick={calculateScore}>
+                SUBMIT
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </>
-  );
-};
-
+      </>
+    );};
 export default TestZone;
