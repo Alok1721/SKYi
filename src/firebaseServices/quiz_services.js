@@ -118,6 +118,7 @@ export const isQuizSolvedById = async (quizId) => {
       return false;
     }
     const quizData = quizDocSnap.data();
+    console.log("inside qui_service  quizData",quizData);
     if (Array.isArray(quizData.solvedBy)) {
       return quizData.solvedBy.includes(currentUserId);
     } else {
@@ -134,6 +135,6 @@ export const isQuizSolvedByQuizData =(quiz) =>{
   const currentUser=auth.currentUser;
   const currentUserId=currentUser.uid;
   if(!currentUserId)return false;
-  return Array.isArray(quizData.solvedBy) && quiz.solvedBy.includes(currentUserId);
+  return Array.isArray(quiz.solvedBy) && quiz.solvedBy.includes(currentUserId);
 
 }

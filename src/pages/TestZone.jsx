@@ -151,14 +151,15 @@ const TestZone = () => {
   };
 
   if (!questions.length) {
-    return <p>No questions available.</p>;
+    return <p>""</p>;
   }
 
   const currentQuestion = questions[currentQuestionIndex];
-  const questionText = currentQuestion?.question || "No question available";
+  const questionText = (currentQuestion?.question?.trim() ) 
+    ? currentQuestion?.question :currentQuestion?.questionImage?.trim() ?"": "No question available";
   const optionsToShow = currentQuestion?.options?.some((opt) => opt.trim() !== "")
     ? currentQuestion.options
-    : ["1", "2", "3", "4", "5"];
+    : ["1", "2", "3", "4"];
 
   return (
     <>
@@ -208,15 +209,18 @@ const TestZone = () => {
               </div>
             )}
 
+            
+          </div>
+          <div className="bottom-buttons-wrapper">
             <div className="bottom-buttons">
-              <button className="important-btn">Mark as Important</button>
-              <button className="skip-btn" onClick={handleSkip}>
-                Skip
-              </button>
-              <button className="save-next-btn" onClick={handleSaveNext}>
-                Save & Next
-              </button>
-            </div>
+                <button className="important-btn">Mark as Important</button>
+                <button className="skip-btn" onClick={handleSkip}>
+                  Skip
+                </button>
+                <button className="save-next-btn" onClick={handleSaveNext}>
+                  Save & Next
+                </button>
+              </div>
           </div>
 
           <div className="navigation-section">

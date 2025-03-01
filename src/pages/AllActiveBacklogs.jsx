@@ -26,7 +26,7 @@ const AllActiveBacklogs = () => {
    const handleStartQuiz = async (quizId) => {
       try {
         const quizData = await fetchQuizById(quizId);
-        if (quizData.exists()) {
+        if (quizData) {
           navigate("/testZone", { state: { questions: quizData.questions,quizId:quizId,isQuiz:quizData.isQuiz,quizData:quizData} });
         } else {
           alert("Quiz not found!");

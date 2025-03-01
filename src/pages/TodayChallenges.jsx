@@ -11,6 +11,7 @@ const TodayChallenges = () => {
   useEffect(() => {
     const fetchData = async () => {
       const quizzes = await fetchTodaysQuizzes();
+      console.log("fetched quizzes: ",quizzes);
       setChallenge(quizzes);
     };
     fetchData();
