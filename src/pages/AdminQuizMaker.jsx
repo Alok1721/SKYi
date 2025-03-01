@@ -64,6 +64,7 @@ const AdminQuizMaker = () => {
   const handleImageUpload =async (index,field,file)=>{
     if(!file)return ;
     const imageUrl=await uploadToCloudinary(file);
+    console.log("image url",imageUrl);
     if(imageUrl)
     {
       handleChange(index,field,imageUrl);

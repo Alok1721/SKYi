@@ -6,9 +6,25 @@ export const fetchDashboardData = async (userId) => {
   try {
     const currentUser = await getCurrentUser();
     const currentUserId=currentUser.id;
-    if (!currentUser || !currentUser.subscriptions) return null;
+    const subscriptions = currentUser?.subscriptions || [];
+    if (!currentUser || subscriptions.length === 0) {
+      console.warn("No subscriptions found. Skipping queries.");
+      return {
+        totalQuizzes: 0,
+        totalBacklogs: 0,
+        todayChallenges: 0,
+        daysLeftIAS: null,
+        analysisData: [],
+        userName: "Guest",
+        userEmail: null,
+        userDpURL: "https://th.bing.com/th/id/OIP._pEcWSA6rfFIY8o1fr7YagHaHa?rs=1&pid=ImgDetMain",
+        progressData: [],
+        graphData: [],
+        podData: []
+      };
+    }
     const quizzesRef = collection(db, "quizzes");
-    const subscribedQuery = query(quizzesRef, where("createdBy", "in", currentUser.subscriptions));
+    const subscribedQuery = query(quizzesRef, where("createdBy", "in",subscriptions));
     
     // Total Quizzes
     const quizzesSnapshot = await getCountFromServer(subscribedQuery);
