@@ -31,12 +31,14 @@ const QuizzesList = () => {
     };
 
   return (
-    <div className="container">
-      <h1 className="title">Polity Quiz</h1>
+    <div className="all-quiz-container">
+      <div className="all-quiz-header">
+        <h1 className="all-quiz-title">ALL Quiz</h1>
+      </div>
       {Object.keys(quizzesByDate).map((date) => (
-        <div key={date} className="quiz-section">
-          <h2 className="quiz-date">{date}</h2>
-          <div className="quiz-grid">
+        <div key={date} className="all-quiz-quiz-section">
+          <h2 className="all-quiz-quiz-date">{date}</h2>
+          <div className="all-quiz-quiz-grid">
             {quizzesByDate[date].map((quiz) => (
               <QuizCard key={quiz.id} quiz={quiz} handleStartQuiz={handleStartQuiz} />
             ))}

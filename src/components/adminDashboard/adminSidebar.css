@@ -1,103 +1,100 @@
-.sidebar {
-    position: fixed;
-    top: 65px;
-    left: -290px;
-    width: 230px;
-    height: 100vh;
-    background: #fff;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    transition: left 0.3s ease-in-out;
-    padding: 20px;
-    color: #000;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  
-  .sidebar ul{
-    list-style: none;
-    padding: 0;
-    margin-top: 30px;
-  }
-  .sidebar ul li{
-    display: flex;
-    align-items: center;
-    padding: 12px 15px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.3s;
-    border-radius: 5px;
-    border-top: 1px solid #f0f0f0;
-    border-bottom: 1px solid #f0f0f0;
-  }
+.admin-sidebar {
+  position: fixed;
+  top: 65px;
+  left: -290px;
+  width: 230px;
+  height: 100%;
+  background: #fff;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: left 0.3s ease-in-out;
+  padding: 20px;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
-  .sidebar ul li .icon{
-    margin-right:10px;
-    font-size: 20px;
-  }
-  .sidebar ul li:hover{
-    transform: translateX(5px);
-  }
-  .sidebar ul li.active {
-    background:#d6b5ff;
-    border-radius: 5px;
-  }
-  .sidebar.open {
-    left: 0;
-  }
-  
-  .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 20px;
-    cursor: pointer;
-    color: #888;
-    transition: 0.3s;
-  }
-  .close-btn:hover {
-    color: #f7866c;
+.admin-sidebar ul{
+  list-style: none;
+  padding: 0;
+  margin-top: 30px;
 }
-  /* Menu Icon Styling */
-  .menu-icon {
-    font-size: 24px;
-    cursor: pointer;
-  }
-  
-  /* Shift dashboard content when sidebar opens */
-  .dashboard.shift {
-    margin-left: 270px;
-    transition: margin-left 0.3s ease-in-out;
-  }
-  .profile{
-    text-align: center;
-    padding: 20px;
-    border-top: 1px solid #7f8c8d;
-    position: absolute;
-    bottom: 100px;
-    padding: 10px;
- }
- .profile-icon {
-    font-size: 40px;
-    color: #dbd3c5;
+.admin-sidebar ul li{
+  display: flex;
+  align-items: center;
+  padding: 12px 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 5px;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
 }
-.profile-name {
-    font-size: 16px;
-    font-weight: bold;
-}
-.profile-email {
-    font-size: 14px;
-    color: #bdc3c7;
-}
-/* @media (max-width: 768px) {
-    .sidebar {
-        width: 160px;
-    }
-    .dashboard.shift {
-        margin-left: 200px;
-    }
-} */
 
+.admin-sidebar ul li .user-icon{
+  margin-right:10px;
+  font-size: 20px;
+}
+.admin-sidebar ul li:hover{
+  transform: translateX(5px);
+}
+.admin-sidebar ul li.active {
+  background:#d6b5ff;
+  border-radius: 5px;
+}
+.admin-sidebar.open {
+  left: 0;
+}
+
+.admin-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #888;
+  transition: 0.3s;
+}
+.admin-close-btn:hover {
+  color: #f7866c;
+}
+/* Menu Icon Styling */
+.admin-menu-icon {
+  font-size: 30px;
+  cursor: pointer;
+}
+
+/* Shift dashboard content when sidebar opens */
+.admin-dashboard.shift {
+  margin-left: 270px;
+  transition: margin-left 0.3s ease-in-out;
+}
+.admin-profile{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px solid #7f8c8d;
+  position: absolute;
+  padding-top: 10px;
+  bottom: 150px;
+  width: 80%;
+}
+.admin-profile-icon {
+  font-size: 40px;
+  color: #dbd3c5;
+}
+.admin-profile-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 5px 0;
+}
+.admin-profile-email {
+  text-align: center;
+  font-size: 14px;
+  color: #bdc3c7;
+  margin: 5px 0;
+  padding-bottom: 10px;
+}
 .admin-bottom-section {
   position: absolute; /* Change to relative to avoid overlap */
   width: 80%;
