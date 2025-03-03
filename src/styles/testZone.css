@@ -76,14 +76,16 @@ body {
   
   /* Question Content */
   .question-content {
-    padding: 15px 0;
-    max-height: 300px; 
+    padding: 10px 10px;
+    min-height: 200px; 
     overflow-y: auto;
     word-wrap: break-word;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    display: block;
+    
   }
   .question-title{
     display: block;
@@ -91,7 +93,7 @@ body {
   }
   .question-content ul {
     list-style: none;
-    padding-left: 0;
+    padding-left: 10px;
   }
   .question-content img{
     max-width: 70%;
@@ -101,7 +103,7 @@ body {
   }
   
   .question-content ul li {
-    padding: 5px 0;
+    padding: 10px 0;
   }
   .question-body{
     padding:20px
@@ -134,8 +136,19 @@ body {
     color: white;
   }
   .important-btn:hover,.skip-btn:hover,.option-btn:hover,.save-next-btn:hover {
-    background: #033f69;
+    background: #007bff;
     color: white ;
+}
+.warning-card{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffcccb;
+  border-left: 6px solid #ff6347;
+  color: #d9534f;
+  font-size: 16px;
+  animation: fadeIn 1s ease-in-out;
+  font-weight: bold;
 }
 
   
@@ -197,20 +210,31 @@ body {
   
   .question-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 15px;
+    grid-template-columns: repeat(auto-fit,minmax(35px,1fr));
+    gap: 5px;
+    width: 100%;
+    justify-content: center;
+    padding: 10px;
     
+  }
+  .question-btn.active{
+    background: #007bff;
+    color: white;
   }
   
   .question-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 14px;
+    width: 100%;
+    height: 35px;
+    font-size: 12px;
     border: 1px solid #ddd;
-    background: white;
+    background:white;
     cursor: pointer;
     color:black;
+    text-align: center;
+    border-radius: 5px;
+  }
+  .question-btn:hover{
+    color:#007bff;
   }
   .question-btn.attempted {
     background: lightgreen !important;
@@ -242,11 +266,10 @@ body {
     font-size: 16px;
     border: none;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: auto;
     position:absolute;
-    bottom: 10px;
-    border-radius: 10,10,0,0;
-    
+    border-radius: 10px,10px,0,0;
+    bottom:10px
 }
 
 @media (max-width: 408px) { 
@@ -275,12 +298,19 @@ body {
 
   .question-header {
     font-size: 14px;
-    height: 35px;
+    height: 55px;
+
   }
 
   .question-content {
-    padding: 10px;
+    padding: 15px,10px;
+    word-wrap: break-word;
+    margin: 10px;
     max-height: 250px;
+    overflow: visible;
+    display: block;
+    width: 100%;
+    overflow-y: auto;
   }
 
   .options {

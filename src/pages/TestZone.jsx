@@ -12,6 +12,7 @@ const TestZone = () => {
   const [questionStatus, setQuestionStatus] = useState({});
   const [timeLeft, setTimeLeft] = useState(180); // Default 3 minutes
   const [quizAllocatedTime, setQuizAllocatedTime] = useState(180); 
+  const [showWarning, setShowWarning] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -52,13 +53,15 @@ const TestZone = () => {
   };
 
   const handleOptionClick = (option) => {
+    setShowWarning(false);
     setSelectedOptions((prev) => ({
       ...prev,
-      [currentQuestionIndex]: option,
+      [currentQuestionIndex]: prev[currentQuestionIndex] === option ? null : option,
     }));
   };
 
   const handleSkip = () => {
+    setShowWarning(false);
     setQuestionStatus((prev) => ({
       ...prev,
       [currentQuestionIndex]: "skipped",
@@ -69,6 +72,12 @@ const TestZone = () => {
   };
 
   const handleSaveNext = () => {
+    if(!selectedOptions[currentQuestionIndex])
+    {
+      setShowWarning(true);
+      return;
+    }
+    setShowWarning(false);
     setQuestionStatus((prev) => ({
       ...prev,
       [currentQuestionIndex]: "attempted",
@@ -208,6 +217,11 @@ const TestZone = () => {
                   </a>
                 </div>
               )}
+              {showWarning && (
+              <div className="warning-card">
+                <p>Please select an option before proceeding!</p>
+              </div>
+            )}
     
               <div className="bottom-buttons">  {/* Merged bottom-buttons-wrapper with bottom-buttons */}
                 <button className="important-btn">Mark as Important</button>
