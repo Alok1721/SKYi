@@ -7,31 +7,56 @@ import { updateUserProgress } from "../firebaseServices/update_user_progress";
 import { isQuizSolvedById } from "../firebaseServices/quiz_services";
 
 const TestZone = () => {
-  const [selectedOptions, setSelectedOptions] = useState({});
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [questionStatus, setQuestionStatus] = useState({});
-  const [timeLeft, setTimeLeft] = useState(180); // Default 3 minutes
-  const [quizAllocatedTime, setQuizAllocatedTime] = useState(180); 
-  const [showWarning, setShowWarning] = useState(false);
-
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Ensure state exists before accessing properties
+  const quizId = location.state?.quizId || null;
   const questions = location.state?.questions || [];
   const isQuiz = location.state?.isQuiz || false;
   const quizData = location.state?.quizData || {};
-  const quizId = location.state?.quizId || null;
+    
+  const [selectedOptions, setSelectedOptions] = useState(() => {
+    const saved = localStorage.getItem(`quiz_${quizId}_selectedOptions`);
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(() => {
+    const saved = localStorage.getItem(`quiz_${quizId}_currentQuestionIndex`);
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  const [questionStatus, setQuestionStatus] = useState(() => {
+    const saved = localStorage.getItem(`quiz_${quizId}_questionStatus`);
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const saved = localStorage.getItem(`quiz_${quizId}_timeLeft`);
+    const allocatedTime = quizData.timeAllocated ? quizData.timeAllocated * 60 : 180;
+    return saved ? parseInt(saved, 10) : allocatedTime;
+  });
+  const [quizAllocatedTime, setQuizAllocatedTime] = useState(() => {
+    return quizData.timeAllocated ? quizData.timeAllocated * 60 : 180;
+  });
+  const [showWarning, setShowWarning] = useState(false);
+
   
   const currentUser = auth.currentUser;
   const currentUserId = currentUser?.uid;
-  
   useEffect(() => {
-    // Use 3 minutes (180 seconds) as default if allocatedTime is missing or invalid
-    const allocatedTime = quizData.timeAllocated ? quizData.timeAllocated * 60 : 180;
-    setTimeLeft(allocatedTime);
-    setQuizAllocatedTime(allocatedTime);
-    console.log("allocateTime:",allocatedTime);
+    localStorage.setItem(`quiz_${quizId}_selectedOptions`, JSON.stringify(selectedOptions));
+  }, [selectedOptions, quizId]);
+
+  useEffect(() => {
+    localStorage.setItem(`quiz_${quizId}_currentQuestionIndex`, currentQuestionIndex);
+  }, [currentQuestionIndex, quizId]);
+
+  useEffect(() => {
+    localStorage.setItem(`quiz_${quizId}_questionStatus`, JSON.stringify(questionStatus));
+  }, [questionStatus, quizId]);
+
+  useEffect(() => {
+    localStorage.setItem(`quiz_${quizId}_timeLeft`, timeLeft);
+  }, [timeLeft, quizId]);
+
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
@@ -44,7 +69,7 @@ const TestZone = () => {
     }, 1000);
 
     return () => clearInterval(timer); // Cleanup timer on unmount
-  }, [quizData.timeAllocated]);
+  }, [quizId]);
 
   const formatTime = (seconds) => {
     const min = Math.floor(seconds / 60);
@@ -144,6 +169,11 @@ const TestZone = () => {
     } catch (error) {
       console.error("Error updating quiz:", error);
     }
+
+    localStorage.removeItem(`quiz_${quizId}_selectedOptions`);
+    localStorage.removeItem(`quiz_${quizId}_currentQuestionIndex`);
+    localStorage.removeItem(`quiz_${quizId}_questionStatus`);
+    localStorage.removeItem(`quiz_${quizId}_timeLeft`);
 
     navigate("/quizResult", {
       state: {
