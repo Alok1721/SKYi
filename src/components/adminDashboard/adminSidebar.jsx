@@ -8,6 +8,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const handleLogout = async () => {
     try {
+      localStorage.removeItem("user");
       await signOut(auth);
       navigate("/"); // Redirect to login page
     } catch (err) {

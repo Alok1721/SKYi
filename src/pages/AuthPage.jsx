@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { auth, db } from "../firebaseConfig";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc, getDoc } from "firebase/firestore";
@@ -19,20 +19,32 @@ const AuthPage = () => {
     setError("");
   };
 
+  useEffect(()=>{
+    const cachedUser=JSON.parse(localStorage.getItem("user"));
+    if(cachedUser){
+      navigate(cachedUser.role==="admin"?"/adminDashboard":"/userDashboard");
+    }
+  },[navigate]);
+
   const handleAuth = async () => {
     try {
       if (isSignup) {
         // Signup process
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        await setDoc(doc(db, "users", user.uid), { name, email, role, createdAt: new Date(),subscriptions:[] });
+        const userData = { uid: user.uid, name, email, role, createdAt: new Date(), subscriptions: [] };
+        await setDoc(doc(db, "users", user.uid), userData);
+        localStorage.setItem("user", JSON.stringify(userData));
         navigate(role === "admin" ? "/adminDashboard" : "/userDashboard");
       } else {
         // Login process
+       
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
+          const userData = userDoc.data();
+          localStorage.setItem("user", JSON.stringify(userData));
           navigate(userDoc.data().role === "admin" ? "/adminDashboard" : "/userDashboard");
         } else {
           setError("User role not found!");
