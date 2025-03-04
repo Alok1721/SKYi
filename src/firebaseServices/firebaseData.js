@@ -110,12 +110,13 @@ export const fetchDashboardData = async (userId) => {
           date, // Date as key
           value: userProgress[date].correctPercentage, 
         }))
-        .filter((entry) => entry.value !== undefined); 
+        .filter((entry) => entry.value !== undefined)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
       podData = Object.keys(userProgress)
         .map((date) => ({
           date, // Date as key
           completedPOD: userProgress[date].completedPOD, 
-        }));
+        })).sort((a, b) => new Date(a.date) - new Date(b.date));
         // console.log("graphData",graphData);
         // console.log("graphData",podData);
          

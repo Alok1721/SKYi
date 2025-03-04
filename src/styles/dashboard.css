@@ -61,40 +61,52 @@
   flex-wrap: wrap;
 }
 
-.calender-container {
+.calendar-container {
   display: flex;
-  flex: 1 1 200px;
-  flex-direction: row;
   overflow-x: auto;
-  gap: 15px;
+  /* flex-wrap: wrap; */
+  gap: 20px;
+  position: relative;
+}
+.calender-filter{
+  position: absolute;
 }
 
-.calender {
-  display: flex;
-  flex: 1 1 200px;
-  min-width: 250px;
-  background: #f9f9f9;
-  flex: 0 0 auto;
-}
-.calender h3 {
-  margin-bottom: 10px;
+.calendar {
+  width: 250px;
+  text-align: center;
 }
 
-.calender-grid {
+.calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 30px);
-  gap: 1px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
 }
 
-.calender-box {
+.calendar-box {
   width: 20px;
-  height:20px;
-  background-color: #ddd;
-  border-radius: 5px;
+  height: 20px;
+  background-color: #dedede;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
 }
 
-.completed-pod {
-  background-color: green;
+.calendar-box.completed-pod {
+  background-color: #4caf50;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: black;
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 
