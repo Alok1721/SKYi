@@ -11,6 +11,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hoveredDate, setHoveredDate] = useState(null);
+  const [selectedFilter, setSelectedFilter] = useState("2025");
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -28,13 +29,127 @@ const Dashboard = () => {
   const graphData = dashboardData?.graphData || [];
   const podData = dashboardData?.podData || [];
 
-  // Define number of days in each month (leap year consideration)
-  const daysInMonth = (monthIndex, year = 2025) => new Date(year, monthIndex + 1, 0).getDate();
+  // Get current date info
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth(); // 0-11
+  const currentDay = currentDate.getDate();
+
+  // Helper functions
+  const daysInMonth = (monthIndex, year) => new Date(year, monthIndex + 1, 0).getDate();
+
+  const getWeekDays = () => {
+    const startOfWeek = new Date(currentDate);
+    const dayOfWeek = currentDate.getDay(); // 0 (Sunday) to 6 (Saturday)
+    startOfWeek.setDate(currentDay - dayOfWeek); // Start from Sunday
+    const weekDays = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+      weekDays.push(date);
+    }
+    return weekDays;
+  };
 
   const months = [
     "January", "February", "March", "April", "May", "June", "July",
     "August", "September", "October", "November", "December"
   ];
+
+  const handleFilterChange = (event) => {
+    setSelectedFilter(event.target.value);
+  };
+
+  // Function to render calendar based on filter
+  const renderCalendar = () => {
+    switch (selectedFilter) {
+      case "this-week":
+        const weekDays = getWeekDays();
+        return (
+          <div className="calendar">
+            <h3>This Week</h3>
+            <div className="calendar-grid week-grid">
+              {weekDays.map((date, idx) => {
+                const formattedDate = date.toISOString().split('T')[0];
+                const pod = podData.find((item) => item.date === formattedDate);
+                const completedClass = pod && pod.completedPOD ? "completed-pod" : "";
+                
+                return (
+                  <div
+                    key={idx}
+                    className={`calendar-box ${completedClass}`}
+                    onMouseEnter={() => setHoveredDate(formattedDate)}
+                    onMouseLeave={() => setHoveredDate(null)}
+                  >
+                    
+                    {hoveredDate === formattedDate && <div className="tooltip">{formattedDate}</div>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+
+      case "this-month":
+        const numDaysCurrentMonth = daysInMonth(currentMonth, currentYear);
+        return (
+          <div className="calendar">
+            <h3>{months[currentMonth]}</h3>
+            <div className="calendar-grid">
+              {Array.from({ length: numDaysCurrentMonth }).map((_, dayIdx) => {
+                const date = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(dayIdx + 1).padStart(2, "0")}`;
+                const pod = podData.find((item) => item.date === date);
+                const completedClass = pod && pod.completedPOD ? "completed-pod" : "";
+
+                return (
+                  <div
+                    key={dayIdx}
+                    className={`calendar-box ${completedClass}`}
+                    onMouseEnter={() => setHoveredDate(date)}
+                    onMouseLeave={() => setHoveredDate(null)}
+                  >
+                    {hoveredDate === date && <div className="tooltip">{date}</div>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+
+      case "2024":
+      case "2025":
+        const year = parseInt(selectedFilter);
+        return months.map((month, index) => {
+          const numDays = daysInMonth(index, year);
+          return (
+            <div key={index} className="calendar">
+              <h3>{month}</h3>
+              <div className="calendar-grid">
+                {Array.from({ length: numDays }).map((_, dayIdx) => {
+                  const date = `${year}-${String(index + 1).padStart(2, "0")}-${String(dayIdx + 1).padStart(2, "0")}`;
+                  const pod = podData.find((item) => item.date === date);
+                  const completedClass = pod && pod.completedPOD ? "completed-pod" : "";
+
+                  return (
+                    <div
+                      key={dayIdx}
+                      className={`calendar-box ${completedClass}`}
+                      onMouseEnter={() => setHoveredDate(date)}
+                      onMouseLeave={() => setHoveredDate(null)}
+                    >
+                      {hoveredDate === date && <div className="tooltip">{date}</div>}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        });
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
@@ -69,37 +184,32 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Calendar Section */}
-        <div className="calendar-container">
-          <div className="calender-filter">
-            <p>POD Tracker</p>
+        <div className="calender-wrapper">
+          <div className="calendar-filter">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="filter-icon"
+            >
+              <path d="M22 3H2l8 9.46V19l4 2V12.46L22 3z" />
+            </svg>
+            <select value={selectedFilter} onChange={handleFilterChange}>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="this-week">This Week</option>
+              <option value="this-month">This Month</option>
+            </select>
           </div>
-          {months.map((month, index) => {
-            const numDays = daysInMonth(index);
-            return (
-              <div key={index} className="calendar">
-                <h3>{month}</h3>
-                <div className="calendar-grid">
-                  {Array.from({ length: numDays }).map((_, dayIdx) => {
-                    const date = `2025-${String(index + 1).padStart(2, "0")}-${String(dayIdx + 1).padStart(2, "0")}`;
-                    const pod = podData.find((item) => item.date === date);
-                    const completedClass = pod && pod.completedPOD ? "completed-pod" : "";
-
-                    return (
-                      <div
-                        key={dayIdx}
-                        className={`calendar-box ${completedClass}`}
-                        onMouseEnter={() => setHoveredDate(date)}
-                        onMouseLeave={() => setHoveredDate(null)}
-                      >
-                        {hoveredDate === date && <div className="tooltip">{date}</div>}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
+          <div className="calendar-container">
+            {renderCalendar()}
+          </div>
         </div>
       </div>
     </>
