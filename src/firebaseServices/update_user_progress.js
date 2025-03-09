@@ -7,12 +7,13 @@ const updateUserProgress = async (currentUserId, newCorrectPercentage, subject) 
         const userDocRef = doc(db, "user_progress", currentUserId);
         const userDocSnap = await getDoc(userDocRef);
         const today = new Date().toISOString().split("T")[0];
-      
+        
         let updatedCorrectPercentage = newCorrectPercentage;
-        let updatedCompletedPOD = subject === "POD"; // Default to true if today's subject is "POD"
+        let updatedCompletedPOD = subject === "POD" && userDocSnap.data().createdAt == today; // Default to true if today's subject is "POD"
     
         if (userDocSnap.exists()) {
           const userProgress = userDocSnap.data();
+          
           const todayProgress = userProgress[today];
           if (todayProgress) {
             updatedCorrectPercentage = (todayProgress.correctPercentage + newCorrectPercentage) / 2;
