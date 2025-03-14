@@ -21,12 +21,11 @@ const Dashboard = () => {
           <span>20</span>
           <p>Total Subscribers</p>
         </div>
-        <div className="admin-stat-card">
+        <div className="admin-stat-card" onClick={() => navigate('/adminQuizMaker')}>
           <span>5</span>
-          {/* <p>Today Assessments</p> */}
-        <button className="admin-btn" onClick={() => navigate('/adminQuizMaker')}>Quiz Maker</button>
+          <p>Quiz Maker</p>
         </div>
-        <div className="admin-stat-card">
+        <div className="admin-stat-card" onClick={()=>navigate('/adminQuestionMaker')}>
           <span>10</span>
           <p>Practice Creation</p>
         </div>

@@ -33,10 +33,7 @@
   transition: all 0.3s ease-in-out;
   transform: translateY(0);
 }
-.stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-}
+ 
 
 .stat-card span {
   font-size: 24px;

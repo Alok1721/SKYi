@@ -12,6 +12,10 @@ import AllActiveQuizzes from './pages/AllActiveQuiz';
 import AllActiveBacklogs from './pages/AllActiveBacklogs';
 import UserProfilePage from './pages/UserProfilePage';
 import UserSubscriptions from './pages/UserSubscriptions';
+import UserPractise from './pages/UserPractise';
+import ListOfPractises from './pages/ListOfPractises';
+import AdminQuestionMaker from './pages/AdminQuestionMaker';
+
 function AppRoutes() {
   return (
     <Routes>
@@ -26,6 +30,9 @@ function AppRoutes() {
       <Route path="/allActiveBacklogs" element={<AllActiveBacklogs />} />
       <Route path="/userProfilePage" element={<UserProfilePage />} />
       <Route path="/userSubscriptions" element={<UserSubscriptions />} />
+      <Route path="/userPractise" element={<UserPractise />} />
+      <Route path="/adminQuestionMaker" element={<AdminQuestionMaker />} />
+      <Route path="/listOfPractise" element={<ListOfPractises />} />
       
     </Routes>
   );

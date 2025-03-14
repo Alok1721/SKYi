@@ -1,0 +1,32 @@
+.list-of-practises {
+  padding: 20px;
+}
+
+.tag-filter {
+  margin-bottom: 15px;
+}
+
+.question-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+button {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+}
+
+.solved {
+  background-color: #4caf50;
+  color: white;
+}
+
+.unsolved {
+  background-color: #f44336;
+  color: white;
+}

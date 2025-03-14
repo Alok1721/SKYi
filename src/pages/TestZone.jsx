@@ -5,6 +5,7 @@ import { auth, db } from "../firebaseConfig";
 import { doc, updateDoc,arrayUnion } from "firebase/firestore";
 import { updateUserProgress } from "../firebaseServices/update_user_progress";
 import { isQuizSolvedById } from "../firebaseServices/quiz_services";
+import { fetchCollectionData, updateCollectionData } from "../firebaseServices/firestoreUtils";
 
 const TestZone = () => {
   const location = useLocation();
@@ -13,7 +14,9 @@ const TestZone = () => {
   const questions = location.state?.questions || [];
   const isQuiz = location.state?.isQuiz || false;
   const quizData = location.state?.quizData || {};
-    
+  const collectionName=location.state?.collectionName ||"quizzes";
+  const collectionId=location.state?.collectionId ||quizId;
+
   const [selectedOptions, setSelectedOptions] = useState(() => {
     const saved = localStorage.getItem(`quiz_${quizId}_selectedOptions`);
     return saved ? JSON.parse(saved) : {};
@@ -132,7 +135,7 @@ const TestZone = () => {
 
     const updatedQuestionStatus = questions.map((question, index) => {
       const userAnswer = selectedOptions[index] || "Not Answered";
-      const isCorrect = question.correctOption && userAnswer === question.correctOption;
+      const isCorrect = question.correctOption ? userAnswer === question.correctOption:false;
 
       if (isCorrect) {
         totalScore += 3; // Award +3 for correct answer
@@ -144,6 +147,7 @@ const TestZone = () => {
       return {
         ...question,
         yourAnswer: userAnswer,
+        isCorrect
       };
     });
 
@@ -156,15 +160,23 @@ const TestZone = () => {
     }
   
     try {
-      const quizDocRef = doc(db, "quizzes", quizId);
-      await updateDoc(quizDocRef, {
+      const DocRef = doc(db, collectionName, collectionId);
+      if(collectionName==="quizzes")
+      {await updateDoc(DocRef, {
         questions: updatedQuestionStatus,
         totalScore,
         correctPercentage,
         quizStatus: true,
         totalQuestions,
         solvedBy:arrayUnion(currentUserId)
-      });
+      });}
+      else{
+        await updateDoc(DocRef,{
+          youAnswer:selectedOptions[currentQuestionIndex],
+          isCorrect:updatedQuestionStatus[currentQuestionIndex].isCorrect,
+          solvedBy:arrayUnion(currentUserId)
+        })
+      }
       console.log("Quiz Updated Successfully");
     } catch (error) {
       console.error("Error updating quiz:", error);

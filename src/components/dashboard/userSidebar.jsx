@@ -32,7 +32,7 @@ const UserSidebar = ({ isOpen, toggleSidebar ,userName,userEmail}) => {
         <li onClick={() => navigate("/allActiveBacklogs")}>
           <FiHelpCircle className="user-icon" /> Backlogs Page
         </li>
-        <li onClick={() => navigate("/userPractice")}>
+        <li onClick={() => navigate("/userPractise")}>
           <FiBookOpen className="user-icon" /> Practice
         </li> 
         <li onClick={() => navigate("/userSubscriptions")}>
