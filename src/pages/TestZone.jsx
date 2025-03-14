@@ -6,8 +6,9 @@ import { doc, updateDoc,arrayUnion } from "firebase/firestore";
 import { updateUserProgress } from "../firebaseServices/update_user_progress";
 import { isQuizSolvedById } from "../firebaseServices/quiz_services";
 import { fetchCollectionData, updateCollectionData } from "../firebaseServices/firestoreUtils";
+import {formateQuestion} from "../utils/textUtils"
 
-const TestZone = () => {
+  const TestZone = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const quizId = location.state?.quizId || null;
@@ -229,7 +230,7 @@ const TestZone = () => {
               </div>
     
               <div className="question-content">
-                <p>{questionText}</p>
+              <p dangerouslySetInnerHTML={{ __html: formateQuestion(questionText) }}></p>
                 {currentQuestion.questionImage && (
                   <img src={currentQuestion.questionImage} alt="Question" className="question-image" />
                 )}
