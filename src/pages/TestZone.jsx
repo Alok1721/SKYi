@@ -118,7 +118,7 @@ import {formateQuestion} from "../utils/textUtils"
 
   const handleUpdateUserProgress = async (correctPercentage) => {
     if (currentUserId) {
-      await updateUserProgress(currentUserId, correctPercentage, quizData.subject);
+      await updateUserProgress(currentUserId, correctPercentage, quizData.subject,quizData.createdAt);
     }
   };
 

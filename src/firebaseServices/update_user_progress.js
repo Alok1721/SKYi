@@ -1,15 +1,21 @@
 import { db } from "../firebaseConfig";
 import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
 
-// Function to update progress for a user
-const updateUserProgress = async (currentUserId, newCorrectPercentage, subject) => {
+const formatDate = (date) => {
+  return date.toISOString().split("T")[0];
+};
+
+const updateUserProgress = async (currentUserId, newCorrectPercentage, subject,questionCreatedAt) => {
     try {
         const userDocRef = doc(db, "user_progress", currentUserId);
         const userDocSnap = await getDoc(userDocRef);
-        const today = new Date().toISOString().split("T")[0];
-      
+        const today = formatDate(new Date());
+        const createdAtDate = questionCreatedAt.toDate();
+        const questionDate = formatDate(createdAtDate);
+
+
         let updatedCorrectPercentage = newCorrectPercentage;
-        let updatedCompletedPOD = subject === "POD"; // Default to true if today's subject is "POD"
+        let updatedCompletedPOD = subject === "POD"&& questionDate === today;
     
         if (userDocSnap.exists()) {
           const userProgress = userDocSnap.data();
@@ -19,8 +25,6 @@ const updateUserProgress = async (currentUserId, newCorrectPercentage, subject) 
             updatedCompletedPOD = todayProgress.completedPOD || subject === "POD";
         }
         }
-    
-        // Update or set document
         await setDoc(userDocRef, {
           [today]:{completedPOD: updatedCompletedPOD,
           correctPercentage: updatedCorrectPercentage,}
