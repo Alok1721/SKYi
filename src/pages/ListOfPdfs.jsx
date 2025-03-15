@@ -7,9 +7,9 @@ import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 const ListOfPdfs = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { pdfs } = location.state || { pdfs: [] }; 
+  const { pdfs } = location.state || { pdfs: [] };
   const [filteredPdfs, setFilteredPdfs] = useState(pdfs);
-  const [filter, setFilter] = useState("all"); 
+  const [filter, setFilter] = useState("all");
   const currentUser = auth.currentUser;
   const currentUserId = currentUser?.uid;
 
@@ -40,6 +40,52 @@ const ListOfPdfs = () => {
     }
   };
 
+  const getGroupName = (filename) => {
+    const dateParts = filename.split(" ");
+    if (dateParts.length >= 2) {
+      return `${dateParts[dateParts.length - 2]} ${dateParts[dateParts.length - 1].replace(".pdf", "")}`.toLowerCase();
+    }
+    return "other";
+  };
+
+  const getDay = (filename) => {
+    const dateParts = filename.split(" ");
+    if (dateParts.length >= 3) {
+      return parseInt(dateParts[0], 10);
+    }
+    return 0; 
+  };
+
+  const groupedPdfs = filteredPdfs.reduce((acc, pdf) => {
+    const groupName = getGroupName(pdf.pdfName);
+    if (!acc[groupName]) {
+      acc[groupName] = [];
+    }
+    acc[groupName].push(pdf);
+    return acc;
+  }, {});
+
+  const sortedGroupedPdfs = Object.keys(groupedPdfs)
+    .sort((a, b) => {
+      const dateA = new Date(`1 ${a}`); 
+      const dateB = new Date(`1 ${b}`); 
+      return dateB - dateA; 
+    })
+    .reduce((acc, groupName) => {
+      acc[groupName] = groupedPdfs[groupName].sort((a, b) => {
+        const dayA = getDay(a.pdfName); 
+        const dayB = getDay(b.pdfName);
+        return dayA - dayB; 
+      });
+      return acc;
+    }, {});
+
+  const formatGroupName = (groupName) => {
+    const [month, year] = groupName.split(" ");
+    const shortYear = year.slice(-2); 
+    return `${month.toUpperCase()}-${shortYear}`;
+  };
+
   return (
     <div className="list-of-pdfs">
       <h2>Current Affairs PDFs</h2>
@@ -65,20 +111,29 @@ const ListOfPdfs = () => {
         </button>
       </div>
 
-      <div className="pdf-grid">
-        {filteredPdfs.map((pdf) => (
-          <div key={pdf.id} className={`pdf-card ${pdf.readBy?.includes(currentUserId) ? "read-by-me" : ""}`} onClick={() => handlePdfClick(pdf)}>
-            {pdf.thumbnail && (
-              <img src={pdf.thumbnail} alt="PDF Thumbnail" className="pdf-thumbnail" />
-            )}
-            <div className="pdf-details">
-              <h3>{pdf.pdfName}</h3>
-              <p>{pdf.type}</p>
-              <p>Read by: {pdf.readBy?.length || 0} users</p>
-            </div>
+      {Object.entries(sortedGroupedPdfs).map(([groupName, pdfsInGroup]) => (
+        <div key={groupName}>
+          <h3>{formatGroupName(groupName)}</h3>
+          <div className="pdf-grid">
+            {pdfsInGroup.map((pdf) => (
+              <div
+                key={pdf.id}
+                className={`pdf-card ${pdf.readBy?.includes(currentUserId) ? "read-by-me" : ""}`}
+                onClick={() => handlePdfClick(pdf)}
+              >
+                {pdf.thumbnail && (
+                  <img src={pdf.thumbnail} alt="PDF Thumbnail" className="pdf-thumbnail" />
+                )}
+                <div className="pdf-details">
+                  <h3>{pdf.pdfName}</h3>
+                  <p>{pdf.type}</p>
+                  <p>Read by: {pdf.readBy?.length || 0} users</p>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 };
