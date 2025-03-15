@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/listOfPractise.css";
-import { db } from "../firebaseConfig";
+import { db, auth } from "../firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 
 const ListOfPractises = () => {
@@ -10,7 +10,9 @@ const ListOfPractises = () => {
   const { playlistId, type, questions, userId } = location.state || { playlistId: null, type: "Unknown", questions: [], userId: null };
 
   const [questionList, setQuestionList] = useState([]);
-  const [selectedTag, setSelectedTag] = useState("All");
+  const [selectedTags, setSelectedTags] = useState([]); // Store multiple selected tags
+  const currentUser = auth.currentUser;
+  const currentUserId = currentUser?.uid;
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -40,42 +42,58 @@ const ListOfPractises = () => {
   }, [playlistId, questions]);
 
   const handleQuestionClick = (question) => {
-    navigate("/testZone", { state: { questions: [question], quizId: question.id, isQuiz: question.isQuiz, quizData: question,collectionName:"questions",collectionId:question.id } });
+    navigate("/testZone", { state: { questions: [question], quizId: question.id, isQuiz: question.isQuiz, quizData: question, collectionName: "questions", collectionId: question.id } });
   };
 
-  // Get unique tags for filtering
-  const uniqueTags = ["All", ...new Set(questionList.flatMap((q) => q.tags || []))];
+  // Get unique tags from all questions
+  const uniqueTags = [...new Set(questionList.flatMap((q) => q.tags || []))];
 
-  // Filter questions by selected tag
-  const filteredQuestions = selectedTag === "All" 
-    ? questionList 
-    : questionList.filter((q) => q.tags?.includes(selectedTag));
+  // Handle tag selection
+  const handleTagClick = (tag) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter((t) => t !== tag)); // Deselect tag
+    } else {
+      setSelectedTags([...selectedTags, tag]); // Select tag
+    }
+  };
+
+  // Filter questions based on selected tags
+  const filteredQuestions = selectedTags.length === 0
+    ? questionList // Show all questions if no tags are selected
+    : questionList.filter((q) => selectedTags.every((tag) => q.tags?.includes(tag))); // Show questions that match all selected tags
 
   return (
     <div className="list-of-practises">
       <h2>{type} Questions</h2>
 
-      {/* Filter by Tag */}
+      {/* Tag Filter Buttons */}
       <div className="tag-filter">
-        <label>Filter by Tag:</label>
-        <select value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)}>
+        <label>Filter by Tags:</label>
+        <div className="tag-buttons">
           {uniqueTags.map((tag, index) => (
-            <option key={index} value={tag}>{tag}</option>
+            <button
+              key={index}
+              className={`tag-button ${selectedTags.includes(tag) ? "active" : ""}`}
+              onClick={() => handleTagClick(tag)}
+            >
+              {tag}
+            </button>
           ))}
-        </select>
+        </div>
       </div>
 
+      {/* Question List */}
       {filteredQuestions.length > 0 ? (
         filteredQuestions.map((question) => (
-          <div 
-            key={question.id} 
-            className={`question-card ${question.solvedBy?.includes(userId) ? "solved" : "unsolved"}`} 
+          <div
+            key={question.id}
+            className={`question-card ${question.solvedBy?.includes(currentUserId) ? "solved" : "unsolved"}`}
             onClick={() => handleQuestionClick(question)}
           >
             <h3>{question.question}</h3>
             <p><strong>Subject:</strong> {question.subject || "Unknown"}</p>
             <p><strong>Tags:</strong> {question.tags?.join(", ") || "None"}</p>
-            <p><strong>Status:</strong> {question.solvedBy?.includes(userId) ? "Solved ✅" : "Unsolved ❌"}</p>
+            <p><strong>Status:</strong> {question.solvedBy?.includes(currentUserId) ? "Solved ✅" : "Unsolved ❌"}</p>
           </div>
         ))
       ) : (

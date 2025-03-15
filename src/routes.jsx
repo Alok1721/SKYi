@@ -15,6 +15,8 @@ import UserSubscriptions from './pages/UserSubscriptions';
 import UserPractise from './pages/UserPractise';
 import ListOfPractises from './pages/ListOfPractises';
 import AdminQuestionMaker from './pages/AdminQuestionMaker';
+import AdminCAMaker from './pages/AdminCAMaker';
+import ListOfPdfs from './pages/ListOfPdfs';
 
 function AppRoutes() {
   return (
@@ -33,6 +35,8 @@ function AppRoutes() {
       <Route path="/userPractise" element={<UserPractise />} />
       <Route path="/adminQuestionMaker" element={<AdminQuestionMaker />} />
       <Route path="/listOfPractise" element={<ListOfPractises />} />
+      <Route path="/adminCAMaker" element={<AdminCAMaker />} />
+      <Route path="/listOfPdfs" element={<ListOfPdfs />} />
       
     </Routes>
   );

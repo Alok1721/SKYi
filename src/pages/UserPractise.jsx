@@ -23,24 +23,39 @@ const UserPractise = () => {
             playlists[type] = [];
           }
 
-          let questionCount = data.questions?.length || 0;
-          let questionsData = [];
+          let itemCount = 0;
+          let itemsData = [];
 
-          if (data.questions?.length > 0) {
-            const questionPromises = data.questions.map(async (questionId) => {
-              const questionDoc = await getDoc(doc(db, "questions", questionId));
-              return questionDoc.exists() ? { id: questionId, ...questionDoc.data() } : null;
-            });
+          if (type === "Current-Affair") {
+            itemCount = data.pdfs?.length || 0;
+            if (data.pdfs?.length > 0) {
+              const pdfPromises = data.pdfs.map(async (pdfId) => {
+                const pdfDoc = await getDoc(doc(db, "pdfs", pdfId));
+                return pdfDoc.exists() ? { id: pdfId, ...pdfDoc.data() } : null;
+              });
 
-            questionsData = (await Promise.all(questionPromises)).filter((q) => q !== null);
-            questionCount = questionsData.length;
+              itemsData = (await Promise.all(pdfPromises)).filter((pdf) => pdf !== null);
+              itemCount = itemsData.length;
+            }
+          } else {
+            itemCount = data.questions?.length || 0;
+            if (data.questions?.length > 0) {
+              const questionPromises = data.questions.map(async (questionId) => {
+                const questionDoc = await getDoc(doc(db, "questions", questionId));
+                return questionDoc.exists() ? { id: questionId, ...questionDoc.data() } : null;
+              });
+
+              itemsData = (await Promise.all(questionPromises)).filter((q) => q !== null);
+              itemCount = itemsData.length;
+            }
           }
 
           playlists[type].push({
             id: docSnap.id,
             name: data.name,
-            questionCount,
-            questionsData, // Store fetched questions
+            itemCount,
+            itemsData, 
+            type, 
             updatedAt: new Date(data.updatedAt?.seconds * 1000).toLocaleString(),
           });
         }
@@ -63,9 +78,15 @@ const UserPractise = () => {
             {section.data.map((item, idx) => (
               <Card
                 key={idx}
-                text={`${item.name} (${item.questionCount} Questions)`}
+                text={`${item.name} (${item.itemCount} ${item.type === "Current-Affair" ? "PDFs" : "Questions"})`}
                 subtext={`Updated: ${item.updatedAt}`}
-                onClick={() => navigate("/listOfPractise", { state: { type: section.title, playlistId: item.id, questions: item.questionsData } })}
+                onClick={() => {
+                  if (item.type === "Current-Affair") {
+                    navigate("/listOfPdfs", { state: { type: section.title, playlistId: item.id, pdfs: item.itemsData } });
+                  } else {
+                    navigate("/listOfPractise", { state: { type: section.title, playlistId: item.id, questions: item.itemsData } });
+                  }
+                }}
               />
             ))}
           </div>

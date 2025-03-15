@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import "../styles/quizResult.css";  // Importing the CSS for quiz result page
 import { formatTime } from '../utils/date_time';
+import {formateQuestion} from "../utils/textUtils"
 const QuizResult = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -71,13 +72,11 @@ const QuizResult = () => {
             return (
               <div key={index} className="question-card">
                 <div className="question-content">
-                  <p>{question.question}</p>
-                  <div className="question-content">
+                  <p dangerouslySetInnerHTML={{ __html: formateQuestion(question.question) }}></p>
+                 
                   {question.questionImage && question.questionImage.trim() !== "" && (
                   <img src={question.questionImage} alt="Question" className="question-image" />
                   )}
-
-            </div>
                   <div className={`answer-banner ${isCorrect ? 'correct' : 'incorrect'}`}>
                     {isCorrect ? 'Correct' : 'Incorrect'}
                   </div>
@@ -88,15 +87,15 @@ const QuizResult = () => {
                     const isCorrectOption = option === question.correctOption; // Check if this is the correct option
                     const optionClass = isSelected ? (isCorrectOption ? 'selected-correct' : 'selected-incorrect') : '';
                     
-                    return (
-                      <div key={optIndex} className={`option ${isCorrectOption ? 'correct-option' : ''} ${optionClass}`}>
-                        {option}
-                      </div>
-                    );
+                    // return (
+                    //   <div key={optIndex} className={`option ${isCorrectOption ? 'correct-option' : ''} ${optionClass}`}>
+                    //     {option}
+                    //   </div>
+                    // );
                   })}
                 </div>
                 <div>Your Answer: {question.yourAnswer}</div>
-                <div> {question.solution??""}</div>
+                <p dangerouslySetInnerHTML={{ __html: formateQuestion(question.solution) }}></p>
                 {question.solutionImage && question.solutionImage.trim() !== "" && (
                 <div className="solution-section">
                   <h4>Solution:</h4>

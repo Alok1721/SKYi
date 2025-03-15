@@ -1,0 +1,75 @@
+.list-of-pdfs {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    
+  }
+  
+  .filter-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .filter-options button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: #888;
+  }
+  
+  .filter-options button.active {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .filter-options button:hover {
+    background-color: #ddd;
+  }
+  
+  .pdf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .pdf-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .pdf-card.read-by-me {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9); /* Faint green gradient */
+  }
+  
+  .pdf-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .pdf-thumbnail {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+  }
+  
+  .pdf-details {
+    padding: 15px;
+  }
+  
+  .pdf-details h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .pdf-details p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #666;
+  }

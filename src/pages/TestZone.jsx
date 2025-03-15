@@ -177,6 +177,7 @@ import {formateQuestion} from "../utils/textUtils"
           isCorrect:updatedQuestionStatus[currentQuestionIndex].isCorrect,
           solvedBy:arrayUnion(currentUserId)
         })
+        console.log("inside else condition and currentuser:",currentUser);
       }
       console.log("Quiz Updated Successfully");
     } catch (error) {

@@ -63,6 +63,37 @@
   border-radius: 5px;
 }
 
+.playlist-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; 
+    color: #888;
+  }
+  
+  .playlist-card {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    flex: 1 1 calc(25% - 20px); /* Adjust card width (4 cards per row) */
+    max-width: calc(25% - 20px); /* Ensure cards don't exceed 25% width */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .playlist-card.selected {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+  
+  .playlist-card:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .playlist-card.selected:hover {
+    background-color: #0056b3;
+  }
 .action-buttons {
   display: flex;
   justify-content: space-between;
@@ -104,3 +135,4 @@
 .submit-btnn:hover {
   background-color: #0056b3;
 }
+

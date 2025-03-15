@@ -17,9 +17,9 @@ const Dashboard = () => {
     <AdminSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
     <div className={`admin-dashboard ${isSidebarOpen ? "shift" : ""}`}>
       <div className="admin-stats">
-        <div className="admin-stat-card">
+        <div className="admin-stat-card" onClick={() => navigate('/adminCAMaker')}>
           <span>20</span>
-          <p>Total Subscribers</p>
+          <p>CA Maker</p>
         </div>
         <div className="admin-stat-card" onClick={() => navigate('/adminQuizMaker')}>
           <span>5</span>

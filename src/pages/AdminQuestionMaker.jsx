@@ -10,14 +10,14 @@ const AdminQuestion = () => {
       question: "",
       options: ["", "", "", ""],
       correctOption: "",
-      playlist: "",
+      playlists: [], // Store multiple playlists for each question
       tags: [],
       solution: "",
       questionImage: "",
       solutionImage: "",
     },
   ]);
-  const [playlists, setPlaylists] = useState([]);
+  const [allPlaylists, setAllPlaylists] = useState([]); // Store all playlists from Firestore
 
   // Fetch playlists from Firestore
   useEffect(() => {
@@ -27,7 +27,7 @@ const AdminQuestion = () => {
         id: doc.id,
         name: doc.data().name,
       }));
-      setPlaylists(playlistData);
+      setAllPlaylists(playlistData);
     };
     fetchPlaylists();
   }, []);
@@ -40,7 +40,7 @@ const AdminQuestion = () => {
         question: "",
         options: ["", "", "", ""],
         correctOption: "",
-        playlist: "",
+        playlists: [], // Initialize with empty playlists
         tags: [],
         solution: "",
         questionImage: "",
@@ -81,6 +81,22 @@ const AdminQuestion = () => {
     }
   };
 
+  // Handle playlist selection
+  const handlePlaylistSelection = (index, playlistId) => {
+    const newQuestions = [...questions];
+    const selectedPlaylists = newQuestions[index].playlists;
+
+    if (selectedPlaylists.includes(playlistId)) {
+      // Remove playlist if already selected
+      newQuestions[index].playlists = selectedPlaylists.filter((id) => id !== playlistId);
+    } else {
+      // Add playlist if not selected
+      newQuestions[index].playlists = [...selectedPlaylists, playlistId];
+    }
+
+    setQuestions(newQuestions);
+  };
+
   // Submit all questions
   const handleSubmit = async () => {
     try {
@@ -88,10 +104,9 @@ const AdminQuestion = () => {
         if (
           !question.question ||
           !question.correctOption ||
-          !question.playlist 
-        //   question.options.some((opt) => !opt.trim())
+          question.playlists.length === 0 // Ensure at least one playlist is selected
         ) {
-          alert("Please fill all fields for each question.");
+          alert("Please fill all fields for each question and select at least one playlist.");
           return;
         }
 
@@ -108,12 +123,14 @@ const AdminQuestion = () => {
           solutionImage: question.solutionImage || "",
         });
 
-        // Update playlist with the new question ID
-        const playlistRef = doc(db, "playlists", question.playlist);
-        await updateDoc(playlistRef, {
-          questions: arrayUnion(questionRef.id),
-          updatedAt: new Date(),
-        });
+        // Update all selected playlists with the new question ID
+        for (const playlistId of question.playlists) {
+          const playlistRef = doc(db, "playlists", playlistId);
+          await updateDoc(playlistRef, {
+            questions: arrayUnion(questionRef.id),
+            updatedAt: new Date(),
+          });
+        }
       }
 
       alert("Questions added successfully!");
@@ -122,7 +139,7 @@ const AdminQuestion = () => {
           question: "",
           options: ["", "", "", ""],
           correctOption: "",
-          playlist: "",
+          playlists: [], // Reset playlists
           tags: [],
           solution: "",
           questionImage: "",
@@ -213,19 +230,19 @@ const AdminQuestion = () => {
           </div>
 
           <div className="form-group">
-            <label>Playlist:</label>
-            <select
-              value={q.playlist}
-              onChange={(e) => handleChange(index, "playlist", e.target.value)}
-            >
-              <option value="">Select Playlist</option>
-              {playlists.map((playlist) => (
-                <option key={playlist.id} value={playlist.id}>
-                  {playlist.name}
-                </option>
-              ))}
-            </select>
-          </div>
+            <label>Playlists:</label>
+            <div className="playlist-cards">
+                {allPlaylists.map((playlist) => (
+                <div
+                    key={playlist.id}
+                    className={`playlist-card ${q.playlists.includes(playlist.id) ? "selected" : ""}`}
+                    onClick={() => handlePlaylistSelection(index, playlist.id)}
+                >
+                    {playlist.name}
+                </div>
+                ))}
+            </div>
+            </div>
 
           <div className="form-group">
             <label>Tags (comma-separated):</label>
