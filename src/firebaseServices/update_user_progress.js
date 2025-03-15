@@ -13,16 +13,16 @@ const updateUserProgress = async (currentUserId, newCorrectPercentage, subject,q
         const createdAtDate = questionCreatedAt.toDate();
         const questionDate = formatDate(createdAtDate);
 
-
+        const isTodaysPOD = subject === "POD" && questionDate === today;
         let updatedCorrectPercentage = newCorrectPercentage;
-        let updatedCompletedPOD = subject === "POD"&& questionDate === today;
+        let updatedCompletedPOD = isTodaysPOD;
     
         if (userDocSnap.exists()) {
           const userProgress = userDocSnap.data();
           const todayProgress = userProgress[today];
           if (todayProgress) {
             updatedCorrectPercentage = (todayProgress.correctPercentage + newCorrectPercentage) / 2;
-            updatedCompletedPOD = todayProgress.completedPOD || subject === "POD";
+            updatedCompletedPOD = todayProgress.completedPOD || isTodaysPOD;
         }
         }
         await setDoc(userDocRef, {
