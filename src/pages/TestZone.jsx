@@ -101,7 +101,7 @@ import {formateQuestion} from "../utils/textUtils"
   };
 
   const handleSaveNext = () => {
-    if(!selectedOptions[currentQuestionIndex])
+    if(!selectedOptions[currentQuestionIndex] && isQuiz)
     {
       setShowWarning(true);
       return;
@@ -118,7 +118,8 @@ import {formateQuestion} from "../utils/textUtils"
 
   const handleUpdateUserProgress = async (correctPercentage) => {
     if (currentUserId) {
-      await updateUserProgress(currentUserId, correctPercentage, quizData.subject,quizData.createdAt);
+      const createdAt = quizData.createdAt?.toDate ? quizData.createdAt.toDate() : new Date();
+      await updateUserProgress(currentUserId, correctPercentage, quizData.subject,createdAt);
     }
   };
 

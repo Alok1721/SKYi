@@ -42,6 +42,7 @@
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: linear-gradient(135deg, #f5f0e8, #e6d0c8);
   }
   .pdf-card.read-by-me {
     background: linear-gradient(135deg, #e8f5e9, #c8e6c9); /* Faint green gradient */
