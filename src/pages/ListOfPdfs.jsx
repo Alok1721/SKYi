@@ -81,8 +81,12 @@ const ListOfPdfs = () => {
     }, {});
 
   const formatGroupName = (groupName) => {
-    const [month, year] = groupName.split(" ");
-    const shortYear = year.slice(-2); 
+    if (!groupName) return ""; 
+    const parts = groupName.split(" ");
+    if (parts.length < 2) return groupName.toUpperCase();
+
+    const [month, year] = parts;
+    const shortYear = year ? year.slice(-2) : "";
     return `${month.toUpperCase()}-${shortYear}`;
   };
 

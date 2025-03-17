@@ -1,4 +1,4 @@
-export const formatQuestion = (content) => {
+export const formateQuestion = (content) => {
  
   const lines = content.split(/(\([a-dA-D1-9]\)|[a-dA-D1-9]\.|\s*[a-dA-D]\.)/g);
 

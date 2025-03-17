@@ -22,9 +22,9 @@ const updateUserProgress = async (currentUserId, newCorrectPercentage, subject, 
       const todayProgress = userProgress[today];
 
       if (todayProgress) {
-        const previousCorrectPercentage = todayProgress.correctPercentage || 0;
+        const previousCorrectPercentage = todayProgress?.correctPercentage || 0;
         updatedCorrectPercentage = (previousCorrectPercentage + newCorrectPercentage) / 2;
-        updatedCompletedPOD = todayProgress.completedPOD || isTodaysPOD;
+        updatedCompletedPOD = todayProgress?.completedPOD || isTodaysPOD;
       }
     }
 

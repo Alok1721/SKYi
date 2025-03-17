@@ -138,6 +138,17 @@ import {formateQuestion} from "../utils/textUtils"
     const updatedQuestionStatus = questions.map((question, index) => {
       const userAnswer = selectedOptions[index] || "Not Answered";
       const isCorrect = question.correctOption ? userAnswer === question.correctOption:false;
+      if(!isQuiz)
+      {
+        // totalScore += 3;
+        totalCorrect++;
+        // userAnswer="Not Answered";
+      return {
+        ...question,
+        yourAnswer: question.correctOption,
+        isCorrect:true
+      };
+      }
 
       if (isCorrect) {
         totalScore += 3; // Award +3 for correct answer
