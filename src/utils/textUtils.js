@@ -1,12 +1,15 @@
-export const formateQuestion=(content)=> {
-    const lines = content.split(/(\([a-d]\))/g);
-    let formattedText = lines[0].trim()+`<br />`;
-     
-    for (let i = 1; i < lines.length; i += 2) {
-      const parts = lines[i + 1].split(':').map((part) => part.trim());
-      formattedText += `<br /> ${lines[i]}`;
-      formattedText += parts.join(`<br />`);
-    }
-    formattedText = formattedText.replace(/\b([1-9]\.)/g, '<br />$1');
-    return formattedText;
+export const formatQuestion = (content) => {
+ 
+  const lines = content.split(/(\([a-dA-D1-9]\)|[a-dA-D1-9]\.|\s*[a-dA-D]\.)/g);
+
+  let formattedText = lines[0].trim() + `<br />`;
+
+  for (let i = 1; i < lines.length; i += 2) {
+      formattedText += `<br />` + lines[i].trim(); 
+      if (lines[i + 1]) {
+          formattedText += ` ${lines[i + 1].trim()}`; 
+      }
   }
+
+  return formattedText;
+};
