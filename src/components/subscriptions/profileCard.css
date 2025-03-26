@@ -63,4 +63,22 @@
     color: #333;
     font-weight: bold;
   }
+  .notification-toggle-on {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+  }
   
+  .notification-toggle-off {
+    background-color: #ccc;
+    color: #333;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+  }

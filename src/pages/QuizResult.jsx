@@ -16,6 +16,7 @@ const QuizResult = () => {
     questions,
     totalTimeTaken,
     totalViewed,
+    collectionName,
   } = location.state || {};
 
   if (!questions) {
@@ -27,6 +28,23 @@ const QuizResult = () => {
 
   const goBack = () => {
     navigate('/allActiveQuizzes');  // Navigate back to quiz list or previous page
+  };
+
+  const handleNextQuestion = () => {
+    const nextQuestionIndex = currentQuestionIndex + 1;
+    if (nextQuestionIndex < questions.length) {
+      navigate("/testZone", {
+        state: {
+          currentQuestion: questions[nextQuestionIndex],
+          currentQuestionIndex: nextQuestionIndex,
+          questions: questions,
+          isQuiz: false,
+        },
+      });
+    }
+    // else {
+    //   navigate("/completion");
+    // }
   };
 
   return (
@@ -77,14 +95,20 @@ const QuizResult = () => {
                   {question.questionImage && question.questionImage.trim() !== "" && (
                   <img src={question.questionImage} alt="Question" className="question-image" />
                   )}
+                  <div className="answer-next-container">
                   <div className={`answer-banner ${isCorrect ? 'correct' : 'incorrect'}`}>
                     {isCorrect ? 'Correct' : 'Incorrect'}
+                    
+                  </div>
+                  {!collectionName !="quizzes" && (
+                      <button className="next-question-btn"  onClick={handleNextQuestion}> Next Question </button>
+                    )}
                   </div>
                 </div>
                 <div className="options">
                   {question.options.map((option, optIndex) => {
-                    const isSelected = option === question.yourAnswer; // Check if this option was selected by the user
-                    const isCorrectOption = option === question.correctOption; // Check if this is the correct option
+                    const isSelected = option === question.yourAnswer; 
+                    const isCorrectOption = option === question.correctOption; 
                     const optionClass = isSelected ? (isCorrectOption ? 'selected-correct' : 'selected-incorrect') : '';
                     
                     // return (

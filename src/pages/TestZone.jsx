@@ -210,7 +210,8 @@ import {formateQuestion} from "../utils/textUtils"
         totalQuestions,
         quizStatus: true,
         totalTimeTaken,
-        totalViewed
+        totalViewed,
+        collectionName
       },
     });
   };

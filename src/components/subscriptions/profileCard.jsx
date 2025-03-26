@@ -1,18 +1,24 @@
 import React ,{useEffect, useState}from 'react';
-import { updateUserSubscriptions } from "../../firebaseServices/update_subscriptions";
+import { updateUserSubscriptions, toggleUserNotification} from "../../firebaseServices/update_subscriptions";
 import { auth, db, storage } from "../../firebaseConfig";
 import './profileCard.css';
 
 function ProfileCard({ user,currentUser }) {
   // console.log("insideProfileCard user:",user,"currentUser:",currentUser);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isNotified,setIsNotified]=useState(false);
+
   useEffect(() => {
     if (currentUser && currentUser.subscriptions?.includes(user.id)) {
       setIsSubscribed(true);
     }
+    if (currentUser && user.subscribedUsers?.includes(currentUser.id)) {
+      setIsNotified(true); 
+    }
   }, [currentUser, user]);
+  
   const handleSubscribe = async() => {
-    if(!currentUser){
+    if (!currentUser || !user?.id) {
       return alert("Please login to subscribe");
     }
     const updated=await updateUserSubscriptions(currentUser.id,user.id);
@@ -20,6 +26,15 @@ function ProfileCard({ user,currentUser }) {
       setIsSubscribed(true);
     }
   }
+  const handleToggleNotification = async () => {
+    if (!currentUser || !user?.id) {
+      return alert("Please login to manage notifications");
+    }
+    const updated = await toggleUserNotification(user.id, currentUser.id, isNotified);
+    if (updated) {
+      setIsNotified(!isNotified);
+    }
+  };
 
   // console.log("user:",user);
   return (
@@ -37,6 +52,15 @@ function ProfileCard({ user,currentUser }) {
         onClick={handleSubscribe}
         disabled={isSubscribed}
         >{isSubscribed ? "Subscribed" : "Subscribe"}</button>
+
+      {isSubscribed && (
+          <button
+          className={`notification-toggle-${isNotified ? "on" : "off"}`}
+          onClick={handleToggleNotification}
+        >
+          🔔 {isNotified ? "On" : "Off"}
+        </button>
+        )}
       </div>
     </div>
   );

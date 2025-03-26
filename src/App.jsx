@@ -5,7 +5,6 @@ import AppRoutes from './routes';
 import './styles/global.css';
 import { DashboardProvider } from './components/dashboard/DashboardContext';
 
-
 function App() {
   return (
     <DashboardProvider>

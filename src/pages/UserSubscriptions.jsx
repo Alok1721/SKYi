@@ -4,8 +4,10 @@ import "../styles/userSubscriptions.css";
 import ProfileCard from "../components/subscriptions/profileCard";
 import {fetchUserData} from "../firebaseServices/fetch_users";
 import {getCurrentUser} from "../firebaseServices/current_user";
+import { getSubscribedUsers } from "../firebaseServices/firestoreUtils";
 
-const UserSubscriptions = () => {
+
+const UserSubscriptions = () => {  
     const locator=useLocation();
     const [adminList, setAdminList] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
@@ -22,10 +24,10 @@ const UserSubscriptions = () => {
         setCurrentUser(user);
       }
       getUser();
-      getAdmins();
+      getAdmins(); 
     }, []);
     console.log("inside usersubscriptioin: currentUser",currentUser);
-  return (
+    return (
     <div className="user-subscriptions">
       {adminList.map((user, index) => (//here user refer to admin
         

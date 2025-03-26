@@ -3,6 +3,9 @@ import "../styles/adminQuizMaker.css";
 import { db,auth } from "../firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";
+import {sendBrevoEmail} from "../emailServices/emailFunctions";
+import { getSubscribedUsers } from "../firebaseServices/firestoreUtils";
+import { QuizEmailTemplate } from "../emailServices/emailTemplates";
 
 const AdminQuizMaker = () => {
   const [questions, setQuestions] = useState([
@@ -77,13 +80,42 @@ const AdminQuizMaker = () => {
     ]);
   };
 
+  const sendQuizNotification = async () => {
+    try {
+      const recipients = await getSubscribedUsers();
+      const emailBody = QuizEmailTemplate({
+        quizTitle,
+        quizDescription,
+        questionCount: questions.length,
+        subject: questionSubject,
+      });
+      return await sendBrevoEmail(
+        recipients,
+        `New ${questionSubject} Quiz Available!`,
+        emailBody
+      );
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      return { success: false };
+    }
+  };
+
   const handlePostQuiz = async () => {
     try {
       if (questions.length === 0 || !questions.some((q) => q.question.trim() || q.questionImage)) {
         setMessage("Please enter at least one question!");
         return;
       }
-
+      
+      sendQuizNotification().then(result => {
+        if (!result.success) {
+          console.warn("Email notification failed");
+        }
+        else{
+          console.log("Email notification sent successfully");
+        }
+      });
+     
       await addDoc(collection(db, "quizzes"), {
         questions: questions,
         createdAt: new Date(),

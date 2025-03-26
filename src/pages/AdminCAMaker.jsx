@@ -3,21 +3,23 @@ import "../styles/adminQuestionMaker.css"; // Reuse the same CSS file
 import { db } from "../firebaseConfig";
 import { collection, addDoc, updateDoc, doc, arrayUnion, getDocs } from "firebase/firestore";
 import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";  
+import {sendBrevoEmail} from "../emailServices/emailFunctions";
+import { getSubscribedUsers } from "../firebaseServices/firestoreUtils";
+import { PDFEmailTemplate } from "../emailServices/emailTemplates";
 
 const AdminCAMaker = () => {
   const [pdfs, setPdfs] = useState([
     {
       pdfName: "",
-      pdfFile: null, // Store PDF file
+      pdfFile: null, 
       pdfLink: "",
-      pdfThumbnail: "", // Store PDF preview image
-      type: "Daily-Current-Affair", // Default type
-      playlists: [], // Store multiple playlists for each PDF
+      pdfThumbnail: "", 
+      type: "Daily-Current-Affair",
+      playlists: [], 
     },
   ]);
-  const [allPlaylists, setAllPlaylists] = useState([]); // Store all playlists from Firestore
+  const [allPlaylists, setAllPlaylists] = useState([]); 
 
-  // Fetch playlists from Firestore
   useEffect(() => {
     const fetchPlaylists = async () => {
       const querySnapshot = await getDocs(collection(db, "playlists"));
@@ -30,15 +32,13 @@ const AdminCAMaker = () => {
     fetchPlaylists();
   }, []);
 
-  // Handle file selection
   const handleFileChange = (index, file) => {
     const newPdfs = [...pdfs];
     newPdfs[index].pdfFile = file;
-    newPdfs[index].pdfName = file.name; // Auto-fill PDF name
+    newPdfs[index].pdfName = file.name; 
     setPdfs(newPdfs);
   };
 
-  // Add a new PDF block
   const handleAddPdf = () => {
     setPdfs([
       ...pdfs,
@@ -53,14 +53,12 @@ const AdminCAMaker = () => {
     ]);
   };
 
-  // Handle input changes
   const handleChange = (index, field, value) => {
     const newPdfs = [...pdfs];
     newPdfs[index][field] = value;
     setPdfs(newPdfs);
   };
 
-  // Handle playlist selection
   const handlePlaylistSelection = (index, playlistId) => {
     const newPdfs = [...pdfs];
     const selectedPlaylists = newPdfs[index].playlists;
@@ -74,7 +72,44 @@ const AdminCAMaker = () => {
     setPdfs(newPdfs);
   };
 
-  // Submit PDFs
+  const sendPdfNotification = async () => {
+    try {
+      const recipients = await getSubscribedUsers();
+      const pdfsByType = {};
+      pdfs.forEach((pdf) => {
+        if (!pdfsByType[pdf.type]) {
+          pdfsByType[pdf.type] = [];
+        }
+        pdfsByType[pdf.type].push(pdf.pdfName);
+      });
+  
+      let emailContent = "<p>The following PDFs have been uploaded:</p>";
+      
+      for (const [type, pdfNames] of Object.entries(pdfsByType)) {
+        emailContent += `<h3>${type}</h3><ul>`;
+        emailContent += pdfNames.map((name) => `<li>${name}</li>`).join("");
+        emailContent += "</ul>";
+      }
+  
+      const emailBody = PDFEmailTemplate({
+        quizTitle: "New PDFs Added",
+        quizDescription: emailContent,
+        questionCount: pdfs.length,
+        subject: "New PDFs Available",
+      });
+  
+      await sendBrevoEmail(recipients, "New PDFs Available", emailBody);
+      
+      console.log("Email notification sent successfully");
+      return { success: true };
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      return { success: false };
+    }
+  };
+  
+  
+
   const handleSubmit = async () => {
     try {
       for (let i = 0; i < pdfs.length; i++) {
@@ -84,30 +119,24 @@ const AdminCAMaker = () => {
           alert("Please select a PDF file and choose at least one playlist.");
           return;
         }
-  
-        // Check file size (optional)
-        if (pdf.pdfFile.size > 100 * 1024 * 1024) { // 100 MB limit
+        if (pdf.pdfFile.size > 100 * 1024 * 1024) { 
           alert(`File "${pdf.pdfName}" exceeds the 100 MB size limit.`);
-          continue; // Skip this file
+          continue; 
         }
-  
-        // Show upload progress
         console.log(`Uploading ${i + 1}/${pdfs.length}: ${pdf.pdfName}`);
-  
-        // Upload PDF to Cloudinary
         const pdfUrl = await uploadToCloudinary(pdf.pdfFile);
   
         if (!pdfUrl) {
           alert(`Failed to upload "${pdf.pdfName}". Please try again.`);
-          continue; // Skip this file
+          continue;
         }
   
         console.log("Upload successful. pdfUrl:", pdfUrl);
+        
+        
+
+        const pdfThumbnail = pdfUrl.replace("/upload/", "/upload/w_200,h_300,pg_1/"); 
   
-        // Generate thumbnail URL (Cloudinary supports generating thumbnails from PDFs)
-        const pdfThumbnail = pdfUrl.replace("/upload/", "/upload/w_200,h_300,pg_1/"); // First page thumbnail
-  
-        // Add PDF to Firestore
         const pdfRef = await addDoc(collection(db, "pdfs"), {
           pdfName: pdf.pdfName,
           pdfLink: pdfUrl,
@@ -117,7 +146,6 @@ const AdminCAMaker = () => {
           readBy: [],
         });
   
-        // Update all selected playlists with the new PDF ID
         for (const playlistId of pdf.playlists) {
           const playlistRef = doc(db, "playlists", playlistId);
           await updateDoc(playlistRef, {
@@ -128,6 +156,14 @@ const AdminCAMaker = () => {
       }
   
       alert("All PDFs added successfully!");
+      sendPdfNotification().then(result => {
+        if (!result.success) {
+          console.warn("Email notification failed");
+        }
+        else{
+          console.log("Email notification sent successfully");
+        }
+      });
       setPdfs([
         {
           pdfName: "",
