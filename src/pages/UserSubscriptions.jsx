@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom"; 
 import "../styles/userSubscriptions.css";
-import ProfileCard from "../components/subscriptions/profileCard";
+import {ProfileCard} from "../components/subscriptions/profileCard";
 import {fetchUserData} from "../firebaseServices/fetch_users";
 import {getCurrentUser} from "../firebaseServices/current_user";
 import { getSubscribedUsers } from "../firebaseServices/firestoreUtils";
