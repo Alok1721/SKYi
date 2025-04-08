@@ -4,11 +4,11 @@
   left: -290px;
   width: 230px;
   height: 100%;
-  background: #fff;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  background: var(--sidebar-background-color);
+  box-shadow: 2px 0 5px var(--shadow-color);
   transition: left 0.3s ease-in-out;
   padding: 20px;
-  color: #000;
+  color: var(--sidebar-text-color);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -27,8 +27,8 @@
   cursor: pointer;
   transition: 0.3s;
   border-radius: 5px;
-  border-top: 1px solid #f0f0f0;
-  border-bottom: 1px solid #f0f0f0;
+  border-top: 1px solid var(--sidebar-border-color);
+  border-bottom: 1px solid var(--sidebar-border-color);
 }
 
 .admin-sidebar ul li .user-icon{
@@ -37,9 +37,11 @@
 }
 .admin-sidebar ul li:hover{
   transform: translateX(5px);
+  background-color: var(--sidebar-hover-color);
 }
 .admin-sidebar ul li.active {
-  background:#d6b5ff;
+  background: var(--sidebar-active-color);
+  color: white;
   border-radius: 5px;
 }
 .admin-sidebar.open {
@@ -52,11 +54,11 @@
   right: 15px;
   font-size: 20px;
   cursor: pointer;
-  color: #888;
+  color: var(--sidebar-text-color);
   transition: 0.3s;
 }
 .admin-close-btn:hover {
-  color: #f7866c;
+  color: var(--primary-color);
 }
 /* Menu Icon Styling */
 .admin-menu-icon {
@@ -73,7 +75,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-top: 1px solid #7f8c8d;
+  border-top: 1px solid var(--sidebar-border-color);
   position: absolute;
   padding-top: 10px;
   bottom: 150px;
@@ -81,17 +83,19 @@
 }
 .admin-profile-icon {
   font-size: 40px;
-  color: #dbd3c5;
+  color: var(--sidebar-text-color);
 }
 .admin-profile-name {
   font-size: 16px;
   font-weight: bold;
   margin: 5px 0;
+  color: var(--sidebar-text-color);
 }
 .admin-profile-email {
   text-align: center;
   font-size: 14px;
-  color: #bdc3c7;
+  color: var(--sidebar-text-color);
+  opacity: 0.7;
   margin: 5px 0;
   padding-bottom: 10px;
 }

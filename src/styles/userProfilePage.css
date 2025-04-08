@@ -56,11 +56,32 @@
   .stat-card {
     padding: 15px;
     border-radius: 10px;
-    background: #f8f9fa;
+    background: var(--card-background);
     text-align: center;
     font-size: 16px;
     font-weight: bold;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px var(--shadow-color);
+    background: var(--card-hover-background);
+    border-color: var(--primary-color);
+  }
+  
+  .stat-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 8px;
+  }
+  
+  .stat-card p {
+    color: var(--text-color);
+    opacity: 0.8;
   }
   
   .profile-settings {
@@ -95,16 +116,16 @@
   
   /* Dark Mode */
   .dark-mode {
-    background: #1a1a1a;
-    color: white;
+    background: var(--background-color);
+    color: var(--text-color);
   }
   
   .dark-mode .profile-container {
-    background: #2a2a2a;
+    background: var(--card-background);
   }
   
   .dark-mode .stat-card {
-    background: #3a3a3a;
+    background: var(--card-background);
   }
   
   .dark-mode .settings-option button {

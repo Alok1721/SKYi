@@ -5,22 +5,39 @@ import { useNavigate } from "react-router-dom";
 import React from 'react'
 import "./dashboardComponents.css";
 
-const UserDashboardHeader=({toggleSidebar,daysLeftIAS,userDpURL}) => {
+const UserDashboardHeader = ({ toggleSidebar, daysLeftIAS, userDpURL, pageTitle = "Dashboard" }) => {
   const navigate = useNavigate();
+
   return (
-    <div className="dashboard-header">
-      <FiMenu className="menu-icon" onClick={toggleSidebar}/>
-      <h2>Dashboard</h2>
-      <span className="time-left">{daysLeftIAS??0} Days left</span>
-      <FaFire className="fire-icon" />
-      <div className="profile-icon" onClick={() => navigate("/userProfilePage")}>
-        {userDpURL ? (
-          <img src={userDpURL} alt="User Profile" className="user-profile-image" />
-        ) : (
-          <FaUserCircle className="default-profile-icon" />
-        )}
+    <header className="dashboard-header">
+      <div className="header-left">
+        <button className="menu-button" onClick={toggleSidebar} aria-label="Toggle menu">
+          <FiMenu className="menu-icon" />
+        </button>
+        <h2 className="dashboard-title">{pageTitle}</h2>
       </div>
-    </div>
+
+      <div className="header-center">
+        <div className="time-left-container">
+          <span className="time-left">{daysLeftIAS ?? 0} Days left</span>
+          <FaFire className="fire-icon" />
+        </div>
+      </div>
+
+      <div className="header-right">
+        <button 
+          className="profile-button" 
+          onClick={() => navigate("/userProfilePage")}
+          aria-label="View profile"
+        >
+          {userDpURL ? (
+            <img src={userDpURL} alt="User Profile" className="user-profile-image" />
+          ) : (
+            <FaUserCircle className="default-profile-icon" />
+          )}
+        </button>
+      </div>
+    </header>
   )
 }
 

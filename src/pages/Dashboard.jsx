@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/dashboard.css";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import UserDashboardHeader from "../components/dashboard/dashboardHeader";
@@ -6,12 +6,26 @@ import { useNavigate } from "react-router-dom";
 import UserSidebar from "../components/dashboard/userSidebar";
 import { useDashboard } from "../components/dashboard/DashboardContext";
 import ProgressOverview from "../components/dashboard/progressBar";
+import { getCurrentTheme } from "../utils/themeUtils";
+import { format } from 'date-fns';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hoveredDate, setHoveredDate] = useState(null);
-  const [selectedFilter, setSelectedFilter] = useState("2025");
+  const [selectedFilter, setSelectedFilter] = useState("this-month");
+  const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
+  const [chartFilter, setChartFilter] = useState("this-month");
+  const chartContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleThemeChange = () => {
+      setCurrentTheme(getCurrentTheme());
+    };
+
+    window.addEventListener('themeChanged', handleThemeChange);
+    return () => window.removeEventListener('themeChanged', handleThemeChange);
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -58,6 +72,43 @@ const Dashboard = () => {
 
   const handleFilterChange = (event) => {
     setSelectedFilter(event.target.value);
+  };
+
+  // Function to format date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return format(date, 'dd-MMM-yy');
+  };
+
+  // Function to filter chart data based on selected filter
+  const getFilteredChartData = () => {
+    const today = new Date();
+    let startDate = new Date();
+
+    switch (chartFilter) {
+      case "this-week":
+        startDate.setDate(today.getDate() - 7);
+        break;
+      case "this-month":
+        startDate.setMonth(today.getMonth() - 1);
+        break;
+      case "last-3-months":
+        startDate.setMonth(today.getMonth() - 3);
+        break;
+      case "last-6-months":
+        startDate.setMonth(today.getMonth() - 6);
+        break;
+      case "this-year":
+        startDate.setFullYear(today.getFullYear() - 1);
+        break;
+      default: // all-time
+        return graphData;
+    }
+
+    return graphData.filter(item => {
+      const itemDate = new Date(item.date);
+      return itemDate >= startDate && itemDate <= today;
+    });
   };
 
   // Function to render calendar based on filter
@@ -173,14 +224,66 @@ const Dashboard = () => {
 
         <div className="progress-chart-container">
           <ProgressOverview progressData={progressData} />
-          <div className="chart">
-            <LineChart width={500} height={200} data={graphData}>
-              <CartesianGrid strokeDasharray="2 2" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} />
-            </LineChart>
+          <div className="chart-wrapper" ref={chartContainerRef}>
+            <div className="chart-header">
+              <select 
+                value={chartFilter} 
+                onChange={(e) => setChartFilter(e.target.value)}
+                className="chart-filter"
+              >
+                <option value="this-week">This Week</option>
+                <option value="this-month">This Month</option>
+                <option value="last-3-months">Last 3 Months</option>
+                <option value="last-6-months">Last 6 Months</option>
+                <option value="this-year">This Year</option>
+                <option value="all-time">All Time</option>
+              </select>
+            </div>
+            <div className="chart">
+              <LineChart 
+                width={chartContainerRef.current?.offsetWidth || 500} 
+                height={200} 
+                data={getFilteredChartData()}
+                margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+              >
+                <CartesianGrid 
+                  strokeDasharray="2 2" 
+                  stroke={currentTheme === 'dark' ? '#404248' : '#e5e7eb'}
+                  vertical={false}
+                />
+                <XAxis 
+                  dataKey="date" 
+                  stroke={currentTheme === 'dark' ? '#a0aec0' : '#666666'}
+                  tick={{ fill: currentTheme === 'dark' ? '#a0aec0' : '#666666' }}
+                  tickFormatter={formatDate}
+                  interval="preserveStartEnd"
+                />
+                <YAxis 
+                  stroke={currentTheme === 'dark' ? '#a0aec0' : '#666666'}
+                  tick={{ fill: currentTheme === 'dark' ? '#a0aec0' : '#666666' }}
+                  domain={['dataMin', 'dataMax']}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: currentTheme === 'dark' ? '#2d2e32' : '#ffffff',
+                    border: `1px solid ${currentTheme === 'dark' ? '#404248' : '#e5e7eb'}`,
+                    borderRadius: '8px',
+                    color: currentTheme === 'dark' ? '#e1e1e1' : '#333333'
+                  }}
+                  labelStyle={{ color: currentTheme === 'dark' ? '#a0aec0' : '#666666' }}
+                  formatter={(value) => [value, 'Score']}
+                  labelFormatter={formatDate}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke={currentTheme === 'dark' ? '#60a5fa' : '#3b82f6'} 
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </div>
           </div>
         </div>
 
@@ -192,7 +295,7 @@ const Dashboard = () => {
               height="16"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="white"
+              stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"

@@ -67,7 +67,7 @@ export const ProfileCard = ({ user, currentUser }) => {
                       className={`notification-toggle-${isNotified ? "on" : "off"}`}
                       onClick={handleToggleNotification}
                   >
-                      🔔 {isNotified ? "On" : "Off"}
+                      🔔 {isNotified ? "Off" : "On"}
                   </button>
               )}
           </div>

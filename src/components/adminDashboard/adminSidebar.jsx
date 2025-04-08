@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FiX, FiUser, FiUsers, FiFileText, FiHelpCircle, FiBookOpen, FiBarChart2,FiLogOut } from "react-icons/fi";
+import { FiX, FiUser, FiUsers, FiFileText, FiHelpCircle, FiBookOpen, FiBarChart2,FiLogOut, FiSettings } from "react-icons/fi";
 import "./adminSidebar.css";
 import {signOut} from "firebase/auth"
 import {auth} from "../../firebaseConfig"
@@ -33,7 +33,10 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         </li>
         <li onClick={() => navigate("/practice")}>
           <FiBookOpen className="admin-icon" /> Practice
-        </li> 
+        </li>
+        <li onClick={() => navigate("/settings")}>
+          <FiSettings className="admin-icon" /> Settings
+        </li>
       </ul>
 
       <div className="admin-profile">

@@ -2,21 +2,21 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/testZone.css";
 import { auth, db } from "../firebaseConfig";
-import { doc, updateDoc,arrayUnion } from "firebase/firestore";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { updateUserProgress } from "../firebaseServices/update_user_progress";
 import { isQuizSolvedById } from "../firebaseServices/quiz_services";
 import { fetchCollectionData, updateCollectionData } from "../firebaseServices/firestoreUtils";
-import {formateQuestion} from "../utils/textUtils"
+import { formateQuestion } from "../utils/textUtils";
 
-  const TestZone = () => {
+const TestZone = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const quizId = location.state?.quizId || null;
   const questions = location.state?.questions || [];
   const isQuiz = location.state?.isQuiz || false;
   const quizData = location.state?.quizData || {};
-  const collectionName=location.state?.collectionName ||"quizzes";
-  const collectionId=location.state?.collectionId ||quizId;
+  const collectionName = location.state?.collectionName || "quizzes";
+  const collectionId = location.state?.collectionId || quizId;
 
   const [selectedOptions, setSelectedOptions] = useState(() => {
     const saved = localStorage.getItem(`quiz_${quizId}_selectedOptions`);
@@ -39,10 +39,16 @@ import {formateQuestion} from "../utils/textUtils"
     return quizData.timeAllocated ? quizData.timeAllocated * 60 : 180;
   });
   const [showWarning, setShowWarning] = useState(false);
+  const [isNavExpanded, setIsNavExpanded] = useState(true);
+  const [timePerQuestion, setTimePerQuestion] = useState(() => {
+    const saved = localStorage.getItem(`quiz_${quizId}_timePerQuestion`);
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [lastSwitchTime, setLastSwitchTime] = useState(Date.now() / 1000); // Track time of last question switch
 
-  
   const currentUser = auth.currentUser;
   const currentUserId = currentUser?.uid;
+
   useEffect(() => {
     localStorage.setItem(`quiz_${quizId}_selectedOptions`, JSON.stringify(selectedOptions));
   }, [selectedOptions, quizId]);
@@ -59,6 +65,9 @@ import {formateQuestion} from "../utils/textUtils"
     localStorage.setItem(`quiz_${quizId}_timeLeft`, timeLeft);
   }, [timeLeft, quizId]);
 
+  useEffect(() => {
+    localStorage.setItem(`quiz_${quizId}_timePerQuestion`, JSON.stringify(timePerQuestion));
+  }, [timePerQuestion, quizId]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -72,8 +81,20 @@ import {formateQuestion} from "../utils/textUtils"
       });
     }, 1000);
 
-    return () => clearInterval(timer); // Cleanup timer on unmount
+    return () => clearInterval(timer);
   }, [quizId]);
+
+  // Update time spent when switching questions
+  const updateTimePerQuestion = (newIndex) => {
+    const currentTime = Date.now() / 1000; // Current time in seconds
+    const timeSpent = currentTime - lastSwitchTime;
+    setTimePerQuestion((prev) => ({
+      ...prev,
+      [currentQuestionIndex]: (prev[currentQuestionIndex] || 0) + timeSpent,
+    }));
+    setLastSwitchTime(currentTime);
+    setCurrentQuestionIndex(newIndex);
+  };
 
   const formatTime = (seconds) => {
     const min = Math.floor(seconds / 60);
@@ -96,13 +117,12 @@ import {formateQuestion} from "../utils/textUtils"
       [currentQuestionIndex]: "skipped",
     }));
     if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
+      updateTimePerQuestion(currentQuestionIndex + 1);
     }
   };
 
   const handleSaveNext = () => {
-    if(!selectedOptions[currentQuestionIndex] && isQuiz)
-    {
+    if (!selectedOptions[currentQuestionIndex] && isQuiz) {
       setShowWarning(true);
       return;
     }
@@ -112,14 +132,14 @@ import {formateQuestion} from "../utils/textUtils"
       [currentQuestionIndex]: "attempted",
     }));
     if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
+      updateTimePerQuestion(currentQuestionIndex + 1);
     }
   };
 
   const handleUpdateUserProgress = async (correctPercentage) => {
     if (currentUserId) {
       const createdAt = quizData.createdAt?.toDate ? quizData.createdAt.toDate() : new Date();
-      await updateUserProgress(currentUserId, correctPercentage, quizData.subject,createdAt);
+      await updateUserProgress(currentUserId, correctPercentage, quizData.subject, createdAt);
     }
   };
 
@@ -129,38 +149,52 @@ import {formateQuestion} from "../utils/textUtils"
       return;
     }
 
+    // Update time for the last question
+    const currentTime = Date.now() / 1000;
+    setTimePerQuestion((prev) => ({
+      ...prev,
+      [currentQuestionIndex]: (prev[currentQuestionIndex] || 0) + (currentTime - lastSwitchTime),
+    }));
+
     const totalQuestions = questions.length;
     let totalScore = 0;
     let totalCorrect = 0;
+    let totalIncorrect = 0;
     let totalViewed = Object.keys(selectedOptions).length;
-    const totalTimeTaken=quizAllocatedTime-timeLeft;
+    const totalTimeTaken = quizAllocatedTime - timeLeft;
+    const totalSkipped = Object.values(questionStatus).filter((status) => status === "skipped").length;
+    const totalAttempted = Object.values(questionStatus).filter((status) => status === "attempted").length;
+    const averageTimePerQuestion = totalTimeTaken / (totalViewed || totalQuestions); // Avoid division by 0
 
     const updatedQuestionStatus = questions.map((question, index) => {
-      const userAnswer = selectedOptions[index] || "Not Answered";
-      const isCorrect = question.correctOption ? userAnswer === question.correctOption:false;
-      if(!isQuiz)
-      {
-        // totalScore += 3;
-        totalCorrect++;
-        // userAnswer="Not Answered";
-      return {
-        ...question,
-        yourAnswer: question.correctOption,
-        isCorrect:true
-      };
+      const userAnswer = selectedOptions[index];
+      const isAttempted = userAnswer !== undefined && userAnswer !== null;
+      const isCorrect = isAttempted && question.correctOption ? userAnswer === question.correctOption : false;
+
+      if (!isQuiz) {
+        return {
+          ...question,
+          yourAnswer: question.correctOption,
+          isCorrect: true,
+          isAttempted: true,
+          timeSpent: timePerQuestion[index] || 0,
+        };
       }
 
       if (isCorrect) {
-        totalScore += 3; // Award +3 for correct answer
+        totalScore += 3;
         totalCorrect++;
-      } else if (userAnswer !== "Not Answered") {
-        totalScore -= 1; // Deduct -1 for incorrect answer
+      } else if (isAttempted) {
+        totalScore -= 1;
+        totalIncorrect++;
       }
 
       return {
         ...question,
-        yourAnswer: userAnswer,
-        isCorrect
+        yourAnswer: userAnswer || "Not Attempted",
+        isCorrect,
+        isAttempted,
+        timeSpent: timePerQuestion[index] || 0, // Include time spent
       };
     });
 
@@ -171,25 +205,24 @@ import {formateQuestion} from "../utils/textUtils"
     } catch (error) {
       console.error("Error updating user progress:", error);
     }
-  
+
     try {
       const DocRef = doc(db, collectionName, collectionId);
-      if(collectionName==="quizzes")
-      {await updateDoc(DocRef, {
-        questions: updatedQuestionStatus,
-        totalScore,
-        correctPercentage,
-        quizStatus: true,
-        totalQuestions,
-        solvedBy:arrayUnion(currentUserId)
-      });}
-      else{
-        await updateDoc(DocRef,{
-          youAnswer:selectedOptions[currentQuestionIndex],
-          isCorrect:updatedQuestionStatus[currentQuestionIndex].isCorrect,
-          solvedBy:arrayUnion(currentUserId)
-        })
-        console.log("inside else condition and currentuser:",currentUser);
+      if (collectionName === "quizzes") {
+        await updateDoc(DocRef, {
+          questions: updatedQuestionStatus,
+          totalScore,
+          correctPercentage,
+          quizStatus: true,
+          totalQuestions,
+          solvedBy: arrayUnion(currentUserId),
+        });
+      } else {
+        await updateDoc(DocRef, {
+          youAnswer: selectedOptions[currentQuestionIndex],
+          isCorrect: updatedQuestionStatus[currentQuestionIndex].isCorrect,
+          solvedBy: arrayUnion(currentUserId),
+        });
       }
       console.log("Quiz Updated Successfully");
     } catch (error) {
@@ -200,18 +233,25 @@ import {formateQuestion} from "../utils/textUtils"
     localStorage.removeItem(`quiz_${quizId}_currentQuestionIndex`);
     localStorage.removeItem(`quiz_${quizId}_questionStatus`);
     localStorage.removeItem(`quiz_${quizId}_timeLeft`);
+    localStorage.removeItem(`quiz_${quizId}_timePerQuestion`);
 
     navigate("/quizResult", {
       state: {
         questions: updatedQuestionStatus,
         score: totalScore,
         totalCorrect,
+        totalIncorrect, // New
         correctPercentage,
         totalQuestions,
         quizStatus: true,
         totalTimeTaken,
         totalViewed,
-        collectionName
+        totalSkipped, // New
+        totalAttempted, // New
+        averageTimePerQuestion, // New
+        timePerQuestion, // New
+        collectionName,
+        totalTimeAllocated: quizAllocatedTime,
       },
     });
   };
@@ -221,96 +261,103 @@ import {formateQuestion} from "../utils/textUtils"
   }
 
   const currentQuestion = questions[currentQuestionIndex];
-  const questionText = (currentQuestion?.question?.trim() ) 
-    ? currentQuestion?.question :currentQuestion?.questionImage?.trim() ?"": "No question available";
+  const questionText = currentQuestion?.question?.trim()
+    ? currentQuestion?.question
+    : currentQuestion?.questionImage?.trim()
+    ? ""
+    : "No question available";
   const optionsToShow = currentQuestion?.options?.some((opt) => opt.trim() !== "")
     ? currentQuestion.options
     : ["1", "2", "3", "4"];
 
-    return (
-      <>
-        <div className="test-header">
-          <h2>Test Zone</h2>
-          <span>Time Left: {formatTime(timeLeft)}</span>
-        </div>
-    
-        <div className="test-container">
-          <div className="test-body">
-            <div className="question-panel">
-              <div className="question-header">
-                <span className="question-title">
-                  Question {currentQuestionIndex + 1}: {currentQuestion.subject || "Unknown Subject"}
-                </span>
-              </div>
-    
-              <div className="question-content">
-              <p dangerouslySetInnerHTML={{ __html: formateQuestion(questionText) }}></p>
-                {currentQuestion.questionImage && (
-                  <img src={currentQuestion.questionImage} alt="Question" className="question-image" />
-                )}
-              </div>
-    
-              {isQuiz ? (
-                <div className="options">
-                  {optionsToShow.map((opt, index) => (
-                    <button
-                      key={index}
-                      className={`option-btn ${selectedOptions[currentQuestionIndex] === opt ? "selected" : ""}`}
-                      onClick={() => handleOptionClick(opt)}
-                    >
-                      {opt}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="resource-card">
-                  <a
-                    href={questionText}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="link-button"
-                  >
-                    Click Me
-                  </a>
-                </div>
-              )}
-              {showWarning && (
-              <div className="warning-card">
-                <p>Please select an option before proceeding!</p>
-              </div>
-            )}
-    
-              <div className="bottom-buttons">  {/* Merged bottom-buttons-wrapper with bottom-buttons */}
-                <button className="important-btn">Mark as Important</button>
-                <button className="skip-btn" onClick={handleSkip}>
-                  Skip
-                </button>
-                <button className="save-next-btn" onClick={handleSaveNext}>
-                  Save & Next
-                </button>
-              </div>
+  return (
+    <>
+      <div className="tz-test-header">
+        <h2>Test Zone</h2>
+        <span>Time Left: {formatTime(timeLeft)}</span>
+      </div>
+
+      <div className="tz-test-container">
+        <div className="tz-test-body">
+          <div className="tz-question-panel">
+            <div className="tz-question-header">
+              <span className="tz-question-title">
+                Question {currentQuestionIndex + 1}: {currentQuestion.subject || "Unknown Subject"}
+              </span>
             </div>
-    
-            <div className="navigation-section">
-              <div className="question-grid">
-                {questions.map((_, i) => (
+
+            <div className="tz-question-content">
+              <p dangerouslySetInnerHTML={{ __html: formateQuestion(questionText) }}></p>
+              {currentQuestion.questionImage && (
+                <img src={currentQuestion.questionImage} alt="Question" className="question-image" />
+              )}
+            </div>
+
+            {isQuiz ? (
+              <div className="tz-options">
+                {optionsToShow.map((opt, index) => (
                   <button
-                    key={i}
-                    className={`question-btn ${i === currentQuestionIndex ? "active" : ""}
-                    ${questionStatus[i] === "attempted" ? "attempted" : ""}
-                    ${questionStatus[i] === "skipped" ? "skipped" : ""}`}
-                    onClick={() => setCurrentQuestionIndex(i)}
+                    key={index}
+                    className={`tz-option-btn ${selectedOptions[currentQuestionIndex] === opt ? "selected" : ""}`}
+                    onClick={() => handleOptionClick(opt)}
                   >
-                    {i + 1}
+                    {opt}
                   </button>
                 ))}
               </div>
-              <button className="submit-btn" onClick={calculateScore}>
-                SUBMIT
+            ) : (
+              <div className="tz-resource-card">
+                <a href={questionText} target="_blank" rel="noopener noreferrer" className="tz-link-button">
+                  Click Me
+                </a>
+              </div>
+            )}
+            {showWarning && (
+              <div className="tz-warning-card">
+                <p>Please select an option before proceeding!</p>
+              </div>
+            )}
+
+            <div className="tz-bottom-buttons">
+              <button className="tz-important-btn">Mark as Important</button>
+              <button className="tz-skip-btn" onClick={handleSkip}>
+                Skip
+              </button>
+              <button className="tz-save-next-btn" onClick={handleSaveNext}>
+                Save & Next
               </button>
             </div>
           </div>
+
+          <div className="tz-navigation-wrapper">
+            <button className="tz-nav-expand-btn" onClick={() => setIsNavExpanded(!isNavExpanded)}>
+              {isNavExpanded ? "vv" : "^^"}
+            </button>
+            {isNavExpanded && (
+              <div className="tz-navigation-section">
+                <div className="tz-question-grid">
+                  {questions.map((_, i) => (
+                    <button
+                      key={i}
+                      className={`tz-question-btn ${i === currentQuestionIndex ? "active" : ""} ${
+                        questionStatus[i] === "attempted" ? "attempted" : ""
+                      } ${questionStatus[i] === "skipped" ? "skipped" : ""}`}
+                      onClick={() => updateTimePerQuestion(i)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+                <button className="tz-submit-btn" onClick={calculateScore}>
+                  SUBMIT
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </>
-    );};
+      </div>
+    </>
+  );
+};
+
 export default TestZone;

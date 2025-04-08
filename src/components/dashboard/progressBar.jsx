@@ -23,20 +23,35 @@ const ProgressOverview = ({progressData}) => {
       <div className="progress-overview">
         <div className="progress-circle">
           <svg width="80" height="80" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="40" stroke="#ddd" strokeWidth="8" fill="none" />
+            <circle 
+              cx="50" 
+              cy="50" 
+              r="40" 
+              stroke="var(--progress-circle-bg)" 
+              strokeWidth="8" 
+              fill="none" 
+            />
             <circle
               cx="50"
               cy="50"
               r="40"
-              stroke="#34c759"
+              stroke="var(--success-color)"
               strokeWidth="8"
               fill="none"
               strokeDasharray="251.2"
               strokeDashoffset={251.2 - (251.2 * overallCorrectPercentage) / 100}
               strokeLinecap="round"
             />
-            <text x="50" y="50" textAnchor="middle" alignmentBaseline="middle" fontSize="14" fill="#333">
-              {overallCorrectPercentage.toFixed(1)}% <tspan x="50" dy="1.2em">Correct</tspan>
+            <text 
+              x="50" 
+              y="50" 
+              textAnchor="middle" 
+              alignmentBaseline="middle" 
+              fontSize="14" 
+              fill="var(--text-color)"
+            >
+              {overallCorrectPercentage.toFixed(1)}% 
+              <tspan x="50" dy="1.2em" fill="var(--text-secondary-color)">Correct</tspan>
             </text>
           </svg>
         </div>
@@ -46,8 +61,14 @@ const ProgressOverview = ({progressData}) => {
             <div key={index} className="progress-item">
               <span className="subject">{item.subject}</span>
               <div className="progress-bar">
-                <div className="correct-bar" style={{ width: `${item.averageCorrectPercentage}%` }}></div>
-                <div className="incorrect-bar" style={{ width: `${100-item.averageCorrectPercentage}%` }}></div>
+                <div 
+                  className="correct-bar" 
+                  style={{ width: `${item.averageCorrectPercentage}%` }}
+                ></div>
+                <div 
+                  className="incorrect-bar" 
+                  style={{ width: `${100-item.averageCorrectPercentage}%` }}
+                ></div>
               </div>
             </div>
           ))}

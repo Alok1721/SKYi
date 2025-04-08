@@ -4,14 +4,17 @@ import { Card } from "../components/practise/card";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebaseConfig";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { FiLoader } from 'react-icons/fi';
 
 const UserPractise = () => {
   const navigate = useNavigate();
   const [sections, setSections] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
+        setIsLoading(true);
         const querySnapshot = await getDocs(collection(db, "playlists"));
         const playlists = {};
 
@@ -63,11 +66,22 @@ const UserPractise = () => {
         setSections(Object.entries(playlists).map(([title, data]) => ({ title, data })));
       } catch (error) {
         console.error("Error fetching playlists:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchPlaylists();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="loading-screen">
+        <FiLoader className="loading-icon" />
+        <p>Loading practice materials...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="user-practise">

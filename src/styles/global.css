@@ -1,27 +1,188 @@
 /* src/styles/global.css */
+:root {
+  /* Light theme variables */
+  --background-color: #f5f5f5;
+  --text-color: #333333;
+  --text-secondary-color: #666666;
+  --primary-color: #3b82f6;
+  --card-background: #ffffff;
+  --card-hover-background: #f8f9fa;
+  --border-color: #e5e7eb;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --calendar-box-background: #e5e7eb;
+  --calendar-box-hover-background: #d1d5db;
+  --success-color: #4caf50;
+  --error-color: #ff4d4f;
+  --error-light: rgba(251, 149, 151, 0.286);
+  --tooltip-background: #333333;
+  --tooltip-text-color: #ffffff;
+  --progress-circle-bg: #e5e7eb;
+  --progress-bar-bg: #e5e7eb;
+  --primary-hover-color: #45a049;
+  --link-color: #0bb8db;
+  --card-background-color: #ffffff;
+  --header-background-color: #ffffff;
+  --header-text-color: #333333;
+  --header-icon-color: #666666;
+  --header-icon-hover-color: #333333;
+  --header-hover-color: #f3f4f6;
+  --header-active-color: #e5e7eb;
+  --header-border-color: #e5e7eb;
+  --header-shadow-color: rgba(0, 0, 0, 0.1);
+  /* Admin specific variables */
+  --sidebar-background-color: #ffffff;
+  --sidebar-text-color: #333333;
+  --sidebar-border-color: #e0e0e0;
+  --sidebar-hover-color: #f5f5f5;
+  --sidebar-active-color: #4CAF50;
+  --stat-card-background-color: #ffffff;
+  --stat-card-text-color: #333333;
+  --stat-card-border-color: #e5e7eb;
+  --stat-card-hover-color: #f8f9fa;
+}
+
+[data-theme="dark"] {
+  --background-color: #1a1b1e;
+  --text-color: #e1e1e1;
+  --text-secondary-color: #a0aec0;
+  --primary-color: #60a5fa;
+  --card-background: #2d2e32;
+  --card-hover-background: #36373c;
+  --border-color: #404248;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --calendar-box-background: #404248;
+  --calendar-box-hover-background: #4a4b50;
+  --success-color: #48bb78;
+  --error-color: #ff6b6b;
+  --tooltip-background: #2d2e32;
+  --tooltip-text-color: #e1e1e1;
+  --progress-circle-bg: #404248;
+  --progress-bar-bg: #404248;
+  --primary-hover-color: #45a049;
+  --link-color: #0bb8db;
+  --card-background-color: #2c2d30;
+  --header-background-color: #2d2e32;
+  --header-text-color: #e1e1e1;
+  --header-icon-color: #a0aec0;
+  --header-icon-hover-color: #e1e1e1;
+  --header-hover-color: #36373c;
+  --header-active-color: #404248;
+  --header-border-color: #404248;
+  --header-shadow-color: rgba(0, 0, 0, 0.3);
+  /* Admin specific variables */
+  --sidebar-background-color: #2c2d30;
+  --sidebar-text-color: #e1e1e1;
+  --sidebar-border-color: #3a3b3e;
+  --sidebar-hover-color: #363739;
+  --sidebar-active-color: #4CAF50;
+  --stat-card-background-color: #2d2e32;
+  --stat-card-text-color: #e1e1e1;
+  --stat-card-border-color: #404248;
+  --stat-card-hover-color: #36373c;
+}
+
+/* Global styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 body {
-    background-color: #181818;
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    color: white;
-  }
-  
-  a {
-    color: #0bb8db;
-    text-decoration: none;
-  }
-  
-  button {
-    border: none;
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Common elements */
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--primary-color);
+}
+
+button {
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--primary-hover-color);
+  transform: translateY(-1px);
+}
+
+/* Common card styles */
+.card {
+  background-color: var(--card-background-color);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px var(--shadow-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  transition: all 0.3s ease;
+}
+
+/* Common input styles */
+input, textarea, select {
+  background-color: var(--card-background-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Dark theme specific styles */
+[data-theme="dark"] {
+  /* Add any additional dark theme specific styles here */
+}
+
+/* Content wrapper styles */
+.content-wrapper {
+  margin-top: 64px; /* Height of the header */
+  transition: margin-left 0.3s ease;
+  min-height: calc(100vh - 64px);
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.content-wrapper.shift {
+  margin-left: 250px; /* Width of the sidebar */
+}
   
