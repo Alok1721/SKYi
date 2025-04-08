@@ -78,7 +78,7 @@ const TodayChallenges = () => {
                 )}
 
                 <button className={`btn ${isCompleted ? "completed" : ""}`} onClick={() => handleStartQuiz(challenge.id)}>
-                  {isCompleted ? "View Result" : "Start Challenge"}
+                  {isCompleted ? "Play Again" : "Start Challenge"}
                 </button>
               </div>
             </div>

@@ -53,17 +53,18 @@ const QuizCard = ({ quiz, handleStartQuiz }) => {
             {quiz.questions?.length + " Questions" || "30 Questions + Pyqs"}
           </p>
           <div className="quiz-buttons">
-            <button className={`status-btn ${isSolved ? "completed" : "backlog"}`}>
+            {!isSolved && (<button className={`status-btn ${isSolved ? "completed" : "backlog"}`}>
               {isSolved ? "Completed" : "Backlog"}
-            </button>
-            <button className="play-btn" onClick={() => handleStartQuiz(quiz.id)}>
-              Play
-            </button>
+            </button>)}
             {isSolved && (
               <button className="submission-btn" onClick={handleShowSubmissions}>
-                <FiList />
+                <FiList /> Submissions
               </button>
             )}
+            <button className="play-btn" onClick={() => handleStartQuiz(quiz.id)}>
+              {isSolved ? "Play Again" : "Play"}
+            </button>
+            
           </div>
         </div>
       </div>
@@ -91,7 +92,7 @@ const QuizCard = ({ quiz, handleStartQuiz }) => {
                     submissions.map((submission, index) => (
                       <tr key={index}>
                         <td>{formatDateTime(submission.timeStamp)}</td>
-                        <td>{submission.quizResult.score}</td>
+                        <td>{submission.quizResult.score} / {submission.quizResult.totalQuestions*3}</td>
                         <td>
                           <button
                             className="view-result-btn"

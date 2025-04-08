@@ -138,12 +138,12 @@ const AdminQuizMaker = () => {
   };
 
   return (
-    <div className="quiz-container">
+    <div className="qm-quiz-container">
       <h2>Admin Quiz Maker</h2>
-      {message && <p className="message">{message}</p>}
+      {message && <p className="qm-message">{message}</p>}
 
       {questions.map((q, index) => (
-        <div key={index} className="question-box">
+        <div key={index} className="qm-question-box">
           <h3>Question {index + 1}</h3>
           <label>Subject:</label>
         <select value={questionSubject} onChange={(e) => 
@@ -187,7 +187,7 @@ const AdminQuizMaker = () => {
           <label>Upload Question Image:</label>
           <input type="file" onChange={(e) => handleImageUpload(index, "questionImage", e.target.files[0])} />
 
-          <div className="options">
+          <div className="qm-options">
             {q.options.map((option, optIndex) => (
               <input
                 key={optIndex}
@@ -222,10 +222,10 @@ const AdminQuizMaker = () => {
         </div>
       ))}
 
-      <button className="add-btn" onClick={addNewQuestion}>
+      <button className="qm-add-btn" onClick={addNewQuestion}>
         + Add New Question
       </button>
-      <button className="post-btn" onClick={handlePostQuiz}>
+      <button className="qm-post-btn" onClick={handlePostQuiz}>
         POST
       </button>
     </div>

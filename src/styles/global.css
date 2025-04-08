@@ -39,6 +39,7 @@
   --stat-card-text-color: #333333;
   --stat-card-border-color: #e5e7eb;
   --stat-card-hover-color: #f8f9fa;
+  --success-color-faint:rgba(142, 253, 142, 0.451);
 }
 
 [data-theme="dark"] {
@@ -79,6 +80,7 @@
   --stat-card-text-color: #e1e1e1;
   --stat-card-border-color: #404248;
   --stat-card-hover-color: #36373c;
+  --success-color-faint:rgba(142, 253, 142, 0.451);
 }
 
 /* Global styles */

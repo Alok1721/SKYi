@@ -1,87 +1,98 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .quiz-container {
-    width: 80%;
-    margin: 20px auto;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-  }
-  
-  h2 {
-    text-align: center;
-    color: #333;
-  }
-  
-  .question-details {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  
-  .question-details input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  .question-box {
-    padding: 15px;
-    border: 1px solid #ddd;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    background: #fff;
-    color: #333;
-  }
-  
-  textarea {
-    width: 100%;
-    height: 50px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  .options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  
-  .options input {
-    width: 48%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  .add-btn {
-    width: 100%;
-    background: green;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  
-  .post-btn {
-    width: 100%;
-    background: blue;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  
+.qm-quiz-container {
+  width: 80%;
+  margin: 20px auto;
+  padding: 20px;
+  background: var(--card-background-color);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+h2 {
+  text-align: center;
+  color: var(--text-color);
+}
+
+.qm-question-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.qm-question-details input {
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background-color: var(--card-background-color);
+  color: var(--text-color);
+}
+
+.qm-question-box {
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 15px;
+  border-radius: 10px;
+  background: var(--card-background-color);
+  color: var(--text-color);
+  box-shadow: 0 1px 3px var(--shadow-color);
+}
+
+textarea {
+  width: 100%;
+  height: 60px;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background-color: var(--card-background-color);
+  color: var(--text-color);
+}
+
+.qm-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.qm-options input {
+  width: 48%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background-color: var(--card-background-color);
+  color: var(--text-color);
+}
+
+/* Buttons */
+.qm-add-btn {
+  width: 100%;
+  background: var(--success-color);
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+
+.qm-add-btn:hover {
+  background: var(--primary-hover-color);
+}
+
+.qm-post-btn {
+  width: 100%;
+  background: var(--primary-color);
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+
+.qm-post-btn:hover {
+  background: var(--primary-hover-color);
+}

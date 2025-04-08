@@ -19,30 +19,30 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <div className={`admin-sidebar ${isOpen ? 'open' : ''}`}>
-      <div className="sidebar-content">
-        <ul className="sidebar-menu">
+      <div className="admin-sidebar-content">
+        <ul className="admin-sidebar-menu">
           <li onClick={() => navigate('/adminDashboard')}>
-            <FiHome className="sidebar-icon" />
+            <FiHome className="admin-sidebar-icon" />
             <span>Dashboard</span>
           </li>
           <li onClick={() => navigate('/adminQuizMaker')}>
-            <FiBook className="sidebar-icon" />
+            <FiBook className="admin-sidebar-icon" />
             <span>Quiz Maker</span>
           </li>
           <li onClick={() => navigate('/adminQuestionMaker')}>
-            <FiFileText className="sidebar-icon" />
+            <FiFileText className="admin-sidebar-icon" />
             <span>Question Maker</span>
           </li>
           <li onClick={() => navigate('/adminCAMaker')}>
-            <FiCalendar className="sidebar-icon" />
+            <FiCalendar className="admin-sidebar-icon" />
             <span>CA Maker</span>
           </li>
           <li onClick={() => navigate('/settings')}>
-            <FiSettings className="sidebar-icon" />
+            <FiSettings className="admin-sidebar-icon" />
             <span>Settings</span>
           </li>
           <li onClick={handleLogout} className="logout-item">
-            <FiLogOut className="sidebar-icon" />
+            <FiLogOut className="admin-sidebar-icon" />
             <span>Logout</span>
           </li>
         </ul>

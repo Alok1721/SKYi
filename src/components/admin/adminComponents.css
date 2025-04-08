@@ -12,43 +12,38 @@
   height: 64px;
   z-index: 1000;
   border-bottom: 1px solid var(--header-border-color);
-  transition: all 0.3s ease;
 }
 
-.header-left {
+.admin-header-left,
+.admin-header-right {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-}
-
-.menu-button {
+.admin-menu-button {
   background: none;
   border: none;
   padding: 0.5rem;
   cursor: pointer;
   border-radius: 8px;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.menu-button:hover {
+.admin-menu-button:hover {
   background-color: var(--header-hover-color);
 }
 
-.menu-icon {
+.admin-menu-icon {
   font-size: 1.5rem;
   color: var(--header-icon-color);
   transition: color 0.2s ease;
 }
 
-.menu-button:hover .menu-icon {
+.admin-menu-button:hover .admin-menu-icon {
   color: var(--header-icon-hover-color);
 }
 
@@ -57,10 +52,9 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--header-text-color);
-  transition: color 0.3s ease;
 }
 
-.profile-button {
+.admin-profile-button {
   background: none;
   border: none;
   padding: 0;
@@ -69,32 +63,74 @@
   height: 40px;
   border-radius: 50%;
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.profile-button:hover {
+.admin-profile-button:hover {
   transform: scale(1.05);
-  box-shadow: 0 2px 8px var(--shadow-color);
 }
 
-.default-profile-icon {
+.admin-default-profile-icon {
   font-size: 2rem;
   color: var(--header-icon-color);
   transition: color 0.2s ease;
 }
 
-.profile-button:hover .default-profile-icon {
+.admin-profile-button:hover .admin-default-profile-icon {
   color: var(--header-icon-hover-color);
+}
+
+/* Dark theme overrides */
+[data-theme="dark"] .admin-header {
+  background-color: var(--dark-header-background-color);
+  border-bottom-color: var(--dark-header-border-color);
+}
+
+[data-theme="dark"] .admin-title {
+  color: var(--dark-header-text-color);
+}
+
+[data-theme="dark"] .admin-menu-icon,
+[data-theme="dark"] .admin-default-profile-icon {
+  color: var(--dark-header-icon-color);
+}
+
+[data-theme="dark"] .admin-menu-button:hover {
+  background-color: var(--dark-header-hover-color);
+}
+
+[data-theme="dark"] .admin-menu-button:hover .admin-menu-icon,
+[data-theme="dark"] .admin-profile-button:hover .admin-default-profile-icon {
+  color: var(--dark-header-icon-hover-color);
+}
+
+@media (max-width: 768px) {
+  .admin-header {
+    padding: 0.5rem 1rem;
+  }
+
+  .admin-title {
+    font-size: 1.1rem;
+  }
+
+  .admin-profile-button {
+    width: 35px;
+    height: 35px;
+  }
+
+  .admin-default-profile-icon {
+    font-size: 1.75rem;
+  }
 }
 
 /* Admin Sidebar Styles */
 .admin-sidebar {
   position: fixed;
   top: 64px;
-  left: -250px;
+  left: -290px;
   width: 250px;
   height: calc(100vh - 64px);
   background-color: var(--sidebar-background-color);
@@ -108,64 +144,54 @@
   left: 0;
 }
 
-.sidebar-content {
+.admin-sidebar-content {
   padding: 1rem 0;
   height: 100%;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-.sidebar-menu {
+.admin-sidebar-menu {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
-.sidebar-menu li {
+.admin-sidebar-menu li {
   padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
   color: var(--sidebar-text-color);
 }
 
-.sidebar-menu li:hover {
+.admin-sidebar-menu li:hover {
   background-color: var(--sidebar-hover-color);
   color: var(--sidebar-text-hover-color);
 }
 
-.sidebar-icon {
+.admin-sidebar-icon {
   font-size: 1.25rem;
   transition: color 0.2s ease;
 }
 
-.sidebar-menu li:hover .sidebar-icon {
+.admin-sidebar-menu li:hover .sidebar-icon {
   color: var(--sidebar-icon-hover-color);
 }
 
-.logout-item {
+.admin-logout-item {
   margin-top: auto;
   border-top: 1px solid var(--header-border-color);
   color: var(--error-color);
 }
 
-.logout-item:hover {
+.admin-logout-item:hover {
   background-color: var(--error-color-light);
   color: var(--error-color);
 }
-
-@media (max-width: 768px) {
-  .admin-header {
-    padding: 0.5rem 1rem;
-  }
-
-  .admin-title {
-    font-size: 1.125rem;
-  }
-
-  .admin-sidebar {
-    width: 100%;
-    left: -100%;
-  }
-} 

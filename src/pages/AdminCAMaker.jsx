@@ -180,11 +180,11 @@ const AdminCAMaker = () => {
   };
 
   return (
-    <div className="admin-question-container">
+    <div className="qnm-question-container">
       <h2>Add PDFs</h2>
       {pdfs.map((pdf, index) => (
-        <div key={index} className="question-block">
-          <div className="form-group">
+        <div key={index} className="qnm-question-block">
+          <div className="qnm-form-group">
             <label>PDF File:</label>
             <input
               type="file"
@@ -193,7 +193,7 @@ const AdminCAMaker = () => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="qnm-form-group">
             <label>PDF Name:</label>
             <input
               type="text"
@@ -205,12 +205,12 @@ const AdminCAMaker = () => {
 
           {/* Display PDF Thumbnail if available */}
           {pdf.pdfThumbnail && (
-            <div className="pdf-thumbnail">
+            <div className="qnm-pdf-thumbnail">
               <img src={pdf.pdfThumbnail} alt="PDF Preview" />
             </div>
           )}
 
-          <div className="form-group">
+          <div className="qnm-form-group">
             <label>Type:</label>
             <select
               value={pdf.type}
@@ -222,13 +222,13 @@ const AdminCAMaker = () => {
             </select>
           </div>
 
-          <div className="form-group">
+          <div className="qnm-form-group">
             <label>Playlists:</label>
-            <div className="playlist-cards">
+            <div className="qnm-playlist-cards">
               {allPlaylists.map((playlist) => (
                 <div
                   key={playlist.id}
-                  className={`playlist-card ${pdf.playlists.includes(playlist.id) ? "selected" : ""}`}
+                  className={`qnm-playlist-card ${pdf.playlists.includes(playlist.id) ? "selected" : ""}`}
                   onClick={() => handlePlaylistSelection(index, playlist.id)}
                 >
                   {playlist.name}
@@ -239,11 +239,11 @@ const AdminCAMaker = () => {
         </div>
       ))}
 
-      <div className="action-buttons">
-        <button onClick={handleAddPdf} className="add-question-btn">
+      <div className="qnm-action-buttons">
+        <button onClick={handleAddPdf} className="qnm-add-question-btn">
           Add Another PDF
         </button>
-        <button onClick={handleSubmit} className="submit-btnn">
+        <button onClick={handleSubmit} className="qnm-submit-btnn">
           Post PDFs
         </button>
       </div>

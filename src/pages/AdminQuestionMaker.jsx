@@ -152,11 +152,11 @@ const AdminQuestion = () => {
   };
 
   return (
-    <div className="admin-question-container">
+    <div className="qnm-admin-question-container">
       <h2>Add Questions</h2>
       {questions.map((q, index) => (
-        <div key={index} className="question-block">
-          <div className="form-group">
+        <div key={index} className="qnm-question-block">
+          <div className="qnm-form-group">
             <label>Question:</label>
             <textarea
               placeholder="Enter question"
@@ -166,7 +166,7 @@ const AdminQuestion = () => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="qnm-form-group">
             <label>Question Image:</label>
             <input
               type="file"
@@ -176,11 +176,11 @@ const AdminQuestion = () => {
               }
             />
             {q.questionImage && (
-              <img src={q.questionImage} alt="Question" className="uploaded-image" />
+              <img src={q.questionImage} alt="Question" className="qnm-uploaded-image" />
             )}
           </div>
 
-          <div className="form-group">
+          <div className="qnm-form-group">
             <label>Options:</label>
             {q.options.map((option, optionIndex) => (
               <input
@@ -195,7 +195,7 @@ const AdminQuestion = () => {
             ))}
           </div>
 
-          <div className="form-group">
+          <div className="qnm-form-group">
             <label>Correct Option:</label>
             <input
               type="text"
@@ -205,7 +205,7 @@ const AdminQuestion = () => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="qnm-form-group">
             <label>Solution:</label>
             <textarea
               placeholder="Enter solution"
@@ -215,7 +215,7 @@ const AdminQuestion = () => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="qnm-form-group">
             <label>Solution Image:</label>
             <input
               type="file"
@@ -225,17 +225,17 @@ const AdminQuestion = () => {
               }
             />
             {q.solutionImage && (
-              <img src={q.solutionImage} alt="Solution" className="uploaded-image" />
+              <img src={q.solutionImage} alt="Solution" className="qnm-uploaded-image" />
             )}
           </div>
 
-          <div className="form-group">
+          <div className="qnm-form-group">
             <label>Playlists:</label>
-            <div className="playlist-cards">
+            <div className="qnm-playlist-cards">
                 {allPlaylists.map((playlist) => (
                 <div
                     key={playlist.id}
-                    className={`playlist-card ${q.playlists.includes(playlist.id) ? "selected" : ""}`}
+                    className={`qnm-playlist-card ${q.playlists.includes(playlist.id) ? "selected" : ""}`}
                     onClick={() => handlePlaylistSelection(index, playlist.id)}
                 >
                     {playlist.name}
@@ -244,7 +244,7 @@ const AdminQuestion = () => {
             </div>
             </div>
 
-          <div className="form-group">
+          <div className="qnm-form-group">
             <label>Tags (comma-separated):</label>
             <input
               type="text"
@@ -256,11 +256,11 @@ const AdminQuestion = () => {
         </div>
       ))}
 
-      <div className="action-buttons">
-        <button onClick={handleAddQuestion} className="add-question-btn">
+      <div className="qnm-action-buttons">
+        <button onClick={handleAddQuestion} className="qnm-add-question-btn">
           Add Another Question
         </button>
-        <button onClick={handleSubmit} className="submit-btnn">
+        <button onClick={handleSubmit} className="qnm-submit-btnn">
           Post Questions
         </button>
       </div>

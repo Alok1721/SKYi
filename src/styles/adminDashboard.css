@@ -1,24 +1,25 @@
-.admin-dashboard-container {
+.ad-admin-dashboard-container {
   min-height: 100vh;
   background-color: var(--background-color);
   color: var(--text-color);
   transition: all 0.3s ease;
 }
 
-.admin-dashboard {
+.ad-admin-dashboard {
   padding: 20px;
+  margin-top: 100px;
   margin-left: 0;
   transition: margin-left 0.3s ease-in-out;
 }
 
-.admin-stats {
+.ad-admin-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
 }
 
-.admin-stat-card {
+.ad-admin-stat-card {
   background-color: var(--stat-card-background-color);
   color: var(--stat-card-text-color);
   border: 1px solid var(--stat-card-border-color);
@@ -30,30 +31,30 @@
   box-shadow: 0 2px 4px var(--shadow-color);
 }
 
-.admin-stat-card:hover {
+.ad-admin-stat-card:hover {
   background-color: var(--stat-card-hover-color);
   transform: translateY(-5px);
 }
 
-.admin-stat-card span {
+.ad-admin-stat-card span {
   font-size: 24px;
   font-weight: bold;
   color: var(--primary-color);
 }
 
-.admin-stat-card p {
+.ad-admin-stat-card p {
   margin: 10px 0 0;
   font-size: 16px;
 }
 
-.admin-progress-chart-container {
+.ad-admin-progress-chart-container {
   background-color: var(--card-background-color);
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 4px var(--shadow-color);
 }
 
-.admin-progress-overview {
+.ad-admin-progress-overview {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -61,13 +62,13 @@
   gap: 20px;
 }
 
-.admin-progress-circle {
+.ad-admin-progress-circle {
   flex: 1;
   min-width: 200px;
   text-align: center;
 }
 
-.admin-circle {
+.ad-admin-circle {
   width: 150px;
   height: 150px;
   border-radius: 50%;
@@ -81,19 +82,19 @@
   text-align: center;
 }
 
-.admin-progress-list {
+.ad-admin-progress-list {
   flex: 1;
   min-width: 200px;
 }
 
-.admin-progress-list p {
+.ad-admin-progress-list p {
   display: flex;
   align-items: center;
   margin: 10px 0;
   color: var(--text-color);
 }
 
-.admin-correct {
+.ad-admin-correct {
   width: 12px;
   height: 12px;
   background-color: var(--primary-color);
@@ -101,7 +102,7 @@
   margin-right: 10px;
 }
 
-.admin-incorrect {
+.ad-admin-incorrect {
   width: 12px;
   height: 12px;
   background-color: #ff4b5c;
@@ -109,7 +110,7 @@
   margin-right: 10px;
 }
 
-.admin-chart {
+.ad-admin-chart {
   display: flex;
   flex: 1 1 45%;
   background: white;
@@ -120,7 +121,7 @@
   width: 100%; 
 }
 
-.admin-calender-container {
+.ad-admin-calender-container {
   display: flex;
   flex: 1 1 200px;
   flex-direction: row;
@@ -128,44 +129,44 @@
   gap: 15px;
 }
 
-.admin-calender {
+.ad-admin-calender {
   display: flex;
   flex: 1 1 200px;
   min-width: 250px;
   background: #f9f9f9;
   flex: 0 0 auto;
 }
-.admin-calender h3 {
+.ad-admin-calender h3 {
   margin-bottom: 10px;
 }
 
-.admin-calender-grid {
+.ad-admin-calender-grid {
   display: grid;
   grid-template-columns: repeat(7, 30px);
   gap: 1px;
 }
 
-.admin-calender-box {
+.ad-admin-calender-box {
   width: 20px;
   height:20px;
   background-color: #ddd;
   border-radius: 5px;
 }
 
-.admin-completed-pod {
+.ad-admin-completed-pod {
   background-color: green;
 }
 
 @media (max-width: 400px) {
-  .admin-stats {
+  .ad-admin-stats {
     flex-direction: column; /* Stack stats cards vertically */
     align-items: center;
   }
-  .admin-stat-card {
+  .ad-admin-stat-card {
     width: 100%; /* Cards take full width on small screens */
     max-width: 350px; /* Limit max-width for readability */
   }
-  .admin-chart {
+  .ad-admin-chart {
     height:150px;
     width: 100%;
   }

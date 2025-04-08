@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AdminHeader from '../admin/AdminHeader';
-import AdminSidebar from '../admin/AdminSidebar';
+import AdminSidebar from '../adminDashboard/adminSidebar';
+import './layout.css';
 
 const WithAdminHeader = (WrappedComponent, pageTitle) => {
   return function WithAdminHeaderComponent(props) {
@@ -11,7 +12,7 @@ const WithAdminHeader = (WrappedComponent, pageTitle) => {
     };
 
     return (
-      <>
+      <div className="admin-layout">
         <AdminHeader 
           toggleSidebar={toggleSidebar}
           pageTitle={pageTitle}
@@ -20,10 +21,10 @@ const WithAdminHeader = (WrappedComponent, pageTitle) => {
           isOpen={isSidebarOpen} 
           toggleSidebar={toggleSidebar}
         />
-        <div className={`content-wrapper ${isSidebarOpen ? "shift" : ""}`}>
+        <div className={`admin-content-wrapper ${isSidebarOpen ? "shift" : ""}`}>
           <WrappedComponent {...props} />
         </div>
-      </>
+      </div>
     );
   };
 };

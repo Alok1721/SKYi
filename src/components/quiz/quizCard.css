@@ -20,10 +20,12 @@
 
 .quiz-card.solved {
   background: linear-gradient(145deg, var(--card-background-color), var(--primary-color-light));
+  border-left: 4px solid var(--success-color);
 }
 
 .quiz-card.unsolved {
   background: linear-gradient(145deg, var(--card-background-color), var(--background-color));
+  border-left: 4px solid var(--error-color);
 }
 
 .quiz-icon {
@@ -83,22 +85,27 @@
 }
 
 .status-btn.completed {
-  background-color: var(--success-color);
+  background-color: var(--success-color-faint);
   color: white;
 }
 
 .status-btn.backlog {
   background-color: var(--error-color);
   color: white;
+  cursor: not-allowed;
 }
 
 .play-btn {
-  background-color: var(--primary-color);
+  background-color: var(--success-color-faint);
   color: white;
 }
 
 .play-btn:hover {
-  background-color: var(--primary-color-dark);
+  background-color: var(--primary-color-light);
+}
+.submission-btn {
+  background-color: var(--success-color-faint);
+  color: white;
 }
 
 @media (max-width: 768px) {
