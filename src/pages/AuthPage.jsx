@@ -195,9 +195,7 @@ const AuthPage = () => {
           <div className="auth-container">
             <button className="auth-close-button" onClick={() => setShowAuthForm(false)}>×</button>
             <h2>{isSignup ? "Sign Up" : "Login"}</h2>
-            <button className="resend-button" onClick={resendVerificationEmail}>
-                  Resend Verification Email
-                </button>
+            
             {error && <p className="error">{error}</p>}
 
             {verificationSent ? (
