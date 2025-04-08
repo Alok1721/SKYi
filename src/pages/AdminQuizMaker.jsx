@@ -149,7 +149,7 @@ const AdminQuizMaker = () => {
         <select value={questionSubject} onChange={(e) => 
           { setIsManual(false);
             setQuestionSubject(e.target.value)}}>
-        {["POD","Geography", "Economics", "History", "Political Science", "Science & Technology", "Environment", "Current Affairs", "Mixed","Media"]
+        {["POD","Geography", "Economics", "History", "Political Science", "Science & Technology", "Environment", "Current Affairs", "Mixed","Media","TEST"]
             .map((subject) => (
             <option key={subject} value={subject}>{subject}</option>
         ))}

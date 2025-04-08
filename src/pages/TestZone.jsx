@@ -4,7 +4,7 @@ import "../styles/testZone.css";
 import { auth, db } from "../firebaseConfig";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { updateUserProgress } from "../firebaseServices/update_user_progress";
-import { isQuizSolvedById } from "../firebaseServices/quiz_services";
+import { isQuizSolvedById,submitQuizResult } from "../firebaseServices/quiz_services";
 import { fetchCollectionData, updateCollectionData } from "../firebaseServices/firestoreUtils";
 import { formateQuestion } from "../utils/textUtils";
 
@@ -235,25 +235,29 @@ const TestZone = () => {
     localStorage.removeItem(`quiz_${quizId}_timeLeft`);
     localStorage.removeItem(`quiz_${quizId}_timePerQuestion`);
 
-    navigate("/quizResult", {
-      state: {
-        questions: updatedQuestionStatus,
-        score: totalScore,
-        totalCorrect,
-        totalIncorrect, // New
-        correctPercentage,
-        totalQuestions,
-        quizStatus: true,
-        totalTimeTaken,
-        totalViewed,
-        totalSkipped, // New
-        totalAttempted, // New
-        averageTimePerQuestion, // New
-        timePerQuestion, // New
-        collectionName,
-        totalTimeAllocated: quizAllocatedTime,
-      },
-    });
+    
+    const quizResult = {
+      score: totalScore,
+      totalCorrect,
+      totalIncorrect,
+      correctPercentage,
+      totalQuestions,
+      questions: updatedQuestionStatus,
+      totalTimeTaken,
+      totalViewed,
+      totalSkipped,
+      totalAttempted,
+      averageTimePerQuestion,
+      timePerQuestion,
+      collectionName,
+      totalTimeAllocated: quizAllocatedTime,
+    };
+    const success = await submitQuizResult(quizId, quizResult);
+    if (success) {
+      navigate("/quizResult", { state: quizResult });
+    } else {
+      alert("Failed to submit quiz. Please try again."); 
+    }
   };
 
   if (!questions.length) {

@@ -125,4 +125,143 @@
     font-size: 13px;
   }
 }
-  
+.submission-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  backdrop-filter: blur(5px); /* Blur effect */
+  -webkit-backdrop-filter: blur(5px); /* For Safari */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it’s above other content */
+}
+
+/* Modal content */
+.submission-modal-content {
+  background-color: var(--card-background-color); /* From global.css */
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+/* Modal header */
+.submission-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.submission-modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary-color); /* From global.css */
+}
+
+.submission-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-secondary-color);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.submission-close-btn:hover {
+  color: var(--error-color); /* From global.css */
+}
+
+/* Modal body */
+.submission-modal-body {
+  padding: 0;
+}
+
+/* Submissions table */
+.submission-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.submission-table th,
+.submission-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.submission-table th {
+  background-color: var(--primary-color); /* From global.css */
+  color: white;
+  font-weight: 600;
+}
+
+.submission-table td {
+  color: var(--text-primary-color);
+}
+
+.view-result-btn {
+  padding: 6px 12px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-result-btn:hover {
+  background-color: var(--primary-hover); /* Ensure this is defined in global.css */
+}
+@media (max-width: 768px) {
+  .submission-modal-content {
+    width: 95%;
+    padding: 16px;
+  }
+
+  .submission-modal-header h2 {
+    font-size: 16px;
+  }
+
+  .submission-close-btn {
+    font-size: 20px;
+  }
+
+  .submission-table th,
+  .submission-table td {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .view-result-btn {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .submission-modal-content {
+    width: 98%;
+    padding: 12px;
+  }
+
+  .submission-table th,
+  .submission-table td {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .view-result-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
