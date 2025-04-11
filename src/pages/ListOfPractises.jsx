@@ -4,7 +4,7 @@ import "../styles/listOfPractise.css";
 import { db, auth } from "../firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
-import { FiBarChart2, FiX } from 'react-icons/fi';
+import { FiBarChart2, FiX ,FiUsers} from 'react-icons/fi';
 import AnalyticsCharts from '../components/analytics/AnalyticsCharts';
 import { truncateText, formatGroupName } from '../utils/textUtils';
 
@@ -21,6 +21,8 @@ const ListOfPractises = () => {
     monthlyStats: [],
     completionStats: []
   });
+  const [groupMode, setGroupMode] = useState(false);
+  const [selectedForGroup, setSelectedForGroup] = useState(new Set());
   const currentUser = auth.currentUser;
   const currentUserId = currentUser?.uid;
 
@@ -142,7 +144,46 @@ const ListOfPractises = () => {
   }, [questionList, currentUserId]);
 
   const handleQuestionClick = (question) => {
-    navigate("/testZone", { state: { questions: [question], quizId: question.id, isQuiz: question.isQuiz, quizData: question, collectionName: "questions", collectionId: question.id } });
+    if (groupMode) {
+      toggleGroupSelection(question.id);
+    } else {
+      
+
+    navigate("/testZone", { state: { questions: [question], quizId: question.id, isQuiz: question.isQuiz, quizData: question, collectionName: "questions", collectionId: question.id,groupMode: true } });
+    }
+  };
+  const toggleGroupMode = () => {
+    if (!groupMode) {
+      const newSelected = new Set(filteredQuestions.map(q => q.id));
+      setSelectedForGroup(newSelected);
+    } else {
+      setSelectedForGroup(new Set());
+    }
+    setGroupMode(!groupMode);
+  };
+  const toggleGroupSelection = (questionId) => {
+    const newSelected = new Set(selectedForGroup);
+    if (newSelected.has(questionId)) {
+      newSelected.delete(questionId);
+    } else {
+      newSelected.add(questionId);
+    }
+    setSelectedForGroup(newSelected);
+  };
+
+  const handleGroupTest = () => {
+    if (selectedForGroup.size > 0) {
+      const groupedQuestions = filteredQuestions.filter(q => selectedForGroup.has(q.id));
+      navigate("/testZone", { 
+        state: { 
+          questions: groupedQuestions,
+          quizId: `group-${Date.now()}`,
+          isQuiz: true,
+          collectionName: "questions",
+           groupMode: true
+        }
+      });
+    }
   };
 
   const uniqueTags = [...new Set(questionList.flatMap((q) => q.tags || []))];
@@ -198,6 +239,12 @@ const ListOfPractises = () => {
         >
           <FiBarChart2 /> {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
         </button>
+        <button 
+            className={`group-toggle ${groupMode ? 'active' : ''}`}
+            onClick={toggleGroupMode}
+          >
+            <FiUsers /> {groupMode ? 'Cancel Grouping' : 'Group Questions'}
+          </button>
       </div>
 
       {showAnalytics && (
@@ -314,6 +361,17 @@ const ListOfPractises = () => {
             </button>
           </div>
         </div>
+        {groupMode && (
+          <div className="group-controls">
+            <button 
+              className="start-group-test"
+              onClick={handleGroupTest}
+              disabled={selectedForGroup.size === 0}
+            >
+              Start Group Test ({selectedForGroup.size} selected)
+            </button>
+          </div>
+        )}
       </div>
 
       {filteredQuestions.length > 0 ? (
@@ -324,6 +382,15 @@ const ListOfPractises = () => {
               className={`question-card ${question.solvedBy?.includes(currentUserId) ? "solved" : "unsolved"}`}
               onClick={() => handleQuestionClick(question)}
             >
+              {groupMode && (
+                <input
+                  type="checkbox"
+                  className="group-checkbox"
+                  checked={selectedForGroup.has(question.id)}
+                  onChange={() => toggleGroupSelection(question.id)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              )}
               <div className="question-content">
                 <h3 title={question.question}>{truncateText(question.question, 30)}</h3>
                 <div className="question-meta">

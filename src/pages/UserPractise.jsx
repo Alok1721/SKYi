@@ -4,7 +4,7 @@ import { Card } from "../components/practise/card";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebaseConfig";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
-import { FiLoader } from 'react-icons/fi';
+import LoadingScreen from "../components/loadingScreen/LoadingScreen";
 
 const UserPractise = () => {
   const navigate = useNavigate();
@@ -75,12 +75,7 @@ const UserPractise = () => {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="loading-screen">
-        <FiLoader className="loading-icon" />
-        <p>Loading practice materials...</p>
-      </div>
-    );
+    return <LoadingScreen message="Loading practice materials..." />;
   }
 
   return (

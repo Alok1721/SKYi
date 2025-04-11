@@ -7,16 +7,20 @@ import { updateUserProgress } from "../firebaseServices/update_user_progress";
 import { isQuizSolvedById,submitQuizResult } from "../firebaseServices/quiz_services";
 import { fetchCollectionData, updateCollectionData } from "../firebaseServices/firestoreUtils";
 import { formateQuestion } from "../utils/textUtils";
+import LoadingScreen from "../components/loadingScreen/LoadingScreen";
 
 const TestZone = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const quizId = location.state?.quizId || null;
-  const questions = location.state?.questions || [];
-  const isQuiz = location.state?.isQuiz || false;
-  const quizData = location.state?.quizData || {};
-  const collectionName = location.state?.collectionName || "quizzes";
-  const collectionId = location.state?.collectionId || quizId;
+  const { 
+    quizId, 
+    questions = [], 
+    isQuiz = false, 
+    quizData = {}, 
+    collectionName = "quizzes", 
+    collectionId, 
+    groupMode = false 
+  } = location.state || {};
 
   const [selectedOptions, setSelectedOptions] = useState(() => {
     const saved = localStorage.getItem(`quiz_${quizId}_selectedOptions`);
@@ -32,7 +36,7 @@ const TestZone = () => {
   });
   const [timeLeft, setTimeLeft] = useState(() => {
     const saved = localStorage.getItem(`quiz_${quizId}_timeLeft`);
-    const allocatedTime = quizData.timeAllocated ? quizData.timeAllocated * 60 : 180;
+    const allocatedTime = groupMode ? questions.length * 120 : (quizData.timeAllocated ? quizData.timeAllocated * 60 : 180);
     return saved ? parseInt(saved, 10) : allocatedTime;
   });
   const [quizAllocatedTime, setQuizAllocatedTime] = useState(() => {
@@ -45,7 +49,7 @@ const TestZone = () => {
     return saved ? JSON.parse(saved) : {};
   });
   const [lastSwitchTime, setLastSwitchTime] = useState(Date.now() / 1000); // Track time of last question switch
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const currentUser = auth.currentUser;
   const currentUserId = currentUser?.uid;
 
@@ -136,10 +140,11 @@ const TestZone = () => {
     }
   };
 
-  const handleUpdateUserProgress = async (correctPercentage) => {
+  const handleUpdateUserProgress = async (correctPercentage,subject) => {
     if (currentUserId) {
       const createdAt = quizData.createdAt?.toDate ? quizData.createdAt.toDate() : new Date();
-      await updateUserProgress(currentUserId, correctPercentage, quizData.subject, createdAt);
+      console.log("Updating user progress...","subject:",subject);
+      await updateUserProgress(currentUserId, correctPercentage, subject|| "Mixed", createdAt);
     }
   };
 
@@ -148,9 +153,9 @@ const TestZone = () => {
       console.error("Quiz ID is missing.");
       return;
     }
-
+    setIsSubmitting(true);
     // Update time for the last question
-    const currentTime = Date.now() / 1000;
+    try{const currentTime = Date.now() / 1000;
     setTimePerQuestion((prev) => ({
       ...prev,
       [currentQuestionIndex]: (prev[currentQuestionIndex] || 0) + (currentTime - lastSwitchTime),
@@ -166,12 +171,27 @@ const TestZone = () => {
     const totalAttempted = Object.values(questionStatus).filter((status) => status === "attempted").length;
     const averageTimePerQuestion = totalTimeTaken / (totalViewed || totalQuestions); // Avoid division by 0
 
-    const updatedQuestionStatus = questions.map((question, index) => {
+    const updatedQuestionStatus = await Promise.all(questions.map(async (question, index) => {
       const userAnswer = selectedOptions[index];
       const isAttempted = userAnswer !== undefined && userAnswer !== null;
       const isCorrect = isAttempted && question.correctOption ? userAnswer === question.correctOption : false;
 
-      if (!isQuiz) {
+      
+      if (groupMode && question.id) {
+        try {
+          const questionRef = doc(db, "questions", question.id);
+          const updateData = {
+            youAnswer: userAnswer || "Not Attempted",
+            isCorrect,
+          };
+          if (isAttempted) {
+            updateData.solvedBy = arrayUnion(currentUserId);
+          }
+          await updateDoc(questionRef, updateData);
+        } catch (error) {
+          console.error(`Error updating question ${question.id}:`, error);
+        }
+      }else if(!isQuiz) {
         return {
           ...question,
           yourAnswer: question.correctOption,
@@ -196,20 +216,17 @@ const TestZone = () => {
         isAttempted,
         timeSpent: timePerQuestion[index] || 0, // Include time spent
       };
-    });
+    }));
 
     const correctPercentage = (totalCorrect / totalQuestions) * 100;
 
     try {
-      await handleUpdateUserProgress(correctPercentage);
-    } catch (error) {
-      console.error("Error updating user progress:", error);
-    }
-
-    try {
-      const DocRef = doc(db, collectionName, collectionId);
-      if (collectionName === "quizzes") {
-        await updateDoc(DocRef, {
+      if (groupMode) {
+        await handleUpdateUserProgress(correctPercentage, "Practise");
+      } else if (collectionName === "quizzes") {
+        await handleUpdateUserProgress(correctPercentage, quizData.subject);
+        const quizRef = doc(db, collectionName, collectionId);
+        await updateDoc(quizRef, {
           questions: updatedQuestionStatus,
           totalScore,
           correctPercentage,
@@ -218,7 +235,9 @@ const TestZone = () => {
           solvedBy: arrayUnion(currentUserId),
         });
       } else {
-        await updateDoc(DocRef, {
+        await handleUpdateUserProgress(correctPercentage, questions[0].subject);
+        const questionRef = doc(db, collectionName, collectionId);
+        await updateDoc(questionRef, {
           youAnswer: selectedOptions[currentQuestionIndex],
           isCorrect: updatedQuestionStatus[currentQuestionIndex].isCorrect,
           solvedBy: arrayUnion(currentUserId),
@@ -251,14 +270,30 @@ const TestZone = () => {
       timePerQuestion,
       collectionName,
       totalTimeAllocated: quizAllocatedTime,
+      isGroupMode: groupMode,
     };
-    const success = await submitQuizResult(quizId, quizResult);
-    if (success) {
+    if(!groupMode)
+    {
+      const success = await submitQuizResult(quizId, quizResult);
+      if (success) {
+        navigate("/quizResult", { state: quizResult });
+      } else {
+        alert("Failed to submit quiz. Please try again."); 
+      }
+    }else{
       navigate("/quizResult", { state: quizResult });
-    } else {
-      alert("Failed to submit quiz. Please try again."); 
     }
+  }catch (error) {
+    console.error("Error calculating score:", error);
+  }finally{ 
+    setIsSubmitting(false);   
+  }
+    
+    
   };
+  if (isSubmitting) {
+    return <LoadingScreen message="Loading result..." />;
+  }
 
   if (!questions.length) {
     return <p>""</p>;

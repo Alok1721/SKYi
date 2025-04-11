@@ -6,6 +6,7 @@ import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";
 import {sendBrevoEmail} from "../emailServices/emailFunctions";
 import { getSubscribedUsers } from "../firebaseServices/firestoreUtils";
 import { PDFEmailTemplate } from "../emailServices/emailTemplates";
+import LoadingScreen from "../components/loadingScreen/LoadingScreen"; // Reuse the loading screen component
 
 const AdminCAMaker = () => {
   const [pdfs, setPdfs] = useState([
@@ -19,6 +20,7 @@ const AdminCAMaker = () => {
     },
   ]);
   const [allPlaylists, setAllPlaylists] = useState([]); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -111,6 +113,7 @@ const AdminCAMaker = () => {
   
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     try {
       for (let i = 0; i < pdfs.length; i++) {
         const pdf = pdfs[i];
@@ -177,8 +180,14 @@ const AdminCAMaker = () => {
     } catch (error) {
       console.error("Error adding PDFs:", error);
     }
+    finally {
+      setIsSubmitting(false);
+    }
   };
 
+  if (isSubmitting) {
+    return <LoadingScreen message="Submitting PDFs..." />;
+  }
   return (
     <div className="qnm-question-container">
       <h2>Add PDFs</h2>

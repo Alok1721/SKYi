@@ -5,6 +5,7 @@ import { setDoc, doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { FiBook, FiAward, FiUsers, FiLogIn, FiEye, FiMail } from "react-icons/fi";
 import "../styles/authPage.css";
+import LoadingScreen from "../components/loadingScreen/LoadingScreen";
 
 // Dummy data for guest mode
 const dummyUserData = {
@@ -63,6 +64,7 @@ const AuthPage = () => {
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
+  const [isUserLoading, setIsUserLoading] = useState(false);
   const navigate = useNavigate();
 
   const toggleAuthMode = () => {
@@ -79,6 +81,7 @@ const AuthPage = () => {
   }, [navigate]);
 
   const handleAuth = async () => {
+    setIsUserLoading(true);
     try {
       if (isSignup) {
         // Signup process
@@ -130,6 +133,9 @@ const AuthPage = () => {
     } catch (err) {
       setError(err.message);
     }
+    finally {
+      setIsUserLoading(false);
+    }
   };
 
   const resendVerificationEmail = async () => {
@@ -151,7 +157,9 @@ const AuthPage = () => {
     localStorage.setItem("todayChallenge", JSON.stringify(dummyTodayChallenge));
     navigate("/userDashboard");
   };
-
+  if(isUserLoading) {
+    return <LoadingScreen message={isSignup ? "Creating account..." : "Logging in..."} />;
+  }
   return (
     <div className="auth-page">
       {/* Hero Section */}

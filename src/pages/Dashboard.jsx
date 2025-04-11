@@ -8,6 +8,7 @@ import { useDashboard } from "../components/dashboard/DashboardContext";
 import ProgressOverview from "../components/dashboard/progressBar";
 import { getCurrentTheme } from "../utils/themeUtils";
 import { format } from 'date-fns';
+import LoadingScreen from "../components/loadingScreen/LoadingScreen";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const Dashboard = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const { dashboardData } = useDashboard();
+  const { dashboardData,isLoading } = useDashboard();
   const totalQuizzes = dashboardData?.totalQuizzes ?? 0;
   const todayChallenges = dashboardData?.todayChallenges ?? 0;
   const totalBacklogs = dashboardData?.totalBacklogs ?? 0;
@@ -201,6 +202,9 @@ const Dashboard = () => {
         return null;
     }
   };
+  if (isLoading && !dashboardData) {
+    return <LoadingScreen message="Loading dashboard..." />;
+  }
 
   return (
     <>

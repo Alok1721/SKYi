@@ -6,6 +6,7 @@ import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";
 import {sendBrevoEmail} from "../emailServices/emailFunctions";
 import { getSubscribedUsers } from "../firebaseServices/firestoreUtils";
 import { QuizEmailTemplate } from "../emailServices/emailTemplates";
+import LoadingScreen from "../components/loadingScreen/LoadingScreen";
 
 const AdminQuizMaker = () => {
   const [questions, setQuestions] = useState([
@@ -38,6 +39,7 @@ const AdminQuizMaker = () => {
   const [questionSubject, setQuestionSubject] = useState("Mixed");
   const [timeAllocated, setTimeAllocated] = useState(0);
   const [isManual, setIsManual] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const extraTimePerQuestion = 3;
   const currentUser = auth.currentUser;
   const currentUserId = currentUser.uid;
@@ -45,7 +47,7 @@ const AdminQuizMaker = () => {
     if (!isManual) {
       calculateTime();
     }
-  }, [setQuestionSubject, questions.length]);
+  }, [questionSubject, questions.length]);
   const calculateTime = () => {
     if (questionSubject in subjectTimeMap) {
       const baseTime = subjectTimeMap[questionSubject]||3;
@@ -101,6 +103,7 @@ const AdminQuizMaker = () => {
   };
 
   const handlePostQuiz = async () => {
+    setIsSubmitting(true);
     try {
       if (questions.length === 0 || !questions.some((q) => q.question.trim() || q.questionImage)) {
         setMessage("Please enter at least one question!");
@@ -135,7 +138,13 @@ const AdminQuizMaker = () => {
       console.error("Error posting quiz:", error);
       setMessage("Failed to post quiz. Try again.");
     }
+    finally {
+      setIsSubmitting(false);
+    }
   };
+  if (isSubmitting) {
+    return <LoadingScreen message="Submitting questions..." />;
+  }
 
   return (
     <div className="qm-quiz-container">

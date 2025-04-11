@@ -3,6 +3,7 @@ import "../styles/adminQuestionMaker.css"; // Import CSS file
 import { db } from "../firebaseConfig";
 import { collection, addDoc, updateDoc, doc, arrayUnion, getDocs } from "firebase/firestore";
 import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";
+import LoadingScreen from "../components/loadingScreen/LoadingScreen";
 
 const AdminQuestion = () => {
   const [questions, setQuestions] = useState([
@@ -18,7 +19,7 @@ const AdminQuestion = () => {
     },
   ]);
   const [allPlaylists, setAllPlaylists] = useState([]); // Store all playlists from Firestore
-
+  const [isSubmitting, setIsSubmitting] = useState(false);  
   // Fetch playlists from Firestore
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -34,14 +35,15 @@ const AdminQuestion = () => {
 
   // Add a new question block
   const handleAddQuestion = () => {
+    const lastQuestion = questions[questions.length - 1];
     setQuestions([
       ...questions,
       {
         question: "",
         options: ["", "", "", ""],
         correctOption: "",
-        playlists: [], // Initialize with empty playlists
-        tags: [],
+        playlists: [...lastQuestion.playlists], // Initialize with empty playlists
+        tags: [...lastQuestion.tags],
         solution: "",
         questionImage: "",
         solutionImage: "",
@@ -97,8 +99,19 @@ const AdminQuestion = () => {
     setQuestions(newQuestions);
   };
 
+  const formatToBulletHTML = (text) => {
+    const paragraphs = text
+      .split(/\n\s*\n/) // split on paragraph breaks
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
+  
+    const bulletHTML = paragraphs.map((p) => `<li>${p}</li>`).join("");
+    return `<ul>${bulletHTML}</ul>`;
+  };
+  
   // Submit all questions
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     try {
       for (const question of questions) {
         if (
@@ -149,8 +162,14 @@ const AdminQuestion = () => {
     } catch (error) {
       console.error("Error adding questions:", error);
     }
+    finally { 
+      setIsSubmitting(false);
+    }
   };
 
+  if (isSubmitting) {
+    return <LoadingScreen message="Submitting questions..." />;
+  }
   return (
     <div className="qnm-admin-question-container">
       <h2>Add Questions</h2>
@@ -209,7 +228,7 @@ const AdminQuestion = () => {
             <label>Solution:</label>
             <textarea
               placeholder="Enter solution"
-              value={q.solution}
+              value={formatToBulletHTML(q.solution)}
               onChange={(e) => handleChange(index, "solution", e.target.value)}
               rows={4}
             />

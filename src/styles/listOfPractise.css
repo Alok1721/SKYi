@@ -88,6 +88,51 @@
   gap: 20px;
   margin-bottom: 30px;
 }
+.group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 16px;
+  background-color: var(--card-background-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  color: var(--text-primary-color);
+}
+
+.group-toggle.active {
+  background-color: var(--primary-color);
+  color: var(--text-primary-color);
+}
+
+.group-controls {
+  margin-top: 15px;
+}
+
+.start-group-test {
+  padding: 8px 16px;
+  background-color: var(--success-color);
+  color: var(--text-primary-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.start-group-test:disabled {
+  background-color: #cccccc; /* Optional: replace with var if themed */
+  cursor: not-allowed;
+}
+
+.group-checkbox {
+  top: 10px;
+  left: 10px;
+}
+
+.selected-for-group {
+  border: 2px solid var(--primary-color);
+  background-color: rgba(0, 123, 255, 0.1); /* Optional: convert using a CSS var + opacity */
+}
 
 .tag-filter, .status-filter {
   margin-bottom: 0;
