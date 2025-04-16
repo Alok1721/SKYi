@@ -101,7 +101,22 @@ const AdminQuizMaker = () => {
       return { success: false };
     }
   };
-
+  const formatToBulletHTML = (text) => {
+    const paragraphs = text.split(/\n\s*\n/); // Split by blank lines
+    return paragraphs
+      .map((para) => {
+        const withLineBreaks = para.trim().replace(/\n/g, "<br />");
+        return `<li>${formatInlineStyles(withLineBreaks)}</li>`;
+      })
+      .join("");
+  };
+  
+  const formatInlineStyles = (text) => {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Bold
+      .replace(/[_*](.*?)[_*]/g, "<em>$1</em>");         // Italic
+  };
+  
   const handlePostQuiz = async () => {
     setIsSubmitting(true);
     try {
@@ -109,6 +124,10 @@ const AdminQuizMaker = () => {
         setMessage("Please enter at least one question!");
         return;
       }
+      const formattedQuestions = questions.map((question) => ({
+        ...question,
+        solution: question.solution ? `<ul>${formatToBulletHTML(question.solution)}</ul>` : "",
+      }));
       
       sendQuizNotification().then(result => {
         if (!result.success) {
@@ -120,7 +139,7 @@ const AdminQuizMaker = () => {
       });
      
       await addDoc(collection(db, "quizzes"), {
-        questions: questions,
+        questions: formattedQuestions,
         createdAt: new Date(),
         subject: questionSubject,
         quizDescription: quizDescription,
