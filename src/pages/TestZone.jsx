@@ -10,18 +10,17 @@ import { formateQuestion } from "../utils/textUtils";
 import LoadingScreen from "../components/loadingScreen/LoadingScreen";
 
 const TestZone = () => {
+
   const location = useLocation();
   const navigate = useNavigate();
-  const { 
-    quizId, 
-    questions = [], 
-    isQuiz = false, 
-    quizData = {}, 
-    collectionName = "quizzes", 
-    collectionId, 
-    groupMode = false 
-  } = location.state || {};
-
+  const quizId = location.state?.quizId || null;
+  const questions = location.state?.questions || [];
+  const isQuiz = location.state?.isQuiz || false;
+  const quizData = location.state?.quizData || {};
+  const collectionName = location.state?.collectionName || "quizzes";
+  const collectionId = location.state?.collectionId || quizId;
+  const groupMode = location.state?.groupMode || false;
+  // console.log("groudMode:",groupMode);
   const [selectedOptions, setSelectedOptions] = useState(() => {
     const saved = localStorage.getItem(`quiz_${quizId}_selectedOptions`);
     return saved ? JSON.parse(saved) : {};
@@ -225,6 +224,10 @@ const TestZone = () => {
         await handleUpdateUserProgress(correctPercentage, "Practise");
       } else if (collectionName === "quizzes") {
         await handleUpdateUserProgress(correctPercentage, quizData.subject);
+        if (!collectionName || !collectionId) {
+          console.error("Invalid collection reference: ", { collectionName, collectionId });
+          return;
+        }
         const quizRef = doc(db, collectionName, collectionId);
         await updateDoc(quizRef, {
           questions: updatedQuestionStatus,
@@ -235,7 +238,7 @@ const TestZone = () => {
           solvedBy: arrayUnion(currentUserId),
         });
       } else {
-        await handleUpdateUserProgress(correctPercentage, questions[0].subject);
+        await handleUpdateUserProgress(correctPercentage, quiz.subject);
         const questionRef = doc(db, collectionName, collectionId);
         await updateDoc(questionRef, {
           youAnswer: selectedOptions[currentQuestionIndex],
@@ -271,6 +274,7 @@ const TestZone = () => {
       collectionName,
       totalTimeAllocated: quizAllocatedTime,
       isGroupMode: groupMode,
+      collectionId: quizId,
     };
     if(!groupMode)
     {
@@ -321,7 +325,7 @@ const TestZone = () => {
           <div className="tz-question-panel">
             <div className="tz-question-header">
               <span className="tz-question-title">
-                Question {currentQuestionIndex + 1}: {currentQuestion.subject || "Unknown Subject"}
+                Question {currentQuestionIndex + 1}: {quizData.subject || "Unknown Subject"}
               </span>
             </div>
 
