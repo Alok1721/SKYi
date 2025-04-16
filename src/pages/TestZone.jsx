@@ -42,6 +42,7 @@ const TestZone = () => {
     return quizData.timeAllocated ? quizData.timeAllocated * 60 : 180;
   });
   const [showWarning, setShowWarning] = useState(false);
+  const [showTimeWarning, setShowTimeWarning] = useState(false);
   const [isNavExpanded, setIsNavExpanded] = useState(true);
   const [timePerQuestion, setTimePerQuestion] = useState(() => {
     const saved = localStorage.getItem(`quiz_${quizId}_timePerQuestion`);
@@ -75,17 +76,30 @@ const TestZone = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(timer);
-          calculateScore();
-          return 0;
+        if (prevTime <= 60) {
+          setShowTimeWarning(true); // Show warning for last 60 seconds
         }
+        if (prevTime <= 5) {
+          setShowTimeWarning(true); // Emphasize imminent submission
+          if (prevTime <= 1) {
+            clearInterval(timer);
+            setTimePerQuestion((prev) => ({
+              ...prev,
+              [currentQuestionIndex]: (prev[currentQuestionIndex] || 0) + 1,
+            }));
+            calculateScore();
+            return 0;
+          }
+        }
+        setTimePerQuestion((prev) => ({
+          ...prev,
+          [currentQuestionIndex]: (prev[currentQuestionIndex] || 0) + 1,
+        }));
         return prevTime - 1;
       });
     }, 1000);
-
     return () => clearInterval(timer);
-  }, [quizId]);
+  }, [quizId, currentQuestionIndex]);
 
   // Update time spent when switching questions
   const updateTimePerQuestion = (newIndex) => {
@@ -317,8 +331,20 @@ const TestZone = () => {
     <>
       <div className="tz-test-header">
         <h2>Test Zone</h2>
-        <span>Time Left: {formatTime(timeLeft)}</span>
+        <span className={`tz-timer ${timeLeft <= 60 ? "tz-timer-critical" : ""}`}>
+        Time Left: {formatTime(timeLeft)}
+      </span>
+      
       </div>
+      {showTimeWarning && (
+  <div className={`tz-warning-card ${timeLeft <= 60 ? "tz-warning-critical" : ""}`}>
+    <p>
+      {timeLeft <= 60
+        ? `Quiz will submit in ${timeLeft} seconds!`
+        : "Please select an option before proceeding!"}
+    </p>
+  </div>)}
+      
 
       <div className="tz-test-container">
         <div className="tz-test-body">

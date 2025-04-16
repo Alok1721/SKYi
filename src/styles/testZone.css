@@ -150,7 +150,16 @@ body {
     background: #007bff;
     color: white ;
 }
-
+.tz-timer {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-color);
+  }
+  
+  .tz-timer-critical {
+    color: var(--error-color);
+    animation: pulse 1s infinite;
+  }
 .tz-warning-card {
     padding: 5px;
     border-radius: 8px;
@@ -164,6 +173,30 @@ body {
     color: var(--error-color);  
 
 }
+.tz-warning-critical {
+    background-color:var(--error-light);
+    border-color: var(--error-color);
+    animation: shake 0.5s ease-in-out infinite;
+  }
+  
+  .tz-warning-critical p {
+    color: var(--error-color);
+    font-weight: bold;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }
 
 .tz-button-buttons-wrapper{
     position: relative;

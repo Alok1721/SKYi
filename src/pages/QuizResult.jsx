@@ -249,7 +249,7 @@ const QuizResult = () => {
                 <div className="qr-solution-section">
                   <p>Correct Option: {currentQuestion.correctOption}</p>
                   <h4>Solution:</h4>
-                  <p dangerouslySetInnerHTML={{ __html: formateQuestion(currentQuestion.solution) }} />
+                  <p dangerouslySetInnerHTML={{ __html: currentQuestion.solution }} />
                   {currentQuestion.solutionImage && currentQuestion.solutionImage.trim() && (
                     <img src={currentQuestion.solutionImage} alt="Solution" className="solution-image" />
                   )}

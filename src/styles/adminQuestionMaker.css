@@ -1,141 +1,225 @@
-/* adminQuestionMaker.css */
-.qnm-admin-question-container {
-  max-width: 800px;
+.admin-question-container {
+  width: 95%;
   margin: 0 auto;
   padding: 20px;
-  background-color: var(--card-background-color);
-  border-radius: 10px;
-  box-shadow: 0 4px 8px var(--shadow-color);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  background-color: var(--background-color);
+  min-height: 100vh;
+  /* right: 20px; */
 }
 
-.qnm-admin-question-container h2 {
+.admin-question-container h2 {
   text-align: center;
   color: var(--text-color);
-  margin-bottom: 20px;
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
 }
 
-.qnm-question-block {
+.question-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .question-wrapper {
+    flex-direction: row;
+  }
+}
+
+.left-container {
   background-color: var(--card-background-color);
-  padding: 20px;
-  border-radius: 8px;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
   box-shadow: 0 2px 4px var(--shadow-color);
-}
-
-.qnm-form-group {
-  margin-bottom: 15px;
-}
-
-.qnm-form-group label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: var(--text-secondary-color);
-}
-
-.qnm-form-group textarea,
-.qnm-form-group input[type="text"],
-.qnm-form-group select {
-  width: 100%;
-  padding: 10px;
-  background-color: var(--card-background-color);
-  color: var(--text-color);
+  flex: 1;
   border: 1px solid var(--border-color);
-  border-radius: 5px;
-  font-size: 14px;
-  margin-bottom: 10px;
 }
 
-.qnm-form-group textarea {
+@media (min-width: 1024px) {
+  .left-container {
+    width: 33.3333%;
+  }
+}
+
+.right-container {
+  background-color: var(--card-background-color);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  flex: 2;
+  border: 1px solid var(--border-color);
+}
+
+@media (min-width: 1024px) {
+  .right-container {
+    width: 66.6667%;
+  }
+}
+
+.left-container h3,
+.right-container h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.playlist-group {
+  margin-bottom: 1.5rem;
+}
+
+.playlist-group h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.playlist-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+
+.playlist-card {
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  background-color: var(--card-background);
+  color: var(--text-secondary-color);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+
+@media (max-width: 640px) {
+  .playlist-card {
+    flex: 1 1 100%; /* Full width on small screens */
+  }
+}
+
+.playlist-card:hover {
+  background-color: var(--card-hover-background);
+}
+
+.playlist-card.selected {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border-color: var(--primary-color);
+}
+
+.playlist-card.selected:hover {
+  background-color: var(--primary-hover-color);
+}
+
+.tag-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.tag-suggestion {
+  padding: 0.375rem 0.75rem;
+  background-color: var(--calendar-box-background);
+  border-radius: 1rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text-color);
+  transition: all 0.2s ease;
+}
+
+.tag-suggestion:hover {
+  background-color: var(--calendar-box-hover-background);
+}
+
+.tag-suggestion.selected {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 0.25rem;
+}
+
+.form-group textarea,
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--text-color);
+  background-color: var(--card-background-color);
+}
+
+.form-group textarea:focus,
+.form-group input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.form-group textarea {
   resize: vertical;
   min-height: 100px;
 }
 
-.qnm-form-group input[type="file"] {
-  padding: 5px;
+.form-group input[type="file"] {
+  padding: 0.25rem;
+  width: 100%;
+  color: var(--text-color);
 }
 
-.qnm-uploaded-image {
+.uploaded-image {
   display: block;
-  margin-top: 10px;
+  margin-top: 0.5rem;
   max-width: 100%;
   height: auto;
-  border-radius: 5px;
+  border-radius: 0.375rem;
 }
 
-.qnm-playlist-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  color: var(--text-secondary-color);
-}
-
-.qnm-playlist-card {
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  cursor: pointer;
-  text-align: center;
-  flex: 1 1 calc(25% - 20px);
-  max-width: calc(25% - 20px);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-  background-color: var(--card-background-color);
-}
-
-.qnm-playlist-card.selected {
-  background-color: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
-}
-
-.qnm-playlist-card:hover {
-  background-color: var(--card-hover-background);
-}
-
-.qnm-playlist-card.selected:hover {
-  background-color: var(--primary-hover-color);
-}
-
-.qnm-action-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.qnm-add-question-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  background-color: var(--success-color);
-  color: #fff;
-  transition: background-color 0.3s ease;
-}
-
-.qnm-add-question-btn:hover {
-  background-color: var(--primary-hover-color);
-}
-
-.qnm-submit-sections {
-  margin-top: 0px;
+.action-buttons {
   display: flex;
   justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-.qnm-submit-btnn {
-  padding: 10px 20px;
+.add-question-btn,
+.submit-btn {
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 5px;
-  font-size: 16px;
+  border-radius: 0.375rem;
+  font-size: 1rem;
   cursor: pointer;
-  background-color: var(--primary-color);
-  color: #fff;
   transition: background-color 0.3s ease;
 }
 
-.qnm-submit-btnn:hover {
+.add-question-btn {
+  background-color: var(--success-color);
+  color: #ffffff;
+}
+
+.add-question-btn:hover {
+  background-color: var(--primary-hover-color);
+}
+
+.submit-btn {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.submit-btn:hover {
   background-color: var(--primary-hover-color);
 }
