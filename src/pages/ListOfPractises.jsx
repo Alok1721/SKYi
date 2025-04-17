@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/listOfPractise.css";
 import { db, auth } from "../firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
-import { FiBarChart2, FiX ,FiUsers} from 'react-icons/fi';
-import AnalyticsCharts from '../components/analytics/AnalyticsCharts';
+import { FiBarChart2, FiUsers } from 'react-icons/fi';
 import { truncateText, formatGroupName } from '../utils/textUtils';
 
 const ListOfPractises = () => {
@@ -16,7 +15,7 @@ const ListOfPractises = () => {
   const [questionList, setQuestionList] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [showAnalytics, setShowAnalytics] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'attempted', 'unattempted'
+  const [statusFilter, setStatusFilter] = useState('all');
   const [analyticsData, setAnalyticsData] = useState({
     monthlyStats: [],
     completionStats: []
@@ -62,24 +61,19 @@ const ListOfPractises = () => {
       questionList.forEach(question => {
         let date;
         try {
-          // Handle different date formats
           if (question.createdAt?.toDate) {
-            // Firestore Timestamp
             date = question.createdAt.toDate();
           } else if (question.createdAt instanceof Date) {
-            // JavaScript Date object
             date = question.createdAt;
           } else if (typeof question.createdAt === 'string') {
-            // ISO string
             date = new Date(question.createdAt);
           } else {
-            // If no valid date, use current date
             date = new Date();
           }
 
           const month = date.toLocaleString('default', { month: 'short', year: 'numeric' });
           const isSolved = question.solvedBy?.includes(currentUserId);
-          
+
           if (!monthlyData[month]) {
             monthlyData[month] = {
               month,
@@ -98,7 +92,6 @@ const ListOfPractises = () => {
           }
         } catch (error) {
           console.error('Error processing question date:', error);
-          // Use current date as fallback
           const month = new Date().toLocaleString('default', { month: 'short', year: 'numeric' });
           if (!monthlyData[month]) {
             monthlyData[month] = {
@@ -143,15 +136,48 @@ const ListOfPractises = () => {
     }
   }, [questionList, currentUserId]);
 
+  // Memoize filteredQuestions to stabilize its reference
+  const filteredQuestions = useMemo(() => {
+    return questionList.filter(question => {
+      const matchesTags = selectedTags.length === 0 || 
+        selectedTags.every((tag) => question.tags?.includes(tag));
+      
+      const matchesStatus = statusFilter === 'all' ||
+        (statusFilter === 'attempted' && question.solvedBy?.includes(currentUserId)) ||
+        (statusFilter === 'unattempted' && !question.solvedBy?.includes(currentUserId));
+      
+      return matchesTags && matchesStatus;
+    });
+  }, [questionList, selectedTags, statusFilter, currentUserId]);
+
+  useEffect(() => {
+    if (groupMode) {
+      const validIds = new Set(filteredQuestions.map(q => q.id));
+      const updatedSelected = new Set([...selectedForGroup].filter(id => validIds.has(id)));
+      filteredQuestions.forEach(q => updatedSelected.add(q.id));
+
+      setSelectedForGroup(updatedSelected);
+    }
+  }, [filteredQuestions, groupMode]);
+
   const handleQuestionClick = (question) => {
     if (groupMode) {
       toggleGroupSelection(question.id);
     } else {
-      
-
-    navigate("/testZone", { state: { questions: [question], quizId: question.id, isQuiz: question.isQuiz, quizData: question, collectionName: "questions", collectionId: question.id,groupMode: true } });
+      navigate("/testZone", { 
+        state: { 
+          questions: [question], 
+          quizId: question.id, 
+          isQuiz: question.isQuiz, 
+          quizData: question, 
+          collectionName: "questions", 
+          collectionId: question.id, 
+          groupMode: true 
+        }
+      });
     }
   };
+
   const toggleGroupMode = () => {
     if (!groupMode) {
       const newSelected = new Set(filteredQuestions.map(q => q.id));
@@ -161,6 +187,7 @@ const ListOfPractises = () => {
     }
     setGroupMode(!groupMode);
   };
+
   const toggleGroupSelection = (questionId) => {
     const newSelected = new Set(selectedForGroup);
     if (newSelected.has(questionId)) {
@@ -180,7 +207,7 @@ const ListOfPractises = () => {
           quizId: `group-${Date.now()}`,
           isQuiz: true,
           collectionName: "questions",
-           groupMode: true
+          groupMode: true
         }
       });
     }
@@ -199,17 +226,6 @@ const ListOfPractises = () => {
   const handleStatusFilter = (status) => {
     setStatusFilter(status);
   };
-
-  const filteredQuestions = questionList.filter(question => {
-    const matchesTags = selectedTags.length === 0 || 
-      selectedTags.every((tag) => question.tags?.includes(tag));
-    
-    const matchesStatus = statusFilter === 'all' ||
-      (statusFilter === 'attempted' && question.solvedBy?.includes(currentUserId)) ||
-      (statusFilter === 'unattempted' && !question.solvedBy?.includes(currentUserId));
-    
-    return matchesTags && matchesStatus;
-  });
 
   const COLORS = {
     light: {
@@ -240,11 +256,11 @@ const ListOfPractises = () => {
           <FiBarChart2 /> {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
         </button>
         <button 
-            className={`group-toggle ${groupMode ? 'active' : ''}`}
-            onClick={toggleGroupMode}
-          >
-            <FiUsers /> {groupMode ? 'Cancel Grouping' : 'Group Questions'}
-          </button>
+          className={`group-toggle ${groupMode ? 'active' : ''}`}
+          onClick={toggleGroupMode}
+        >
+          <FiUsers /> {groupMode ? 'Cancel Grouping' : 'Group Questions'}
+        </button>
       </div>
 
       {showAnalytics && (
