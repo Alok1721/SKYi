@@ -1,0 +1,186 @@
+.qnm-question-container {
+    width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--background-color);
+    min-height: 100vh;
+  }
+  
+  .qnm-question-container h2 {
+    text-align: center;
+    color: var(--text-color);
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+  
+  .qnm-question-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .qnm-question-wrapper {
+      flex-direction: row;
+      flex-wrap: wrap; /* Allow multiple forms to wrap */
+    }
+  }
+  
+  .qnm-left-container {
+    background-color: var(--card-background-color);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    flex: 1;
+    border: 1px solid var(--border-color);
+  }
+  
+  @media (min-width: 1024px) {
+    .qnm-left-container {
+      width: 33.3333%;
+      min-width: 300px; /* Prevent forms from getting too narrow */
+    }
+  }
+  
+  .qnm-playlist-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .qnm-playlist-group h4 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+  }
+  
+  .qnm-playlist-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Adjusted for readability */
+    gap: 0.5rem;
+  }
+  
+  .qnm-playlist-card {
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    background-color: var(--card-background);
+    color: var(--text-secondary-color);
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  
+  @media (max-width: 640px) {
+    .qnm-playlist-card {
+      flex: 1 1 100%; /* Full width on small screens */
+    }
+  }
+  
+  .qnm-playlist-card:hover {
+    background-color: var(--card-hover-background);
+  }
+  
+  .qnm-playlist-card.selected {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+  }
+  
+  .qnm-playlist-card.selected:hover {
+    background-color: var(--primary-hover-color);
+  }
+  
+  .qnm-form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .qnm-form-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+  }
+  
+  .qnm-form-group input[type="text"],
+  .qnm-form-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--text-color);
+    background-color: var(--card-background-color);
+  }
+  
+  .qnm-form-group input[type="text"]:focus,
+  .qnm-form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+  }
+  
+  .qnm-form-group select {
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M7 7l3-3 3 3m0 6l-3 3-3-3"></path></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1rem;
+  }
+  
+  .qnm-form-group input[type="file"] {
+    padding: 0.25rem;
+    width: 100%;
+    color: var(--text-color);
+  }
+  
+  .qnm-uploaded-image img {
+    display: block;
+    margin-top: 0.5rem;
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.375rem;
+  }
+  
+  .qnm-error-message {
+    color: var(--error-color, #d32f2f);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+  }
+  
+  .qnm-action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .qnm-add-question-btn,
+  .qnm-submit-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .qnm-add-question-btn {
+    background-color: var(--success-color);
+    color: #ffffff;
+  }
+  
+  .qnm-add-question-btn:hover {
+    background-color: var(--primary-hover-color);
+  }
+  
+  .qnm-submit-btn {
+    background-color: var(--primary-color);
+    color: #ffffff;
+  }
+  
+  .qnm-submit-btn:hover {
+    background-color: var(--primary-hover-color);
+  }
