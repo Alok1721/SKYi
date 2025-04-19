@@ -21,6 +21,7 @@ import Settings from './components/Settings/Settings';
 import UserSettings from './components/Settings/UserSettings';
 import WithUserHeader from './components/layout/WithUserHeader';
 import WithAdminHeader from './components/layout/WithAdminHeader';
+import PdfViewer from './pages/PdfViewer';
 
 // Wrap user pages with WithUserHeader
 const UserDashboard = WithUserHeader(Dashboard, "Dashboard");
@@ -38,6 +39,7 @@ const AdminDashboardPage = WithAdminHeader(AdminDashboard, "Admin Dashboard");
 const AdminQuizMakerPage = WithAdminHeader(AdminQuizMaker, "Quiz Maker");
 const AdminQuestionMakerPage = WithAdminHeader(AdminQuestionMaker, "Question Maker");
 const AdminCAMakerPage = WithAdminHeader(AdminCAMaker, "Current Affairs Maker");
+
 
 function AppRoutes() {
   return (
@@ -66,6 +68,9 @@ function AppRoutes() {
       {/* Special Routes (without header) */}
       <Route path="/testZone" element={<TestZone />} />
       <Route path="/quizResult" element={<QuizResult />} />
+      <Route path="/view-pdf" element={<PdfViewer />} />
+      
+      {/* Catch-all route */}
     </Routes>
   );
 }

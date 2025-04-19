@@ -1,0 +1,93 @@
+.pdf-viewer-container {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+    background-color: var(--card-background-color);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    border-radius: 12px;
+    margin: 2rem auto;
+    max-width: 95%;
+    height: calc(100vh - 4rem);
+    position: relative;
+  }
+  
+  .pdf-viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--header-background-color);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px var(--header-shadow-color);
+    border: 1px solid var(--header-border-color);
+    flex-wrap: wrap;
+  }
+  
+  .left-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .right-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .pdf-title {
+    font-size: 1.2rem;
+    color: var(--header-text-color);
+    margin: 0;
+  }
+  
+  .back-button,
+  .pdf-action-button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .back-button:hover,
+  .pdf-action-button:hover {
+    background-color: var(--primary-hover-color);
+    transform: translateY(-1px);
+  }
+  
+  .iframe-container {
+    flex-grow: 1;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    position: relative;
+  }
+  
+  .pdf-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 10px;
+  }
+  
+  .loading-overlay {
+    position: absolute;
+    top: 110px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--card-background-color);
+    color: var(--text-secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    z-index: 10;
+    pointer-events: none;
+  }
+  

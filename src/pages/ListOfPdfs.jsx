@@ -91,7 +91,14 @@ const ListOfPdfs = () => {
 
   const handlePdfClick = async (pdf) => {
     try {
-      window.open(pdf.pdfLink, "_blank");
+      // window.open(pdf.pdfLink, "_blank");
+      navigate("/view-pdf", {
+        state: {
+          pdfUrl: pdf.pdfLink,
+          pdfName: pdf.pdfName
+        }
+      });
+      
       const pdfRef = doc(db, "pdfs", pdf.id);
       await updateDoc(pdfRef, {
         readBy: arrayUnion(currentUserId),
