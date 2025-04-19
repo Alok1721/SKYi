@@ -128,7 +128,10 @@
   top: 10px;
   left: 10px;
 }
-
+.status-dots {
+  display: inline-flex;
+  align-items: center;
+}
 .selected-for-group {
   border: 2px solid var(--primary-color);
   background-color: rgba(0, 123, 255, 0.1); /* Optional: convert using a CSS var + opacity */

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/testZone.css";
 import { auth, db } from "../firebaseConfig";
-import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { doc, updateDoc, arrayUnion,setDoc } from "firebase/firestore";
 import { updateUserProgress } from "../firebaseServices/update_user_progress";
 import { isQuizSolvedById,submitQuizResult } from "../firebaseServices/quiz_services";
 import { fetchCollectionData, updateCollectionData } from "../firebaseServices/firestoreUtils";
@@ -184,6 +184,32 @@ const TestZone = () => {
     const totalAttempted = Object.values(questionStatus).filter((status) => status === "attempted").length;
     const averageTimePerQuestion = totalTimeTaken / (totalViewed || totalQuestions); // Avoid division by 0
 
+    const updateQuestionProgress = async (questionId, isCorrect) => {
+      if (!currentUserId || !questionId) {
+        console.error("Missing userId or questionId for question_progress update.");
+        return;
+      }
+      try {
+        const progressId = `${currentUserId}_${questionId}`;
+        const progressRef = doc(db, "question_progress", progressId);
+        const attempt = {
+          date: new Date().toISOString(),
+          correct: isCorrect,
+        };
+        await setDoc(
+          progressRef,
+          {
+            userId: currentUserId,
+            questionId: questionId,
+            attempts: arrayUnion(attempt),
+          },
+          { merge: true }
+        );
+        console.log(`Question progress updated for question ${questionId}`);
+      } catch (error) {
+        console.error(`Error updating question_progress for ${questionId}:`, error);
+      }
+    };
     const updatedQuestionStatus = await Promise.all(questions.map(async (question, index) => {
       const userAnswer = selectedOptions[index];
       const isAttempted = userAnswer !== undefined && userAnswer !== null;
@@ -199,6 +225,7 @@ const TestZone = () => {
           };
           if (isAttempted) {
             updateData.solvedBy = arrayUnion(currentUserId);
+            await updateQuestionProgress(question.id, isCorrect);
           }
           await updateDoc(questionRef, updateData);
         } catch (error) {

@@ -28,29 +28,40 @@ const ListOfPractises = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
+        let fetchedQuestions = [];
         if (questions?.length) {
-          setQuestionList(questions);
+          fetchedQuestions = questions;
         } else if (playlistId) {
           const playlistDoc = await getDoc(doc(db, "playlists", playlistId));
           if (playlistDoc.exists()) {
             const questionIds = playlistDoc.data().questions || [];
-
             const questionPromises = questionIds.map(async (id) => {
               const questionDoc = await getDoc(doc(db, "questions", id));
               return questionDoc.exists() ? { id, ...questionDoc.data() } : null;
             });
-
-            const fetchedQuestions = (await Promise.all(questionPromises)).filter((q) => q !== null);
-            setQuestionList(fetchedQuestions);
+            fetchedQuestions = (await Promise.all(questionPromises)).filter((q) => q !== null);
           }
         }
+
+        // Fetch question_progress for each question
+        const questionsWithProgress = await Promise.all(fetchedQuestions.map(async (question) => {
+          const progressId = `${currentUserId}_${question.id}`;
+          const progressDoc = await getDoc(doc(db, "question_progress", progressId));
+          let attempts = [];
+          if (progressDoc.exists()) {
+            attempts = progressDoc.data().attempts || [];
+          }
+          return { ...question, attempts };
+        }));
+
+        setQuestionList(questionsWithProgress);
       } catch (error) {
-        console.error("Error fetching questions:", error);
+        console.error("Error fetching questions or progress:", error);
       }
     };
 
     fetchQuestions();
-  }, [playlistId, questions]);
+  }, [playlistId, questions, currentUserId]);
 
   useEffect(() => {
     const calculateAnalytics = () => {
@@ -136,7 +147,6 @@ const ListOfPractises = () => {
     }
   }, [questionList, currentUserId]);
 
-  // Memoize filteredQuestions to stabilize its reference
   const filteredQuestions = useMemo(() => {
     return questionList.filter(question => {
       const matchesTags = selectedTags.length === 0 || 
@@ -155,7 +165,6 @@ const ListOfPractises = () => {
       const validIds = new Set(filteredQuestions.map(q => q.id));
       const updatedSelected = new Set([...selectedForGroup].filter(id => validIds.has(id)));
       filteredQuestions.forEach(q => updatedSelected.add(q.id));
-
       setSelectedForGroup(updatedSelected);
     }
   }, [filteredQuestions, groupMode]);
@@ -244,6 +253,24 @@ const ListOfPractises = () => {
 
   const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
   const currentColors = isDarkMode ? COLORS.dark : COLORS.light;
+
+  // Function to format ISO timestamp to human-readable format
+  const formatTimestamp = (isoString) => {
+    try {
+      const date = new Date(isoString);
+      return date.toLocaleString('default', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+    } catch (error) {
+      console.error('Error formatting timestamp:', error);
+      return isoString; // Fallback to raw string if parsing fails
+    }
+  };
 
   return (
     <div className="list-of-practises">
@@ -415,6 +442,26 @@ const ListOfPractises = () => {
                 </div>
                 <div className="question-status">
                   {question.solvedBy?.includes(currentUserId) ? "Solved" : "Unsolved"}
+                  {question.solvedBy?.includes(currentUserId) && question.attempts?.length > 0 && (
+                    <div className="status-dots">
+                      {question.attempts.map((attempt, index) => (
+                        <span
+                          key={index}
+                          className="status-dot"
+                          title={`Attempt on ${formatTimestamp(attempt.date)}`}
+                          style={{
+                            backgroundColor: attempt.correct ? currentColors.solved : currentColors.unsolved,
+                            width: '10px',
+                            height: '10px',
+                            borderRadius: '50%',
+                            display: 'inline-block',
+                            marginLeft: index === 0 ? '8px' : '4px',
+                            marginRight: '4px'
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="question-icon">
