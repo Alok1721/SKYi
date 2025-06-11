@@ -5,6 +5,7 @@ import AppRoutes from './routes';
 import './styles/global.css';
 import { DashboardProvider } from './components/dashboard/DashboardContext';
 import { getCurrentTheme, setTheme } from './utils/themeUtils';
+import { ExamProvider } from './contexts/ExamContext.jsx';
 
 function App() {
   useEffect(() => {
@@ -14,11 +15,16 @@ function App() {
   }, []);
 
   return (
+    <ExamProvider>
     <DashboardProvider>
+      
       <Router>
+        
         <AppRoutes />
+      
       </Router>
     </DashboardProvider>
+    </ExamProvider>
   );
 }
 

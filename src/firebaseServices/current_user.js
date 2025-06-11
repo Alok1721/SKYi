@@ -1,4 +1,4 @@
-import { auth, db } from "../firebaseConfig"; // Import Firebase instances
+import { auth, db } from "../firebaseConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -16,10 +16,17 @@ export const getCurrentUser = async () => {
     const userRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userRef);
 
-    return userDoc.exists() ? {id:user.uid,...userDoc.data()} : null;
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      return {
+        id: user.uid,
+        ...userData,
+        isAdmin: userData.role === "admin" 
+      };
+    }
+    return null;
   } catch (error) {
     console.error("Error fetching current user:", error);
     return null;
   }
 };
-

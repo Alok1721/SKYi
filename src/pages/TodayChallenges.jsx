@@ -3,21 +3,23 @@ import "../styles/todayChallenges.css";
 import { useNavigate } from "react-router-dom";
 import { fetchTodaysQuizzes, getQuizDetails } from "../firebaseServices/quiz_services";
 import { isQuizSolvedByQuizData } from "../firebaseServices/quiz_services";
+import { useExam } from '../contexts/ExamContext';
 
 const TodayChallenges = () => {
+  const { examName } = useExam();
   const navigate = useNavigate();
   const [challenges, setChallenge] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const quizzes = await fetchTodaysQuizzes();
+      const quizzes = await fetchTodaysQuizzes(examName);
       setChallenge(quizzes);
     };
     fetchData();
   }, []);
 
   const handleStartQuiz = async (quizId) => {
-    const quizData = await getQuizDetails(quizId);
+    const quizData = await getQuizDetails(quizId,examName);
     if (quizData) {
       navigate("/testZone", {
         state: {
@@ -52,7 +54,7 @@ const TodayChallenges = () => {
       <h2 className="title">Today's Challenges</h2>
       <div className="challenge-list">
         {challenges.map((challenge, index) => {
-          const isCompleted = isQuizSolvedByQuizData(challenge);
+          const isCompleted = isQuizSolvedByQuizData(challenge,examName);
           const stats = getAttemptsAndAccuracy(challenge);
           
           return (

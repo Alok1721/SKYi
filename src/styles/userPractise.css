@@ -16,10 +16,24 @@
   animation: spin 1s linear infinite;
 }
 
+
 .loading-screen p {
   font-size: 1.2rem;
   color: var(--text-secondary-color);
 }
+.no-practise-container {
+  height: 70vh; /* or 100vh if you want to center relative to full screen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.no-practise-container p {
+  font-size: 1.2rem;
+  color: #555;
+}
+
 
 @keyframes spin {
   from {

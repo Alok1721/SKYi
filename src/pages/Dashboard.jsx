@@ -36,7 +36,7 @@ const Dashboard = () => {
   const totalQuizzes = dashboardData?.totalQuizzes ?? 0;
   const todayChallenges = dashboardData?.todayChallenges ?? 0;
   const totalBacklogs = dashboardData?.totalBacklogs ?? 0;
-  const daysLeftIAS = dashboardData?.daysLeftIAS;
+  const daysLeft = dashboardData?.daysLeft;
   const userName = dashboardData?.userName;
   const userEmail = dashboardData?.userEmail;
   const userDpURL = dashboardData?.userDpURL;
@@ -208,7 +208,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <UserDashboardHeader toggleSidebar={toggleSidebar} daysLeftIAS={daysLeftIAS} userDpURL={userDpURL} />
+      <UserDashboardHeader toggleSidebar={toggleSidebar} daysLeft={daysLeft} userDpURL={userDpURL} />
       <UserSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} userName={userName} userEmail={userEmail} />
       <div className={`dashboard ${isSidebarOpen ? "shift" : ""}`}>
         <div className="stats">

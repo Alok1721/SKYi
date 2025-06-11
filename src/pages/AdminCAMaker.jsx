@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "../styles/adminCAMaker.css";
 import { db } from "../firebaseConfig";
-import { collection, addDoc, updateDoc, doc, arrayUnion, getDocs } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc, arrayUnion, getDocs, query, where } from "firebase/firestore";
 import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";
 import { sendBrevoEmail } from "../emailServices/emailFunctions";
 import { getSubscribedUsers } from "../firebaseServices/firestoreUtils";
 import { PDFEmailTemplate } from "../emailServices/emailTemplates";
+import { getAdminDefaultExam } from "../firebaseServices/admin_service";
 import LoadingScreen from "../components/loadingScreen/LoadingScreen";
 
 const AdminCAMaker = () => {
@@ -20,19 +21,31 @@ const AdminCAMaker = () => {
     },
   ]);
   const [allPlaylists, setAllPlaylists] = useState([]);
+  const [examName, setExamName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState([{}]); // Validation errors
+  const [errors, setErrors] = useState([{}]);
 
   useEffect(() => {
-    const fetchPlaylists = async () => {
-      const querySnapshot = await getDocs(collection(db, "playlists"));
-      const playlistData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        name: doc.data().name,
-      }));
-      setAllPlaylists(playlistData);
+    const fetchData = async () => {
+      try {
+        // Fetch default examName
+        const defaultExam = await getAdminDefaultExam();
+        setExamName(defaultExam);
+        // Fetch playlists filtered by examName
+        const playlistsQuery = defaultExam
+          ? query(collection(db, "playlists"), where("examName", "==", defaultExam))
+          : collection(db, "playlists");
+        const querySnapshot = await getDocs(playlistsQuery);
+        const playlistData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          name: doc.data().name,
+        }));
+        setAllPlaylists(playlistData);
+      } catch (error) {
+        console.error("Error fetching playlists:", error);
+      }
     };
-    fetchPlaylists();
+    fetchData();
   }, []);
 
   const handleFileChange = (index, file) => {
@@ -105,10 +118,10 @@ const AdminCAMaker = () => {
         quizTitle: "New PDFs Added",
         quizDescription: emailContent,
         questionCount: pdfs.length,
-        subject: "New PDFs Available",
+        subject: `New ${examName} PDFs Available`,
       });
 
-      await sendBrevoEmail(recipients, "New PDFs Available", emailBody);
+      await sendBrevoEmail(recipients, `New ${examName} PDFs Available`, emailBody);
       console.log("Email notification sent successfully");
       return { success: true };
     } catch (error) {
@@ -118,6 +131,12 @@ const AdminCAMaker = () => {
   };
 
   const handleSubmit = async () => {
+    if (!examName) {
+      alert("Please select a default exam in Settings.");
+      setIsSubmitting(false);
+      return;
+    }
+
     setIsSubmitting(true);
     const newErrors = pdfs.map(() => ({}));
     let hasErrors = false;
@@ -168,6 +187,7 @@ const AdminCAMaker = () => {
           pdfLink: pdfUrl,
           pdfThumbnail: pdfThumbnail,
           type: pdf.type,
+          examName, // Include examName
           createdAt: new Date(),
           readBy: [],
         });
@@ -177,6 +197,7 @@ const AdminCAMaker = () => {
           await updateDoc(playlistRef, {
             pdfs: arrayUnion(pdfRef.id),
             updatedAt: new Date(),
+            examName, // Ensure playlist has examName
           });
         }
       }
@@ -214,7 +235,7 @@ const AdminCAMaker = () => {
 
   return (
     <div className="qnm-question-container">
-      <h2>Add PDFs</h2>
+      <h2>Add PDFs for {examName || "No Exam Selected"}</h2>
       <div className="qnm-question-wrapper">
         {pdfs.map((pdf, index) => (
           <div key={index} className="qnm-left-container">
@@ -264,6 +285,7 @@ const AdminCAMaker = () => {
             <div className="qnm-playlist-group">
               <h4>Playlists:</h4>
               <div className="qnm-playlist-cards">
+                {allPlaylists.length === 0 && <p>No playlists available for {examName}.</p>}
                 {allPlaylists.map((playlist) => (
                   <div
                     key={playlist.id}

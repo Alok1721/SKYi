@@ -6,8 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import QuizCard from "../components/quiz/quizCard";
 import { fetchActiveBacklogs, fetchQuizById } from "../firebaseServices/quiz_services";
 import { THEMES, getCurrentTheme } from "../utils/themeUtils";
+import { useExam } from '../contexts/ExamContext';
 
 const AllActiveBacklogs = () => {
+  const { examName } = useExam();
   const [quizzesByDate, setQuizzesByDate] = useState({});
   const navigate = useNavigate();
   const currentTheme = getCurrentTheme();
@@ -20,7 +22,7 @@ const AllActiveBacklogs = () => {
   useEffect(() => {
     const loadQuizzes = async () => {
       try {
-        let groupedQuizzes = await fetchActiveBacklogs();
+        let groupedQuizzes = await fetchActiveBacklogs(examName);
         setQuizzesByDate(groupedQuizzes);
       } catch (error) {
         console.error("Error fetching quizzes:", error);
@@ -32,7 +34,7 @@ const AllActiveBacklogs = () => {
 
   const handleStartQuiz = async (quizId) => {
     try {
-      const quizData = await fetchQuizById(quizId);
+      const quizData = await fetchQuizById(quizId,examName);
       if (quizData) {
         navigate("/testZone", { 
           state: { 

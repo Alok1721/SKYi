@@ -5,9 +5,11 @@ import { auth } from "../../firebaseConfig";
 import { FiBook, FiList } from "react-icons/fi"; 
 import { fetchUserSubmissionsByQuizId } from "../../firebaseServices/quiz_services";
 import { formatDateTime, formatTime } from "../../utils/date_time";
+import { useExam } from "../../contexts/ExamContext";
 
 
 const QuizCard = ({ quiz, handleStartQuiz }) => {
+  const { examName } = useExam();
   const navigate = useNavigate();
   const currentUser = auth.currentUser;
   const currentUserId = currentUser ? currentUser.uid : null;
@@ -25,7 +27,7 @@ const QuizCard = ({ quiz, handleStartQuiz }) => {
       setShowModal(true);
       return;
     }
-    const fetchedSubmissions = await fetchUserSubmissionsByQuizId(currentUserId, quiz.id);
+    const fetchedSubmissions = await fetchUserSubmissionsByQuizId(currentUserId, quiz.id,examName);
     setSubmissions(fetchedSubmissions);
     setShowModal(true);
   };
@@ -39,7 +41,7 @@ const QuizCard = ({ quiz, handleStartQuiz }) => {
     setShowModal(false);
   };
 
-  const isSolved = isQuizSolvedById(quiz);
+  const isSolved = isQuizSolvedById(quiz,examName);
 
   return (
     <>

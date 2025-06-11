@@ -1,0 +1,78 @@
+
+.admin-exam-migration {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-exam-migration h1 {
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.admin-exam-migration p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.admin-exam-migration code {
+  background-color: var(--input-bg);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  color: var(--text-primary);
+}
+
+.migration-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.migration-button:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.migration-button:disabled {
+  background-color: var(--border-color);
+  cursor: not-allowed;
+}
+
+.migration-message {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.error-message {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: var(--error-color);
+  background-color: var(--error-bg);
+  padding: 0.75rem;
+  border-radius: 4px;
+}
+
+.back-button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: var(--secondary-hover);
+}

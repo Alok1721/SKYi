@@ -1,34 +1,36 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { fetchDashboardData } from "../../firebaseServices/firebaseData";
-import { auth } from "../../firebaseConfig"; // Only need auth here
+import { auth } from "../../firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
+import { useExam } from '../../contexts/ExamContext';
 
 const DashboardContext = createContext();
 
 export const DashboardProvider = ({ children }) => {
-  const [dashboardData, setDashboardData] = useState(null); 
-  const [loading, setLoading] = useState(false); // true for active fetch
-  const [error, setError] = useState(null); 
-  const [lastUserId, setLastUserId] = useState(null); 
+  const { examName } = useExam(); // Move useExam to top level
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [lastUserId, setLastUserId] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         if (user.uid !== lastUserId || !dashboardData) {
-          setLoading(true); 
-          setError(null); 
-          fetchDashboardData(user.uid)
+          setLoading(true);
+          setError(null);
+          fetchDashboardData(user.uid, examName)
             .then((data) => {
               setDashboardData(data);
-              setLastUserId(user.uid); 
+              setLastUserId(user.uid);
             })
             .catch((err) => {
               console.error("Error fetching dashboard data:", err);
               setError(err.message || "Failed to load dashboard data");
-              setDashboardData({}); 
+              setDashboardData({});
             })
             .finally(() => {
-              setLoading(false); 
+              setLoading(false);
             });
         }
       } else {
@@ -39,8 +41,8 @@ export const DashboardProvider = ({ children }) => {
       }
     });
 
-    return () => unsubscribe(); 
-  }, []); 
+    return () => unsubscribe();
+  }, [lastUserId, dashboardData, examName]); // Add examName to dependencies
 
   return (
     <DashboardContext.Provider value={{ dashboardData, loading, error }}>

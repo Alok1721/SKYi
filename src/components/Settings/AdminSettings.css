@@ -1,0 +1,153 @@
+.admin-settings-container {
+  padding: 2rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.admin-settings-title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+}
+
+.admin-settings-section {
+  background-color: var(--card-background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.admin-settings-section h2 {
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+  font-size: 1.25rem;
+}
+
+.admin-theme-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.admin-theme-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.admin-theme-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.admin-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--border-color);
+  transition: 0.4s;
+}
+
+.admin-slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: var(--card-background-color);
+  transition: 0.4s;
+}
+
+input:checked + .admin-slider {
+  background-color: var(--primary-color);
+}
+
+input:checked + .admin-slider:before {
+  transform: translateX(26px);
+}
+
+.admin-slider.round {
+  border-radius: 34px;
+}
+
+.admin-slider.round:before {
+  border-radius: 50%;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-form-group label {
+  font-weight: bold;
+  color: var(--text-secondary-color);
+}
+
+.admin-exam-select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  background-color: var(--card-background-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.admin-exam-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+  outline: none;
+}
+
+.admin-save-btn {
+  width: 100%;
+  padding: 0.9rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.admin-save-btn:hover {
+  background-color: var(--primary-hover-color);
+  transform: translateY(-1px);
+}
+
+.admin-save-btn:disabled {
+  background-color: var(--border-color);
+  cursor: not-allowed;
+}
+
+.admin-error {
+  color: var(--error-color);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.admin-success {
+  color: var(--success-color);
+  text-align: center;
+  margin-bottom: 1rem;
+}

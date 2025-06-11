@@ -8,9 +8,10 @@ import { isQuizSolvedById,submitQuizResult } from "../firebaseServices/quiz_serv
 import { fetchCollectionData, updateCollectionData } from "../firebaseServices/firestoreUtils";
 import { formateQuestion } from "../utils/textUtils";
 import LoadingScreen from "../components/loadingScreen/LoadingScreen";
+import { useExam } from '../contexts/ExamContext';
 
 const TestZone = () => {
-
+  const { examName } = useExam();
   const location = useLocation();
   const navigate = useNavigate();
   const quizId = location.state?.quizId || null;
@@ -153,11 +154,11 @@ const TestZone = () => {
     }
   };
 
-  const handleUpdateUserProgress = async (correctPercentage,subject) => {
+  const handleUpdateUserProgress = async (correctPercentage,subject,examName) => {
     if (currentUserId) {
       const createdAt = quizData.createdAt?.toDate ? quizData.createdAt.toDate() : new Date();
       console.log("Updating user progress...","subject:",subject);
-      await updateUserProgress(currentUserId, correctPercentage, subject|| "Mixed", createdAt);
+      await updateUserProgress(currentUserId, correctPercentage, subject|| "Mixed", createdAt,examName);
     }
   };
 
@@ -262,9 +263,9 @@ const TestZone = () => {
 
     try {
       if (groupMode) {
-        await handleUpdateUserProgress(correctPercentage, "Practise");
+        await handleUpdateUserProgress(correctPercentage, "Practise",examName);
       } else if (collectionName === "quizzes") {
-        await handleUpdateUserProgress(correctPercentage, quizData.subject);
+        await handleUpdateUserProgress(correctPercentage, quizData.subject,examName);
         if (!collectionName || !collectionId) {
           console.error("Invalid collection reference: ", { collectionName, collectionId });
           return;
@@ -279,7 +280,7 @@ const TestZone = () => {
           solvedBy: arrayUnion(currentUserId),
         });
       } else {
-        await handleUpdateUserProgress(correctPercentage, quiz.subject);
+        await handleUpdateUserProgress(correctPercentage, quiz.subject,examName);
         const questionRef = doc(db, collectionName, collectionId);
         await updateDoc(questionRef, {
           youAnswer: selectedOptions[currentQuestionIndex],
@@ -319,7 +320,7 @@ const TestZone = () => {
     };
     if(!groupMode)
     {
-      const success = await submitQuizResult(quizId, quizResult);
+      const success = await submitQuizResult(quizId, quizResult,examName);
       if (success) {
         navigate("/quizResult", { state: quizResult });
       } else {

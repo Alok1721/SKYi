@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import QuizCard from "../components/quiz/quizCard";
 import { fetchQuizzesByDate, fetchQuizById } from "../firebaseServices/quiz_services";
 import { FiLoader } from 'react-icons/fi';
+import { useExam } from '../contexts/ExamContext';
 
 const QuizzesList = () => {
+  const { examName } = useExam();
   const [quizzesByDate, setQuizzesByDate] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,7 +17,7 @@ const QuizzesList = () => {
     const loadQuizzes = async () => {
       try {
         setLoading(true);
-        const groupedQuizzes = await fetchQuizzesByDate();
+        const groupedQuizzes = await fetchQuizzesByDate(examName);
         setQuizzesByDate(groupedQuizzes);
       } catch (error) {
         console.error("Error fetching quizzes:", error);
@@ -29,7 +31,7 @@ const QuizzesList = () => {
 
   const handleStartQuiz = async (quizId) => {
     try {
-      const quizData = await fetchQuizById(quizId);
+      const quizData = await fetchQuizById(quizId,examName);
       if (quizData) {
         navigate("/testZone", {
           state: {

@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "../styles/adminQuestionMaker.css";
 import { db } from "../firebaseConfig";
-import { collection, getDocs, doc, query, where, writeBatch,arrayUnion } from "firebase/firestore";
+import { collection, getDocs, doc, query, where, writeBatch, arrayUnion } from "firebase/firestore";
 import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";
+import { getAdminDefaultExam } from "../firebaseServices/admin_service";
 import LoadingScreen from "../components/loadingScreen/LoadingScreen";
 
-const AdminQuestion = () => {
+const AdminQuestionMaker = () => {
   const [questions, setQuestions] = useState([
     {
       questionNumber: 1,
@@ -20,33 +21,45 @@ const AdminQuestion = () => {
     },
   ]);
   const [allPlaylists, setAllPlaylists] = useState([]);
+  const [examName, setExamName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
   const [allTags, setAllTags] = useState([]);
 
   useEffect(() => {
-    const fetchPlaylists = async () => {
-      const querySnapshot = await getDocs(collection(db, "playlists"));
-      const playlistData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        name: doc.data().name,
-        type: doc.data().type,
-      }));
-      const groupedPlaylists = playlistData.reduce((acc, playlist) => {
-        const type = playlist.type || "Others";
-        if (!acc[type]) acc[type] = [];
-        acc[type].push(playlist);
-        return acc;
-      }, {});
-      Object.keys(groupedPlaylists).forEach((type) => {
-        groupedPlaylists[type].sort((a, b) => a.name.localeCompare(b.name));
-      });
-      setAllPlaylists(groupedPlaylists);
+    const fetchData = async () => {
+      try {
+        // Fetch default examName
+        const defaultExam = await getAdminDefaultExam();
+        setExamName(defaultExam);
+
+        // Fetch playlists filtered by examName
+        const playlistsQuery = defaultExam
+          ? query(collection(db, "playlists"), where("examName", "==", defaultExam))
+          : collection(db, "playlists");
+        const querySnapshot = await getDocs(playlistsQuery);
+        const playlistData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          name: doc.data().name,
+          type: doc.data().type,
+        }));
+        const groupedPlaylists = playlistData.reduce((acc, playlist) => {
+          const type = playlist.type || "Others";
+          if (!acc[type]) acc[type] = [];
+          acc[type].push(playlist);
+          return acc;
+        }, {});
+        Object.keys(groupedPlaylists).forEach((type) => {
+          groupedPlaylists[type].sort((a, b) => a.name.localeCompare(b.name));
+        });
+        setAllPlaylists(groupedPlaylists);
+      } catch (error) {
+        console.error("Error fetching playlists:", error);
+      }
     };
-    fetchPlaylists();
+    fetchData();
   }, []);
 
-  // Memoize selected playlist IDs to optimize useEffect trigger
   const selectedPlaylistIds = useMemo(() => {
     const ids = new Set();
     questions.forEach((q) => {
@@ -58,15 +71,11 @@ const AdminQuestion = () => {
   useEffect(() => {
     const fetchTagsFromSelectedPlaylists = async () => {
       if (selectedPlaylistIds.length === 0) {
-        console.log("No playlists selected, clearing tags.");
         setAllTags([]);
         return;
       }
 
-      console.log("Fetching tags for playlists:", selectedPlaylistIds);
-
       try {
-        // Query questions where playlists array contains any of the selectedPlaylistIds
         const questionsQuery = query(
           collection(db, "questions"),
           where("playlists", "array-contains-any", selectedPlaylistIds)
@@ -79,13 +88,7 @@ const AdminQuestion = () => {
           tags.forEach((tag) => tagSet.add(tag));
         });
 
-        const tagsArray = Array.from(tagSet);
-        console.log("Fetched tags:", tagsArray);
-        setAllTags(tagsArray);
-
-        if (tagsArray.length === 0) {
-          console.log("No tags found. Ensure questions have the 'playlists' field.");
-        }
+        setAllTags(Array.from(tagSet));
       } catch (error) {
         console.error("Error fetching tags:", error);
         setAllTags([]);
@@ -155,7 +158,7 @@ const AdminQuestion = () => {
   };
 
   const formatToBulletHTML = (text) => {
-    const paragraphs = text.split(/\n\s*\n/); // Split by blank lines
+    const paragraphs = text.split(/\n\s*\n/);
     return paragraphs
       .map((para) => {
         const withLineBreaks = para.trim().replace(/\n/g, "<br />");
@@ -163,25 +166,26 @@ const AdminQuestion = () => {
       })
       .join("");
   };
-  
+
   const formatInlineStyles = (text) => {
     return text
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Bold
-      .replace(/[_*](.*?)[_*]/g, "<em>$1</em>");         // Italic
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/[_*](.*?)[_*]/g, "<em>$1</em>");
   };
-  
 
   const handleSubmit = async () => {
+    if (!examName) {
+      alert("Please select a default exam in Settings.");
+      setIsSubmitting(false);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const batch = writeBatch(db);
 
       for (const question of questions) {
-        if (
-          !question.question ||
-          !question.correctOption ||
-          question.playlists.length === 0
-        ) {
+        if (!question.question || !question.correctOption || question.playlists.length === 0) {
           alert("Please fill all fields for each question and select at least one playlist.");
           return;
         }
@@ -197,7 +201,8 @@ const AdminQuestion = () => {
           solution: formatToBulletHTML(question.solution),
           questionImage: question.questionImage || "",
           solutionImage: question.solutionImage || "",
-          playlists: question.playlists, // Save playlists in question
+          playlists: question.playlists,
+          examName, // Include examName
         });
 
         for (const playlistId of question.playlists) {
@@ -205,6 +210,7 @@ const AdminQuestion = () => {
           batch.update(playlistRef, {
             questions: arrayUnion(questionRef.id),
             updatedAt: new Date(),
+            examName, // Ensure playlist has examName
           });
         }
       }
@@ -239,22 +245,20 @@ const AdminQuestion = () => {
 
   return (
     <div className="admin-question-container">
-      <h2>Add Questions</h2>
+      <h2>Add Questions for {examName || "No Exam Selected"}</h2>
       {questions.map((q, index) => (
         <div key={index} className="question-wrapper">
-          {/* Left Container: Playlists and Tags */}
           <div className="left-container">
-            <h3>Playlists : {q.questionNumber}</h3>
+            <h3>Playlists: {q.questionNumber}</h3>
             {Object.entries(allPlaylists).map(([type, playlists]) => (
               <div key={type} className="playlist-group">
                 <h4>{type}</h4>
                 <div className="playlist-cards">
+                  {playlists.length === 0 && <p>No playlists available for {examName}.</p>}
                   {playlists.map((playlist) => (
                     <div
                       key={playlist.id}
-                      className={`playlist-card ${
-                        q.playlists.includes(playlist.id) ? "selected" : ""
-                      }`}
+                      className={`playlist-card ${q.playlists.includes(playlist.id) ? "selected" : ""}`}
                       onClick={() => handlePlaylistSelection(index, playlist.id)}
                     >
                       {playlist.name}
@@ -283,9 +287,9 @@ const AdminQuestion = () => {
                     onClick={() => {
                       const updatedQuestions = [...questions];
                       if (isSelected) {
-                        updatedQuestions[index].tags = updatedQuestions[
-                          index
-                        ].tags.filter((t) => t !== tag);
+                        updatedQuestions[index].tags = updatedQuestions[index].tags.filter(
+                          (t) => t !== tag
+                        );
                       } else {
                         updatedQuestions[index].tags.push(tag);
                       }
@@ -299,10 +303,9 @@ const AdminQuestion = () => {
             </div>
           </div>
 
-          {/* Right Container: Question Details */}
           <div className="right-container">
             <div className="form-group">
-              <label>Question : {q.questionNumber}</label>
+              <label>Question {q.questionNumber}</label>
               <textarea
                 placeholder="Enter question"
                 value={q.question}
@@ -320,11 +323,7 @@ const AdminQuestion = () => {
                 }
               />
               {q.questionImage && (
-                <img
-                  src={q.questionImage}
-                  alt="Question"
-                  className="uploaded-image"
-                />
+                <img src={q.questionImage} alt="Question" className="uploaded-image" />
               )}
             </div>
             <div className="form-group">
@@ -347,16 +346,14 @@ const AdminQuestion = () => {
                 type="text"
                 placeholder="Correct option (e.g., Option 1)"
                 value={q.correctOption}
-                onChange={(e) =>
-                  handleChange(index, "correctOption", e.target.value)
-                }
+                onChange={(e) => handleChange(index, "correctOption", e.target.value)}
               />
             </div>
             <div className="form-group">
               <label>Solution</label>
               <textarea
                 placeholder="Enter solution"
-                value={formatToBulletHTML(q.solution)}
+                value={q.solution}
                 onChange={(e) => handleChange(index, "solution", e.target.value)}
                 rows={4}
               />
@@ -371,11 +368,7 @@ const AdminQuestion = () => {
                 }
               />
               {q.solutionImage && (
-                <img
-                  src={q.solutionImage}
-                  alt="Solution"
-                  className="uploaded-image"
-                />
+                <img src={q.solutionImage} alt="Solution" className="uploaded-image" />
               )}
             </div>
             <div className="action-buttons">
@@ -393,4 +386,4 @@ const AdminQuestion = () => {
   );
 };
 
-export default AdminQuestion;
+export default AdminQuestionMaker;

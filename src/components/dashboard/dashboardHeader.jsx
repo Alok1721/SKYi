@@ -1,12 +1,15 @@
 import { FiMenu } from "react-icons/fi"; // Menu Icon
 import { FaFire } from "react-icons/fa"; // Fire Icon
+import { FaSpinner } from "react-icons/fa";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import React from 'react'
+import React from 'react';
+import { useExam } from '../../contexts/ExamContext';
 import "./dashboardComponents.css";
 
-const UserDashboardHeader = ({ toggleSidebar, daysLeftIAS, userDpURL, pageTitle = "Dashboard" }) => {
+const UserDashboardHeader = ({ toggleSidebar, daysLeft, userDpURL, pageTitle = "Dashboard" }) => {
   const navigate = useNavigate();
+  const { examName } = useExam();
 
   return (
     <header className="dashboard-header">
@@ -19,9 +22,18 @@ const UserDashboardHeader = ({ toggleSidebar, daysLeftIAS, userDpURL, pageTitle 
 
       <div className="header-center">
         <div className="time-left-container">
-          <span className="time-left">{daysLeftIAS ?? 0} Days left</span>
-          <FaFire className="fire-icon" />
-        </div>
+            <span className="time-left">
+              {daysLeft === null ? (
+                <FaSpinner className="spinner-icon spin" />  // loading spinner
+              ) : examName ? (
+                `${daysLeft} Days left for ${examName}`
+              ) : (
+                'Select an exam'
+              )}
+            </span>
+            {examName && daysLeft !== null && <FaFire className="fire-icon" />}
+          </div>
+
       </div>
 
       <div className="header-right">
@@ -38,7 +50,7 @@ const UserDashboardHeader = ({ toggleSidebar, daysLeftIAS, userDpURL, pageTitle 
         </button>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default UserDashboardHeader
+export default UserDashboardHeader;

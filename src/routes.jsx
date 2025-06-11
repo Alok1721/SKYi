@@ -1,4 +1,3 @@
-// src/Routes.jsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
@@ -17,11 +16,12 @@ import ListOfPractises from './pages/ListOfPractises';
 import AdminQuestionMaker from './pages/AdminQuestionMaker';
 import AdminCAMaker from './pages/AdminCAMaker';
 import ListOfPdfs from './pages/ListOfPdfs';
-import Settings from './components/Settings/Settings';
-import UserSettings from './components/Settings/UserSettings';
+import ListSettings from './components/Settings/AdminSettings';
+import ListUserSettings from './components/Settings/UserSettings';
 import WithUserHeader from './components/layout/WithUserHeader';
 import WithAdminHeader from './components/layout/WithAdminHeader';
 import PdfViewer from './pages/PdfViewer';
+import AdminExamMigration from './pages/AdminExamMigration';
 
 // Wrap user pages with WithUserHeader
 const UserDashboard = WithUserHeader(Dashboard, "Dashboard");
@@ -33,13 +33,15 @@ const UserChallenges = WithUserHeader(TodayChallenges, "Today's Challenges");
 const UserPractice = WithUserHeader(UserPractise, "Practice");
 const UserPdfs = WithUserHeader(ListOfPdfs, "PDF Resources");
 const UserPracticeList = WithUserHeader(ListOfPractises, "Practice List");
+const UserSettings = WithUserHeader(ListUserSettings, "User Setting");
 
 // Wrap admin pages with WithAdminHeader
 const AdminDashboardPage = WithAdminHeader(AdminDashboard, "Admin Dashboard");
 const AdminQuizMakerPage = WithAdminHeader(AdminQuizMaker, "Quiz Maker");
 const AdminQuestionMakerPage = WithAdminHeader(AdminQuestionMaker, "Question Maker");
 const AdminCAMakerPage = WithAdminHeader(AdminCAMaker, "Current Affairs Maker");
-
+const AdminExamMigrationPage = WithAdminHeader(AdminExamMigration, "Exam Migration");
+const Settings = WithAdminHeader(ListSettings, "Admin Setting");
 
 function AppRoutes() {
   return (
@@ -63,6 +65,7 @@ function AppRoutes() {
       <Route path="/adminQuizMaker" element={<AdminQuizMakerPage />} />
       <Route path="/adminQuestionMaker" element={<AdminQuestionMakerPage />} />
       <Route path="/adminCAMaker" element={<AdminCAMakerPage />} />
+      <Route path="/adminExamMigration" element={<AdminExamMigrationPage />} />
       <Route path="/settings" element={<Settings />} />
       
       {/* Special Routes (without header) */}

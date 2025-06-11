@@ -7,17 +7,17 @@ const WithUserHeader = (WrappedComponent, pageTitle) => {
   return function WithUserHeaderComponent(props) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const { dashboardData } = useDashboard();
-    const { daysLeftIAS, userDpURL, userName, userEmail } = dashboardData || {};
-
+    const { daysLeft, userDpURL, userName, userEmail } = dashboardData || {};
     const toggleSidebar = () => {
       setIsSidebarOpen(!isSidebarOpen);
     };
+    console.log("dashboard data, dayleft: ",daysLeft," url:",userDpURL);
 
     return (
       <>
         <UserDashboardHeader 
           toggleSidebar={toggleSidebar} 
-          daysLeftIAS={daysLeftIAS} 
+          daysLeft={daysLeft} 
           userDpURL={userDpURL}
           pageTitle={pageTitle}
         />
