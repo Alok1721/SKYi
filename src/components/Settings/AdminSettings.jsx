@@ -11,7 +11,18 @@ import {
   doc,
   getDoc,
   updateDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+  addDoc,
 } from "firebase/firestore";
+import {
+  fetchPlaylistsByExam,
+  createPlaylist,
+  updatePlaylist,
+} from "../../firebaseServices/playlist";
+
 
 import { auth, db } from "../../firebaseConfig";
 import { THEMES, getCurrentTheme, setTheme } from "../../utils/themeUtils";
@@ -104,6 +115,25 @@ const [newPlaylistType, setNewPlaylistType] = useState("");
 
   loadExamDetails();
 }, [selectedExamForUpdate]);
+  //----------------- Playlist Management---------------
+ useEffect(() => {
+  if (!selectedExamForUpdate) return;
+
+  const loadPlaylists = async () => {
+    try {
+      const data = await fetchPlaylistsByExam(
+        selectedExamForUpdate
+      );
+      setPlaylists(data);
+    } catch (err) {
+      console.error("Error fetching playlists:", err);
+      setError("Failed to load playlists.");
+    }
+  };
+
+  loadPlaylists();
+}, [selectedExamForUpdate]);
+
 
 
   // ---------------- HANDLERS ----------------
@@ -192,6 +222,68 @@ const handleAddNewExam = async () => {
     setIsUpdatingExam(false);
   }
 };
+
+  const handleSelectPlaylist = (playlist) => {
+  setSelectedPlaylist(playlist);
+  setPlaylistName(playlist.name);
+  setPlaylistType(playlist.type || "");
+};
+const handleUpdatePlaylist = async () => {
+  if (!selectedPlaylist) return;
+
+  try {
+    setIsUpdatingExam(true);
+
+    await updatePlaylist(selectedPlaylist.id, {
+      name: playlistName,
+      type: playlistType,
+    });
+
+    setPlaylists((prev) =>
+      prev.map((p) =>
+        p.id === selectedPlaylist.id
+          ? { ...p, name: playlistName, type: playlistType }
+          : p
+      )
+    );
+
+    setSuccessMessage("Playlist updated successfully!");
+    setError("");
+  } catch (err) {
+    console.error(err);
+    setError("Failed to update playlist.");
+  } finally {
+    setIsUpdatingExam(false);
+  }
+};
+
+const handleAddPlaylist = async () => {
+  if (!newPlaylistName.trim() || !selectedExamForUpdate) {
+    return setError("Playlist name & exam required.");
+  }
+
+  try {
+    await createPlaylist({
+      name: newPlaylistName,
+      type: newPlaylistType,
+      examName: selectedExamForUpdate,
+    });
+
+    const updated = await fetchPlaylistsByExam(
+      selectedExamForUpdate
+    );
+    setPlaylists(updated);
+
+    setSuccessMessage("Playlist added!");
+    setNewPlaylistName("");
+    setNewPlaylistType("");
+    setError("");
+  } catch (err) {
+    console.error(err);
+    setError("Failed to add playlist.");
+  }
+};
+
 
 
   // ---------------- UI ----------------
@@ -344,6 +436,76 @@ const handleAddNewExam = async () => {
           </div>
         )}
       </div>
+      <div className="admin-settings-section">
+  <h2>Playlist Management</h2>
+
+  {!selectedExamForUpdate && (
+    <p>Select an exam above to manage playlists.</p>
+  )}
+
+  {/* Existing Playlists */}
+  <div className="playlist-grid">
+    {playlists.map((pl) => (
+      <div
+        key={pl.id}
+        className={`playlist-card ${
+          selectedPlaylist?.id === pl.id ? "selected" : ""
+        }`}
+        onClick={() => handleSelectPlaylist(pl)}
+      >
+        <strong>{pl.name}</strong>
+        <span>{pl.type}</span>
+      </div>
+    ))}
+  </div>
+
+  {/* Update Playlist */}
+  {selectedPlaylist && (
+    <>
+      <h3>Edit Playlist</h3>
+
+      <input
+        className="admin-exam-select"
+        value={playlistName}
+        onChange={(e) => setPlaylistName(e.target.value)}
+        placeholder="Playlist Name"
+      />
+
+      <input
+        className="admin-exam-select"
+        value={playlistType}
+        onChange={(e) => setPlaylistType(e.target.value)}
+        placeholder="Playlist Type"
+      />
+
+      <button className="admin-save-btn" onClick={handleUpdatePlaylist}>
+        Update Playlist
+      </button>
+    </>
+  )}
+
+    {/* Add Playlist */}
+    <h3>Add New Playlist</h3>
+
+    <input
+      className="admin-exam-select"
+      value={newPlaylistName}
+      onChange={(e) => setNewPlaylistName(e.target.value)}
+      placeholder="Playlist Name"
+    />
+
+    <input
+      className="admin-exam-select"
+      value={newPlaylistType}
+      onChange={(e) => setNewPlaylistType(e.target.value)}
+      placeholder="Playlist Type"
+    />
+
+    <button className="admin-save-btn" onClick={handleAddPlaylist}>
+      Add Playlist
+    </button>
+  </div>
+
     </div>
   );
 };

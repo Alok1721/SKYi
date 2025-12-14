@@ -151,3 +151,28 @@ input:checked + .admin-slider:before {
   text-align: center;
   margin-bottom: 1rem;
 }
+
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.playlist-card {
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--card-background-color);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.playlist-card:hover {
+  transform: translateY(-2px);
+}
+
+.playlist-card.selected {
+  border-color: var(--primary-color);
+  background: rgba(76, 175, 80, 0.1);
+}
