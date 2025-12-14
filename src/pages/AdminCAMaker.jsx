@@ -32,6 +32,7 @@ const AdminCAMaker = () => {
         const defaultExam = await getAdminDefaultExam();
         setExamName(defaultExam);
         // Fetch playlists filtered by examName
+        
         const playlistsQuery = defaultExam
           ? query(collection(db, "playlists"), where("examName", "==", defaultExam))
           : collection(db, "playlists");
