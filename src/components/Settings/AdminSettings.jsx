@@ -8,296 +8,176 @@ import {
   addSubjectToExam,
 } from "../../firebaseServices/exam_details";
 import {
-  doc,
-  getDoc,
-  updateDoc,
-  collection,
-  getDocs,
-  query,
-  where,
-  addDoc,
-} from "firebase/firestore";
-import {
   fetchPlaylistsByExam,
   createPlaylist,
   updatePlaylist,
 } from "../../firebaseServices/playlist";
-
-
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../firebaseConfig";
 import { THEMES, getCurrentTheme, setTheme } from "../../utils/themeUtils";
 import LoadingScreen from "../loadingScreen/LoadingScreen";
 import "./AdminSettings.css";
 
+/* ---------------------------------------------------
+   Reusable Collapsible Section
+--------------------------------------------------- */
+const AdminSection = ({ title, isOpen, onToggle, children }) => {
+  return (
+    <div className="admin-settings-section">
+      <div className="admin-section-header" onClick={onToggle}>
+        <h2>{title}</h2>
+        <span className="admin-section-toggle">{isOpen ? "−" : "+"}</span>
+      </div>
+
+      {isOpen && <div className="admin-section-content">{children}</div>}
+    </div>
+  );
+};
+
 const AdminSettings = () => {
-  // Theme
+  /* ---------------- Theme ---------------- */
   const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
 
-  // Exams
+  /* ---------------- Exams ---------------- */
   const [examOptions, setExamOptions] = useState([]);
   const [examName, setExamName] = useState("");
 
-  // Add exam
   const [newExamName, setNewExamName] = useState("");
-  const [isAddingExam, setIsAddingExam] = useState(false);
-
-  // Update exam
   const [selectedExamForUpdate, setSelectedExamForUpdate] = useState("");
   const [examDate, setExamDate] = useState("");
   const [newSubject, setNewSubject] = useState("");
   const [currentSubjects, setCurrentSubjects] = useState([]);
-  const [isUpdatingExam, setIsUpdatingExam] = useState(false);
 
-  // UI states
+  /* ---------------- Playlists ---------------- */
+  const [playlists, setPlaylists] = useState([]);
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [playlistName, setPlaylistName] = useState("");
+  const [playlistType, setPlaylistType] = useState("");
+  const [newPlaylistName, setNewPlaylistName] = useState("");
+  const [newPlaylistType, setNewPlaylistType] = useState("");
+
+  /* ---------------- UI ---------------- */
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Playlist management
-const [playlists, setPlaylists] = useState([]);
-const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  /* ---------------- Section Control ---------------- */
+  const [openSection, setOpenSection] = useState("general");
+  const toggleSection = (key) =>
+    setOpenSection((prev) => (prev === key ? "" : key));
 
-const [playlistName, setPlaylistName] = useState("");
-const [playlistType, setPlaylistType] = useState("");
-
-const [newPlaylistName, setNewPlaylistName] = useState("");
-const [newPlaylistType, setNewPlaylistType] = useState("");
-
-
-  // ---------------- FETCH INITIAL DATA ----------------
+  /* ---------------- Initial Load ---------------- */
   useEffect(() => {
-  const fetchSettings = async () => {
-    try {
-      const exams = await fetchAllExams();
-      setExamOptions(exams);
+    const init = async () => {
+      try {
+        const exams = await fetchAllExams();
+        setExamOptions(exams);
 
-      const user = auth.currentUser;
-      if (user) {
-        const userSnap = await getDoc(doc(db, "users", user.uid));
-        if (userSnap.exists()) {
-          setExamName(userSnap.data().examName || "");
+        const user = auth.currentUser;
+        if (user) {
+          const snap = await getDoc(doc(db, "users", user.uid));
+          if (snap.exists()) setExamName(snap.data().examName || "");
         }
+      } catch {
+        setError("Failed to load settings.");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      console.error("fetchSettings error:", err);
-      setError("Failed to load settings.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  fetchSettings();
-  setTheme(currentTheme);
-}, [currentTheme]);
+    init();
+    setTheme(currentTheme);
+  }, [currentTheme]);
 
-
-  // ---------------- FETCH SELECTED EXAM DETAILS ----------------
+  /* ---------------- Load Exam Details ---------------- */
   useEffect(() => {
-  if (!selectedExamForUpdate) return;
+    if (!selectedExamForUpdate) return;
 
-  const loadExamDetails = async () => {
-    try {
+    const load = async () => {
       const data = await fetchExamDetails(selectedExamForUpdate);
       if (!data) return;
 
       setCurrentSubjects(data.subject || []);
       setExamDate(
         data.examDate
-          ? new Date(data.examDate.seconds * 1000)
-              .toISOString()
-              .split("T")[0]
+          ? new Date(data.examDate.seconds * 1000).toISOString().split("T")[0]
           : ""
       );
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
-  loadExamDetails();
-}, [selectedExamForUpdate]);
-  //----------------- Playlist Management---------------
- useEffect(() => {
-  if (!selectedExamForUpdate) return;
+      const pl = await fetchPlaylistsByExam(selectedExamForUpdate);
+      setPlaylists(pl);
+    };
 
-  const loadPlaylists = async () => {
-    try {
-      const data = await fetchPlaylistsByExam(
-        selectedExamForUpdate
-      );
-      setPlaylists(data);
-    } catch (err) {
-      console.error("Error fetching playlists:", err);
-      setError("Failed to load playlists.");
-    }
-  };
+    load();
+  }, [selectedExamForUpdate]);
 
-  loadPlaylists();
-}, [selectedExamForUpdate]);
-
-
-
-  // ---------------- HANDLERS ----------------
-
-  const handleThemeToggle = () => {
+  /* ---------------- Handlers ---------------- */
+  const handleThemeToggle = () =>
     setCurrentTheme(
-      currentTheme === THEMES.LIGHT ? THEMES.DARK : THEMES.LIGHT
+      currentTheme === THEMES.DARK ? THEMES.LIGHT : THEMES.DARK
     );
-  };
 
   const handleSaveExam = async () => {
-    if (!examName) {
-      setError("Please select an exam.");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      await updateDoc(doc(db, "users", auth.currentUser.uid), {
-        examName,
-      });
-      setSuccessMessage("Default exam saved!");
-      setError("");
-    } catch (err) {
-      setError("Failed to save exam.");
-    } finally {
-      setIsLoading(false);
-    }
+    if (!examName) return setError("Select an exam.");
+    await updateDoc(doc(db, "users", auth.currentUser.uid), { examName });
+    setSuccessMessage("Default exam saved!");
   };
 
-const handleAddNewExam = async () => {
-  const name = newExamName.trim();
-  if (!name) return setError("Exam name cannot be empty.");
-  if (examOptions.includes(name)) return setError("Exam already exists.");
-
-  try {
-    setIsAddingExam(true);
-    await createExam(name);
-
-    setExamOptions((prev) => [...prev, name]);
-    setExamName(name);
+  const handleAddExam = async () => {
+    if (!newExamName.trim()) return;
+    await createExam(newExamName);
+    setExamOptions((p) => [...p, newExamName]);
     setNewExamName("");
-    setSuccessMessage("Exam created successfully!");
-    setError("");
-  } catch {
-    setError("Failed to create exam.");
-  } finally {
-    setIsAddingExam(false);
-  }
-};
+    setSuccessMessage("Exam created!");
+  };
 
-
-  const handleAddSubject = async () => {
-  if (!newSubject.trim() || !selectedExamForUpdate) return;
-  if (currentSubjects.includes(newSubject))
-    return setError("Subject already exists.");
-
-  try {
-    setIsUpdatingExam(true);
-    await addSubjectToExam(selectedExamForUpdate, newSubject);
-
-    setCurrentSubjects((prev) => [...prev, newSubject]);
-    setNewSubject("");
-    setSuccessMessage("Subject added successfully!");
-    setError("");
-  } catch {
-    setError("Failed to add subject.");
-  } finally {
-    setIsUpdatingExam(false);
-  }
-};
-
-
- const handleUpdateExamDate = async () => {
-  if (!examDate || !selectedExamForUpdate) return;
-
-  try {
-    setIsUpdatingExam(true);
+  const handleUpdateDate = async () => {
     await updateExamDate(selectedExamForUpdate, examDate);
-
     setSuccessMessage("Exam date updated!");
-    setError("");
-  } catch {
-    setError("Failed to update exam date.");
-  } finally {
-    setIsUpdatingExam(false);
-  }
-};
+  };
 
-  const handleSelectPlaylist = (playlist) => {
-  setSelectedPlaylist(playlist);
-  setPlaylistName(playlist.name);
-  setPlaylistType(playlist.type || "");
-};
-const handleUpdatePlaylist = async () => {
-  if (!selectedPlaylist) return;
+  const handleAddSubjectClick = async () => {
+    await addSubjectToExam(selectedExamForUpdate, newSubject);
+    setCurrentSubjects((p) => [...p, newSubject]);
+    setNewSubject("");
+    setSuccessMessage("Subject added!");
+  };
 
-  try {
-    setIsUpdatingExam(true);
-
+  const handleUpdatePlaylist = async () => {
     await updatePlaylist(selectedPlaylist.id, {
       name: playlistName,
       type: playlistType,
     });
+    setSuccessMessage("Playlist updated!");
+  };
 
-    setPlaylists((prev) =>
-      prev.map((p) =>
-        p.id === selectedPlaylist.id
-          ? { ...p, name: playlistName, type: playlistType }
-          : p
-      )
-    );
-
-    setSuccessMessage("Playlist updated successfully!");
-    setError("");
-  } catch (err) {
-    console.error(err);
-    setError("Failed to update playlist.");
-  } finally {
-    setIsUpdatingExam(false);
-  }
-};
-
-const handleAddPlaylist = async () => {
-  if (!newPlaylistName.trim() || !selectedExamForUpdate) {
-    return setError("Playlist name & exam required.");
-  }
-
-  try {
+  const handleAddPlaylist = async () => {
     await createPlaylist({
       name: newPlaylistName,
       type: newPlaylistType,
       examName: selectedExamForUpdate,
     });
-
-    const updated = await fetchPlaylistsByExam(
-      selectedExamForUpdate
-    );
-    setPlaylists(updated);
-
-    setSuccessMessage("Playlist added!");
+    setPlaylists(await fetchPlaylistsByExam(selectedExamForUpdate));
     setNewPlaylistName("");
     setNewPlaylistType("");
-    setError("");
-  } catch (err) {
-    console.error(err);
-    setError("Failed to add playlist.");
-  }
-};
+    setSuccessMessage("Playlist added!");
+  };
 
-
-
-  // ---------------- UI ----------------
-  if (isLoading) {
-    return <LoadingScreen message="Loading admin settings..." />;
-  }
+  if (isLoading) return <LoadingScreen message="Loading Admin Settings..." />;
 
   return (
     <div className="admin-settings-container">
       <h1 className="admin-settings-title">Admin Settings</h1>
 
-      {/* Appearance */}
-      <div className="admin-settings-section">
-        <h2>Appearance</h2>
+      {error && <p className="admin-error">{error}</p>}
+      {successMessage && <p className="admin-success">{successMessage}</p>}
+
+      {/* GENERAL */}
+      <AdminSection
+        title="General Settings"
+        isOpen={openSection === "general"}
+        onToggle={() => toggleSection("general")}
+      >
         <div className="admin-theme-toggle">
           <span>Dark Mode</span>
           <label className="admin-theme-switch">
@@ -306,206 +186,153 @@ const handleAddPlaylist = async () => {
               checked={currentTheme === THEMES.DARK}
               onChange={handleThemeToggle}
             />
-            <span className="admin-slider round"></span>
+            <span className="admin-slider round" />
           </label>
         </div>
-      </div>
 
-      {/* Exam Settings */}
-      <div className="admin-settings-section">
-        <h2>Exam Settings</h2>
-
-        {error && <p className="admin-error">{error}</p>}
-        {successMessage && (
-          <p className="admin-success">{successMessage}</p>
-        )}
-
-        <div className="admin-form-group">
-          <label>Select Default Exam</label>
-          <select
-            value={examName}
-            onChange={(e) => setExamName(e.target.value)}
-            className="admin-exam-select"
-          >
-            <option value="">Select exam</option>
-            {examOptions.map((exam) => (
-              <option key={exam} value={exam}>
-                {exam}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <button
-          onClick={handleSaveExam}
-          className="admin-save-btn"
+        <select
+          className="admin-exam-select"
+          value={examName}
+          onChange={(e) => setExamName(e.target.value)}
         >
-          Save Exam
+          <option value="">Select Default Exam</option>
+          {examOptions.map((e) => (
+            <option key={e}>{e}</option>
+          ))}
+        </select>
+
+        <button className="admin-save-btn" onClick={handleSaveExam}>
+          Save Default Exam
         </button>
-      </div>
+      </AdminSection>
 
-      {/* Add Exam */}
-      <div className="admin-settings-section">
-        <h2>Add New Exam</h2>
-
-        <div className="admin-form-group">
-          <label>Exam Name</label>
-          <input
-            type="text"
-            value={newExamName}
-            onChange={(e) => setNewExamName(e.target.value)}
-            placeholder="Enter exam name"
-            className="admin-exam-select"
-          />
-        </div>
-
-        <button
-          onClick={handleAddNewExam}
-          className="admin-save-btn"
-          disabled={isAddingExam}
-        >
+      {/* EXAM MANAGEMENT */}
+      <AdminSection
+        title="Exam Management"
+        isOpen={openSection === "exam"}
+        onToggle={() => toggleSection("exam")}
+      >
+        <input
+          className="admin-exam-select"
+          placeholder="New Exam Name"
+          value={newExamName}
+          onChange={(e) => setNewExamName(e.target.value)}
+        />
+        <button className="admin-save-btn" onClick={handleAddExam}>
           Add Exam
         </button>
-      </div>
 
-      {/* Update Exam */}
-      <div className="admin-settings-section">
-        <h2>Update Exam</h2>
+        <hr />
 
-        <div className="admin-form-group">
-          <label>Select Exam</label>
-          <select
-            value={selectedExamForUpdate}
-            onChange={(e) =>
-              setSelectedExamForUpdate(e.target.value)
-            }
-            className="admin-exam-select"
-          >
-            <option value="">Select exam</option>
-            {examOptions.map((exam) => (
-              <option key={exam} value={exam}>
-                {exam}
-              </option>
-            ))}
-          </select>
-        </div>
+        <select
+          className="admin-exam-select"
+          value={selectedExamForUpdate}
+          onChange={(e) => setSelectedExamForUpdate(e.target.value)}
+        >
+          <option value="">Select Exam to Update</option>
+          {examOptions.map((e) => (
+            <option key={e}>{e}</option>
+          ))}
+        </select>
 
-        <div className="admin-form-group">
-          <label>Exam Date</label>
-          <input
-            type="date"
-            value={examDate}
-            onChange={(e) => setExamDate(e.target.value)}
-            className="admin-exam-select"
-          />
-          <button
-            onClick={handleUpdateExamDate}
-            className="admin-save-btn"
-            disabled={isUpdatingExam}
-          >
-            Update Exam Date
-          </button>
-        </div>
+        {selectedExamForUpdate && (
+          <>
+            <input
+              type="date"
+              className="admin-exam-select"
+              value={examDate}
+              onChange={(e) => setExamDate(e.target.value)}
+            />
+            <button className="admin-save-btn" onClick={handleUpdateDate}>
+              Update Date
+            </button>
 
-        <div className="admin-form-group">
-          <label>Add Subject</label>
-          <input
-            type="text"
-            value={newSubject}
-            onChange={(e) => setNewSubject(e.target.value)}
-            placeholder="Enter subject name"
-            className="admin-exam-select"
-          />
-          <button
-            onClick={handleAddSubject}
-            className="admin-save-btn"
-            disabled={isUpdatingExam}
-          >
-            Add Subject
-          </button>
-        </div>
-
-        {currentSubjects.length > 0 && (
-          <div className="admin-form-group">
-            <label>Current Subjects</label>
-            <ul>
-              {currentSubjects.map((sub, idx) => (
-                <li key={idx}>{sub}</li>
-              ))}
-            </ul>
-          </div>
+            <input
+              className="admin-exam-select"
+              placeholder="New Subject"
+              value={newSubject}
+              onChange={(e) => setNewSubject(e.target.value)}
+            />
+            <button
+              className="admin-save-btn"
+              onClick={handleAddSubjectClick}
+            >
+              Add Subject
+            </button>
+          </>
         )}
-      </div>
-      <div className="admin-settings-section">
-  <h2>Playlist Management</h2>
+      </AdminSection>
 
-  {!selectedExamForUpdate && (
-    <p>Select an exam above to manage playlists.</p>
-  )}
-
-  {/* Existing Playlists */}
-  <div className="playlist-grid">
-    {playlists.map((pl) => (
-      <div
-        key={pl.id}
-        className={`playlist-card ${
-          selectedPlaylist?.id === pl.id ? "selected" : ""
-        }`}
-        onClick={() => handleSelectPlaylist(pl)}
+      {/* PLAYLIST MANAGEMENT */}
+      <AdminSection
+        title="Playlist Management"
+        isOpen={openSection === "playlist"}
+        onToggle={() => toggleSection("playlist")}
       >
-        <strong>{pl.name}</strong>
-        <span>{pl.type}</span>
-      </div>
-    ))}
-  </div>
+        {!selectedExamForUpdate && <p>Select an exam first.</p>}
 
-  {/* Update Playlist */}
-  {selectedPlaylist && (
-    <>
-      <h3>Edit Playlist</h3>
+        {selectedExamForUpdate && (
+          <>
+            <div className="playlist-grid">
+              {playlists.map((p) => (
+                <div
+                  key={p.id}
+                  className={`playlist-card ${
+                    selectedPlaylist?.id === p.id ? "selected" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedPlaylist(p);
+                    setPlaylistName(p.name);
+                    setPlaylistType(p.type || "");
+                  }}
+                >
+                  <strong>{p.name}</strong>
+                  <span>{p.type}</span>
+                </div>
+              ))}
+            </div>
 
-      <input
-        className="admin-exam-select"
-        value={playlistName}
-        onChange={(e) => setPlaylistName(e.target.value)}
-        placeholder="Playlist Name"
-      />
+            {selectedPlaylist && (
+              <>
+                <input
+                  className="admin-exam-select"
+                  value={playlistName}
+                  onChange={(e) => setPlaylistName(e.target.value)}
+                />
+                <input
+                  className="admin-exam-select"
+                  value={playlistType}
+                  onChange={(e) => setPlaylistType(e.target.value)}
+                />
+                <button
+                  className="admin-save-btn"
+                  onClick={handleUpdatePlaylist}
+                >
+                  Update Playlist
+                </button>
+              </>
+            )}
 
-      <input
-        className="admin-exam-select"
-        value={playlistType}
-        onChange={(e) => setPlaylistType(e.target.value)}
-        placeholder="Playlist Type"
-      />
+            <hr />
 
-      <button className="admin-save-btn" onClick={handleUpdatePlaylist}>
-        Update Playlist
-      </button>
-    </>
-  )}
-
-    {/* Add Playlist */}
-    <h3>Add New Playlist</h3>
-
-    <input
-      className="admin-exam-select"
-      value={newPlaylistName}
-      onChange={(e) => setNewPlaylistName(e.target.value)}
-      placeholder="Playlist Name"
-    />
-
-    <input
-      className="admin-exam-select"
-      value={newPlaylistType}
-      onChange={(e) => setNewPlaylistType(e.target.value)}
-      placeholder="Playlist Type"
-    />
-
-    <button className="admin-save-btn" onClick={handleAddPlaylist}>
-      Add Playlist
-    </button>
-  </div>
-
+            <input
+              className="admin-exam-select"
+              placeholder="New Playlist Name"
+              value={newPlaylistName}
+              onChange={(e) => setNewPlaylistName(e.target.value)}
+            />
+            <input
+              className="admin-exam-select"
+              placeholder="Playlist Type"
+              value={newPlaylistType}
+              onChange={(e) => setNewPlaylistType(e.target.value)}
+            />
+            <button className="admin-save-btn" onClick={handleAddPlaylist}>
+              Add Playlist
+            </button>
+          </>
+        )}
+      </AdminSection>
     </div>
   );
 };
