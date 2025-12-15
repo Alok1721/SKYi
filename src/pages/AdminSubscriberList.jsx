@@ -46,6 +46,10 @@ const AdminSubscriberList = () => {
 
   /* ---------------- ONLINE / OFFLINE STATUS ---------------- */
   useEffect(() => {
+  console.log("STATUS MAP:", userStatusMap);
+}, [userStatusMap]);
+
+  useEffect(() => {
     if (!users.length) return;
 
     const unsubscribers = users.map((user) =>
