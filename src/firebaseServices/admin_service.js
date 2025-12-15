@@ -1,4 +1,4 @@
-import { db } from "../firebaseConfig";
+import { db, auth  } from "../firebaseConfig";
 import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 export const getAdminDefaultExam = async () => {
   console.log("inside the adminExamNameFetch");
