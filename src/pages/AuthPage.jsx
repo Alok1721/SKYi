@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { auth, db } from "../firebaseConfig";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { auth, db, realtimeDB } from "../firebaseConfig";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import { setDoc, doc, getDoc } from "firebase/firestore";
+import { ref, set, onDisconnect, onValue } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import { FiBook, FiAward, FiUsers, FiLogIn, FiEye, FiMail } from "react-icons/fi";
 import "../styles/authPage.css";
@@ -18,8 +23,8 @@ const dummyUserData = {
   progress: {
     totalQuizzes: 0,
     averageScore: 0,
-    completedTopics: []
-  }
+    completedTopics: [],
+  },
 };
 
 const dummyTodayChallenge = {
@@ -33,26 +38,32 @@ const dummyTodayChallenge = {
       question: "Which country recently launched its first indigenous aircraft carrier?",
       options: ["India", "China", "Russia", "USA"],
       correctAnswer: "India",
-      explanation: "India launched its first indigenous aircraft carrier, INS Vikrant, in 2022."
+      explanation:
+        "India launched its first indigenous aircraft carrier, INS Vikrant, in 2022.",
     },
     {
       id: 2,
       question: "What is the theme of World Environment Day 2024?",
       options: ["Ecosystem Restoration", "Beat Plastic Pollution", "Only One Earth", "Air Pollution"],
       correctAnswer: "Ecosystem Restoration",
-      explanation: "The theme for World Environment Day 2024 is 'Ecosystem Restoration'."
+      explanation: "The theme for World Environment Day 2024 is 'Ecosystem Restoration'.",
     },
     {
       id: 3,
       question: "Which Indian state recently launched the 'One District One Product' scheme?",
       options: ["Uttar Pradesh", "Maharashtra", "Karnataka", "Tamil Nadu"],
       correctAnswer: "Uttar Pradesh",
-      explanation: "Uttar Pradesh launched the 'One District One Product' scheme to promote local products."
-    }
+      explanation:
+        "Uttar Pradesh launched the 'One District One Product' scheme to promote local products.",
+    },
   ],
   totalQuestions: 3,
-  passingScore: 60
+  passingScore: 60,
 };
+
+const TIME_FILTERS = [
+  // not used here but keep if needed later
+];
 
 const AuthPage = () => {
   const [isSignup, setIsSignup] = useState(false);
@@ -80,60 +91,76 @@ const AuthPage = () => {
     }
   }, [navigate]);
 
+  /* ---------------- HANDLE ONLINE STATUS ---------------- */
+  const setUserOnline = (uid) => {
+    const connectedRef = ref(realtimeDB, ".info/connected");
+
+    onValue(connectedRef, (snap) => {
+      if (snap.val() === true) {
+        const statusRef = ref(realtimeDB, `status/${uid}`);
+        set(statusRef, { isOnline: true, lastActive: new Date().toISOString() });
+
+        onDisconnect(statusRef).set({
+          isOnline: false,
+          lastActive: new Date().toISOString(),
+        });
+      }
+    });
+  };
+
   const handleAuth = async () => {
     setIsUserLoading(true);
     try {
       if (isSignup) {
-        // Signup process
+        // Signup
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        
-        // Send verification email
+
         await sendEmailVerification(user);
         setVerificationSent(true);
         setVerificationEmail(email);
-        
-        // Store user data in Firestore
-        const userData = { 
-          uid: user.uid, 
-          name, 
-          email, 
-          role, 
-          createdAt: new Date(), 
+
+        const userData = {
+          uid: user.uid,
+          name,
+          email,
+          role,
+          createdAt: new Date(),
           subscriptions: [],
-          emailVerified: false
+          emailVerified: false,
         };
         await setDoc(doc(db, "users", user.uid), userData);
-        
-        // Clear form
+
         setEmail("");
         setPassword("");
         setName("");
         setRole("user");
       } else {
-        // Login process
+        // Login
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        
-        // Check if email is verified
+
         if (!user.emailVerified) {
           setError("Please verify your email address before logging in.");
           return;
         }
-        
+
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
           localStorage.setItem("user", JSON.stringify(userData));
-          navigate(userDoc.data().role === "admin" ? "/adminDashboard" : "/userDashboard");
+
+          // Set user online properly
+          setUserOnline(user.uid);
+
+          navigate(userData.role === "admin" ? "/adminDashboard" : "/userDashboard");
         } else {
           setError("User role not found!");
         }
       }
     } catch (err) {
       setError(err.message);
-    }
-    finally {
+    } finally {
       setIsUserLoading(false);
     }
   };
@@ -151,15 +178,16 @@ const AuthPage = () => {
   };
 
   const enterGuestMode = () => {
-    // Store guest data in localStorage
     localStorage.setItem("user", JSON.stringify(dummyUserData));
     localStorage.setItem("guestMode", "true");
     localStorage.setItem("todayChallenge", JSON.stringify(dummyTodayChallenge));
     navigate("/userDashboard");
   };
-  if(isUserLoading) {
+
+  if (isUserLoading) {
     return <LoadingScreen message={isSignup ? "Creating account..." : "Logging in..."} />;
   }
+
   return (
     <div className="auth-page">
       {/* Hero Section */}
@@ -178,32 +206,13 @@ const AuthPage = () => {
         </div>
       </div>
 
-      {/* Features Section */}
-      <div className="features-section">
-        <div className="feature-card">
-          <FiBook className="feature-icon" />
-          <h3>Comprehensive Study Material</h3>
-          <p>Access high-quality study materials curated by experts</p>
-        </div>
-        <div className="feature-card">
-          <FiAward className="feature-icon" />
-          <h3>Mock Tests & Analysis</h3>
-          <p>Practice with simulated tests and detailed performance analysis</p>
-        </div>
-        <div className="feature-card">
-          <FiUsers className="feature-icon" />
-          <h3>Expert Guidance</h3>
-          <p>Get guidance from experienced mentors and toppers</p>
-        </div>
-      </div>
-
       {/* Auth Form Overlay */}
       {showAuthForm && (
         <div className="auth-overlay">
           <div className="auth-container">
             <button className="auth-close-button" onClick={() => setShowAuthForm(false)}>×</button>
             <h2>{isSignup ? "Sign Up" : "Login"}</h2>
-            
+
             {error && <p className="error">{error}</p>}
 
             {verificationSent ? (
@@ -229,30 +238,25 @@ const AuthPage = () => {
                     onChange={(e) => setName(e.target.value)}
                   />
                 )}
-
                 <input
                   type="email"
                   placeholder="Enter Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-
                 <input
                   type="password"
                   placeholder="Enter Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-
                 {isSignup && (
                   <select value={role} onChange={(e) => setRole(e.target.value)}>
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
                   </select>
                 )}
-
                 <button onClick={handleAuth}>{isSignup ? "Sign Up" : "Login"}</button>
-
                 <p className="toggle-text" onClick={toggleAuthMode}>
                   {isSignup ? "Already have an account? Login" : "Don't have an account? Sign Up"}
                 </p>

@@ -1,0 +1,45 @@
+.admin-subscriber-list {
+  padding: 24px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+.admin-subscriber-list h2 {
+  font-size: 22px;
+  margin-bottom: 16px;
+  color: #1e293b;
+}
+
+.admin-subscriber-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.subscriber-item {
+  background: #ffffff;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  transition: all 0.25s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.subscriber-item strong {
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.subscriber-item:hover {
+  background-color: #eef2ff;
+  transform: translateY(-2px);
+}
+
+.subscriber-item span {
+  font-size: 13px;
+  color: #64748b;
+}

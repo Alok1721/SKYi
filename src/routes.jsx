@@ -22,6 +22,8 @@ import WithUserHeader from './components/layout/WithUserHeader';
 import WithAdminHeader from './components/layout/WithAdminHeader';
 import PdfViewer from './pages/PdfViewer';
 import AdminExamMigration from './pages/AdminExamMigration';
+import SubscriberDetailsPage from "./pages/SubscriberDetailsPage";
+import AdminSubscriberList from "./pages/AdminSubscriberList";
 
 // Wrap user pages with WithUserHeader
 const UserDashboard = WithUserHeader(Dashboard, "Dashboard");
@@ -67,6 +69,8 @@ function AppRoutes() {
       <Route path="/adminCAMaker" element={<AdminCAMakerPage />} />
       <Route path="/adminExamMigration" element={<AdminExamMigrationPage />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/subscriber/:userId" element={<SubscriberDetailsPage />} />
+      <Route path="/admin/subscribers" element={<AdminSubscriberList />} />
       
       {/* Special Routes (without header) */}
       <Route path="/testZone" element={<TestZone />} />

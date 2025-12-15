@@ -22,7 +22,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         <li onClick={() => navigate("/adminDashboard")}>
           <FiBarChart2 className="admin-icon" /> Dashboard
         </li>
-        <li onClick={() => navigate("/totalSubscriber")}>
+        <li onClick={() => navigate("/admin/subscribers")}>
           <FiUsers className="admin-icon" /> Subscribers
         </li>
         <li onClick={() => navigate("/adminQuizMaker")}>
