@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { db, realtimeDB } from "../firebaseConfig";
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
-import { ref, onValue } from "firebase/database";
-import { fetchSubmissionsByUserId } from "../firebaseServices/submission_service";
 import "../styles/subscriberDetailsPage.css";
+
+import { fetchSubmissionsByUserId } from "../firebaseServices/submission_service";
+import { getUserById } from "../firebaseServices/user_service";
+import { getUserProgressData } from "../firebaseServices/user_progress_service";
+import { subscribeUserStatus } from "../firebaseServices/user_status_service";
+
 
 import {
   LineChart,
@@ -91,54 +93,49 @@ const SubscriberDetailsPage = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const userSnap = await getDoc(doc(db, "users", userId));
-        if (!userSnap.exists()) return;
-        const user = userSnap.data();
+        const user = await getUserById(userId);
+        if (!user) return;
+
         setUserData(user);
 
         const subs = await fetchSubmissionsByUserId(userId);
         setSubmissions(subs || []);
 
-        if (user.subscribedExam) {
-          const refProgress = collection(db, `user_progress/${userId}/${user.subscribedExam}`);
-          const snap = await getDocs(refProgress);
-          const g = [];
-          const p = [];
-          snap.forEach((d) => {
-            g.push({ date: d.id, value: d.data().correctPercentage || 0 });
-            p.push({ date: d.id, completedPOD: d.data().completedPOD === true });
-          });
-          setGraphData(g.sort((a, b) => new Date(a.date) - new Date(b.date)));
-          setPodData(p);
-        }
+        const examId =
+          user.subscribedExam ||
+          user.subscriptions?.[0] ||
+          null;
+
+        const { graphData, podData } = await getUserProgressData(userId, examId);
+
+        setGraphData(graphData);
+        setPodData(podData);
       } catch (err) {
-        console.error(err);
+        console.error("Subscriber details error:", err);
       } finally {
         setLoading(false);
       }
     };
+
     load();
   }, [userId]);
 
   /* ---------------- ONLINE STATUS ---------------- */
   useEffect(() => {
-    const statusRef = ref(realtimeDB, `status/${userId}`);
-    const unsubscribe = onValue(statusRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        setIsOnline(data.isOnline);
-        setLastActive(data.lastActive);
-      }
+    return subscribeUserStatus(userId, ({ isOnline, lastActive }) => {
+      setIsOnline(isOnline);
+      setLastActive(lastActive);
     });
-    return () => unsubscribe();
   }, [userId]);
 
   /* ---------------- STATS ---------------- */
-  const todayStr = new Date().toDateString();
+    const todayStr = new Date().toDateString();
+
   const todaySubs = useMemo(
     () => submissions.filter(s => new Date(s.timeStamp).toDateString() === todayStr),
     [submissions]
   );
+
   const todayStats = useMemo(() => calculateStats(todaySubs), [todaySubs]);
   const overallStats = useMemo(() => calculateStats(submissions), [submissions]);
 
@@ -169,29 +166,32 @@ const SubscriberDetailsPage = () => {
     return map;
   }, [podData]);
 
+
   /* ---------------- SUBMISSIONS FILTER + PAGINATION ---------------- */
-  const ITEMS_PER_PAGE = 25;
-  const [submissionFilter, setSubmissionFilter] = useState(TIME_FILTERS[1]);
-  const [currentPage, setCurrentPage] = useState(1);
+const ITEMS_PER_PAGE = 25; // Show max 25 submissions per page
+const [submissionFilter, setSubmissionFilter] = useState(TIME_FILTERS[1]);
+const [currentPage, setCurrentPage] = useState(1);
 
-  const filteredSubmissions = useMemo(() => {
-    const { start, end } = resolveDateRange(submissionFilter);
-    return submissions.filter((s) => {
-      const date = new Date(s.timeStamp);
-      return date >= start && date <= end;
-    });
-  }, [submissions, submissionFilter]);
+// Filtered submissions based on selected time filter
+const filteredSubmissions = useMemo(() => {
+  const { start, end } = resolveDateRange(submissionFilter);
+  return submissions.filter((s) => {
+    const date = new Date(s.timeStamp);
+    return date >= start && date <= end;
+  });
+}, [submissions, submissionFilter]);
 
-  const totalPages = Math.ceil(filteredSubmissions.length / ITEMS_PER_PAGE);
-  const currentSubmissions = filteredSubmissions.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
+// Pagination logic
+const totalPages = Math.ceil(filteredSubmissions.length / ITEMS_PER_PAGE);
+const currentSubmissions = filteredSubmissions.slice(
+  (currentPage - 1) * ITEMS_PER_PAGE,
+  currentPage * ITEMS_PER_PAGE
+);
   if (loading) return <p>Loading analytics...</p>;
   if (!userData) return <p>User not found</p>;
+
+const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
 
   /* ---------------- RENDER ---------------- */
   return (
@@ -201,6 +201,7 @@ const SubscriberDetailsPage = () => {
         <h2>{userData.name}</h2>
         <p>{userData.email}</p>
         <span className="role-badge">{userData.role}</span>
+        {/* Online/Offline */}
         <div className="user-status" style={{ marginTop: "8px" }}>
           Status: {isOnline ? (
             <span style={{ color: "#10b981" }}>Online</span>
@@ -249,7 +250,9 @@ const SubscriberDetailsPage = () => {
               }
             >
               {TIME_FILTERS.map((f) => (
-                <option key={f.key} value={f.key}>{f.label}</option>
+                <option key={f.key} value={f.key}>
+                  {f.label}
+                </option>
               ))}
             </select>
           </div>
@@ -261,10 +264,18 @@ const SubscriberDetailsPage = () => {
               data={filteredGraphData}
             >
               <CartesianGrid strokeDasharray="2 2" />
-              <XAxis dataKey="date" tickFormatter={(d) => format(new Date(d), "dd MMM")} />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(d) => format(new Date(d), "dd MMM")}
+              />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#3b82f6"
+                strokeWidth={2}
+              />
             </LineChart>
           </div>
         </div>
@@ -291,7 +302,10 @@ const SubscriberDetailsPage = () => {
                 if (podFilter.key === "this-week") {
                   monthsToRender = [{ name: "This Week", days: podDays.slice(0, 7) }];
                 } else if (podFilter.key === "this-month") {
-                  monthsToRender = [{ name: `${now.toLocaleString("default", { month: "long" })} ${now.getFullYear()}`, days: podDays }];
+                  monthsToRender = [{
+                    name: `${now.toLocaleString("default", { month: "long" })} ${now.getFullYear()}`,
+                    days: podDays
+                  }];
                 } else if (podFilter.key === "last-3-months" || podFilter.key === "last-6-months") {
                   const monthsCount = podFilter.key === "last-3-months" ? 3 : 6;
                   for (let i = monthsCount - 1; i >= 0; i--) {
@@ -323,7 +337,11 @@ const SubscriberDetailsPage = () => {
                     <h4 className="month-title">{month.name}</h4>
                     <div className="calendar-grid">
                       {month.days.map((date) => (
-                        <div key={date} className={`calendar-box ${podMap[date] ? "completed-pod" : ""}`} title={date} />
+                        <div
+                          key={date}
+                          className={`calendar-box ${podMap[date] ? "completed-pod" : ""}`}
+                          title={date}
+                        />
                       ))}
                     </div>
                   </div>
@@ -343,7 +361,7 @@ const SubscriberDetailsPage = () => {
             value={submissionFilter.key}
             onChange={(e) => {
               setSubmissionFilter(TIME_FILTERS.find(f => f.key === e.target.value));
-              setCurrentPage(1);
+              setCurrentPage(1); // reset to first page
             }}
           >
             {TIME_FILTERS.map(f => (

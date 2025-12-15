@@ -43,3 +43,22 @@
   font-size: 13px;
   color: #64748b;
 }
+.subscriber-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.subscriber-status {
+  display: block;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.subscriber-status.online {
+  color: var(--success-color);
+}
+
+.subscriber-status.offline {
+  color: var(--error-color);
+}

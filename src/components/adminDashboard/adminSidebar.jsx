@@ -1,23 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiX, FiUser, FiUsers, FiFileText, FiHelpCircle, FiBookOpen, FiBarChart2,FiLogOut, FiSettings } from "react-icons/fi";
+import {
+  FiX,
+  FiUser,
+  FiUsers,
+  FiFileText,
+  FiBookOpen,
+  FiBarChart2,
+  FiLogOut,
+  FiSettings,
+} from "react-icons/fi";
 import "./adminSidebar.css";
-import {signOut} from "firebase/auth"
-import {auth} from "../../firebaseConfig"
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebaseConfig";
+import { getUserProfile } from "../../firebaseServices/auth";
+
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
+
+  const [admin, setAdmin] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  /* -------- LOAD ADMIN PROFILE -------- */
+  useEffect(() => {
+    const loadAdmin = async () => {
+      try {
+        const data = await getUserProfile();
+        setAdmin(data);
+      } catch (err) {
+        console.error("Failed to load admin profile", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAdmin();
+  }, []);
+
+  /* -------- LOGOUT -------- */
   const handleLogout = async () => {
     try {
       localStorage.removeItem("user");
       await signOut(auth);
-      navigate("/"); // Redirect to login page
+      navigate("/");
     } catch (err) {
       console.error("Failed to log out:", err.message);
     }
   };
+
   return (
     <div className={`admin-sidebar ${isOpen ? "open" : ""}`}>
-      <div className="admin-close-btn" onClick={toggleSidebar}><FiX /></div>
+      <div className="admin-close-btn" onClick={toggleSidebar}>
+        <FiX />
+      </div>
+
       <ul>
         <li onClick={() => navigate("/adminDashboard")}>
           <FiBarChart2 className="admin-icon" /> Dashboard
@@ -28,30 +64,37 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         <li onClick={() => navigate("/adminQuizMaker")}>
           <FiFileText className="admin-icon" /> Quiz-Maker
         </li>
-        <li onClick={() => navigate("/problem-of-day")}>
-          <FiHelpCircle className="admin-icon" /> Problem of Day
-        </li>
-        <li onClick={() => navigate("/practice")}>
-          <FiBookOpen className="admin-icon" /> Practice
+        <li onClick={() => navigate("/adminQuestionMaker")}>
+          <FiBookOpen className="admin-icon" /> Question-Maker
         </li>
         <li onClick={() => navigate("/settings")}>
           <FiSettings className="admin-icon" /> Settings
         </li>
       </ul>
 
+      {/* -------- ADMIN PROFILE -------- */}
       <div className="admin-profile">
         <FiUser className="admin-profile-icon" />
-        <p className="admin-profile-name">Alok Kumar</p>
-        <p className="admin-profile-email">alokkhinjit123@gmail.com</p>
+
+        {loading ? (
+          <p className="admin-profile-name">Loading...</p>
+        ) : (
+          <>
+            <p className="admin-profile-name">
+              {admin?.name || "Admin"}
+            </p>
+            <p className="admin-profile-email">
+              {admin?.email || ""}
+            </p>
+          </>
+        )}
       </div>
+
+      {/* -------- LOGOUT -------- */}
       <div className="admin-bottom-section">
-              
-      
-              <button className="admin-logout-btn" onClick={handleLogout}>
-                <FiLogOut className="admin-logout-icon"/>
-              </button>
-      
-      
+        <button className="admin-logout-btn" onClick={handleLogout}>
+          <FiLogOut className="admin-logout-icon" />
+        </button>
       </div>
     </div>
   );

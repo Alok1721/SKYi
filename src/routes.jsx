@@ -1,5 +1,8 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import WithUserHeader from './components/layout/WithUserHeader';
+import WithAdminHeader from './components/layout/WithAdminHeader';
+
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import AuthPage from './pages/AuthPage';
@@ -18,8 +21,6 @@ import AdminCAMaker from './pages/AdminCAMaker';
 import ListOfPdfs from './pages/ListOfPdfs';
 import ListSettings from './components/Settings/AdminSettings';
 import ListUserSettings from './components/Settings/UserSettings';
-import WithUserHeader from './components/layout/WithUserHeader';
-import WithAdminHeader from './components/layout/WithAdminHeader';
 import PdfViewer from './pages/PdfViewer';
 import AdminExamMigration from './pages/AdminExamMigration';
 import SubscriberDetailsPage from "./pages/SubscriberDetailsPage";
@@ -44,6 +45,8 @@ const AdminQuestionMakerPage = WithAdminHeader(AdminQuestionMaker, "Question Mak
 const AdminCAMakerPage = WithAdminHeader(AdminCAMaker, "Current Affairs Maker");
 const AdminExamMigrationPage = WithAdminHeader(AdminExamMigration, "Exam Migration");
 const Settings = WithAdminHeader(ListSettings, "Admin Setting");
+const AAdminSubscriberList = WithAdminHeader(AdminSubscriberList, "Subscribers List");
+const SSubscriberDetailsPage = WithAdminHeader(SubscriberDetailsPage, "Subscribers Details");
 
 function AppRoutes() {
   return (
@@ -69,8 +72,8 @@ function AppRoutes() {
       <Route path="/adminCAMaker" element={<AdminCAMakerPage />} />
       <Route path="/adminExamMigration" element={<AdminExamMigrationPage />} />
       <Route path="/settings" element={<Settings />} />
-      <Route path="/subscriber/:userId" element={<SubscriberDetailsPage />} />
-      <Route path="/admin/subscribers" element={<AdminSubscriberList />} />
+      <Route path="/subscriber/:userId" element={<SSubscriberDetailsPage />} />
+      <Route path="/admin/subscribers" element={<AAdminSubscriberList />} />
       
       {/* Special Routes (without header) */}
       <Route path="/testZone" element={<TestZone />} />

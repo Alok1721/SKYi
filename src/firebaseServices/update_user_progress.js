@@ -14,7 +14,7 @@ export const updateUserProgress = async (currentUserId, newCorrectPercentage, su
 
     const today = formatDate(new Date());
     const questionDate = formatDate(questionCreatedAt.toDate ? questionCreatedAt.toDate() : questionCreatedAt);
-    const isTodaysPOD = subject === "POD" && questionDate === today;
+    const isTodaysPOD =questionDate === today;//any submission will count as pod, easy to track submision at once 
 
     const progressRef = doc(db, `user_progress/${currentUserId}/${examName}`, today);
     const progressSnap = await getDoc(progressRef);

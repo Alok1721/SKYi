@@ -1,67 +1,68 @@
 import React, { useEffect, useState } from "react";
-import { db, auth } from "../firebaseConfig";
-import { collection, getDocs, doc, getDoc, query, where } from "firebase/firestore";
+import { auth } from "../firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import "../styles/adminSubscriberList.css";
 
+/* -------- SERVICES -------- */
+import { getAdminSubscribers } from "../firebaseServices/admin_service";
+import { subscribeUserStatus } from "../firebaseServices/user_status_service";
+
 const AdminSubscriberList = () => {
   const [users, setUsers] = useState([]);
+  const [userStatusMap, setUserStatusMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+
   const navigate = useNavigate();
 
+  /* ---------------- FETCH SUBSCRIBERS ---------------- */
   useEffect(() => {
-    const fetchSubscribedUsers = async () => {
+    const loadSubscribers = async () => {
       try {
         const adminId = auth.currentUser?.uid;
 
         if (!adminId) {
           setMessage("Admin not authenticated.");
-          setLoading(false);
           return;
         }
 
-        // 1️⃣ Fetch admin document
-        const adminSnap = await getDoc(doc(db, "users", adminId));
+        const subscribers = await getAdminSubscribers(adminId);
 
-        if (!adminSnap.exists()) {
-          setMessage("Admin profile not found.");
-          setLoading(false);
-          return;
-        }
-
-        const { subscribedUsers = [] } = adminSnap.data();
-
-        // 2️⃣ If no subscribers
-        if (subscribedUsers.length === 0) {
+        if (subscribers.length === 0) {
           setMessage("No users have subscribed to you yet.");
-          setUsers([]);
-          setLoading(false);
-          return;
         }
 
-        // 3️⃣ Fetch only subscribed users
-        // Firestore 'in' supports max 10 → chunk if needed
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("__name__", "in", subscribedUsers.slice(0, 10)));
-
-        const snap = await getDocs(q);
-        const userList = snap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        }));
-
-        setUsers(userList);
-      } catch (error) {
-        console.error("Error fetching subscribers:", error);
+        setUsers(subscribers);
+      } catch (err) {
+        console.error(err);
         setMessage("Failed to load subscribers.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSubscribedUsers();
+    loadSubscribers();
   }, []);
+
+  /* ---------------- ONLINE / OFFLINE STATUS ---------------- */
+  useEffect(() => {
+  console.log("STATUS MAP:", userStatusMap);
+}, [userStatusMap]);
+
+  useEffect(() => {
+    if (!users.length) return;
+
+    const unsubscribers = users.map((user) =>
+      subscribeUserStatus(user.id, ({ isOnline, lastActive }) => {
+        setUserStatusMap((prev) => ({
+          ...prev,
+          [user.id]: { isOnline, lastActive },
+        }));
+      })
+    );
+
+    return () => unsubscribers.forEach((unsub) => unsub());
+  }, [users]);
 
   if (loading) {
     return <p className="admin-info-text">Loading subscribers...</p>;
@@ -74,19 +75,33 @@ const AdminSubscriberList = () => {
       {message && <p className="admin-info-text">{message}</p>}
 
       <ul>
-        {users.map((user) => (
-          <li
-            key={user.id}
-            className="subscriber-item"
-            onClick={() => navigate(`/subscriber/${user.id}`)}
-          >
-            <div>
-              <strong>{user.name}</strong>
-              <div className="subscriber-email">{user.email}</div>
-            </div>
-            <span className="subscriber-role">{user.role}</span>
-          </li>
-        ))}
+        {users.map((user) => {
+          const isOnline = userStatusMap[user.id]?.isOnline;
+
+          return (
+            <li
+              key={user.id}
+              className="subscriber-item"
+              onClick={() => navigate(`/subscriber/${user.id}`)}
+            >
+              <div>
+                <strong>{user.name}</strong>
+                <div className="subscriber-email">{user.email}</div>
+              </div>
+
+              <div className="subscriber-meta">
+                <span className="subscriber-role">{user.role}</span>
+                <span
+                  className={`subscriber-status ${
+                    isOnline ? "online" : "offline"
+                  }`}
+                >
+                  {isOnline ? "Online" : "Offline"}
+                </span>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

@@ -1,6 +1,5 @@
-import { auth, db } from "../firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
-
+import { db } from "../firebaseConfig";
+import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 export const getAdminDefaultExam = async () => {
   console.log("inside the adminExamNameFetch");
     try {
@@ -40,4 +39,24 @@ export const getSubjectsByExamName = async (examName) => {
     console.error("Error fetching subjects:", error);
     return [];
   }
+};
+
+
+/**
+ * Fetch subscribers for an admin
+ */
+export const getAdminSubscribers = async (adminId) => {
+  if (!adminId) return [];
+  const adminSnap = await getDoc(doc(db, "users", adminId));
+  if (!adminSnap.exists()) return [];
+  const { subscribedUsers = [] } = adminSnap.data();
+  if (subscribedUsers.length === 0) return [];
+  const usersRef = collection(db, "users");
+  const q = query(usersRef, where("__name__", "in", subscribedUsers.slice(0, 10)));
+
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
 };
