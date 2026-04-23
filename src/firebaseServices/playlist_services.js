@@ -67,3 +67,70 @@ export const fetchPlaylistsByExam = async (examName) => {
     return [];
   }
 };
+
+export const fetchQuestionsByExamOptimized = async (examName) => {
+  if (!examName) return [];
+
+  try {
+    // 1. Fetch all questions
+    const questionSnap = await getDocs(
+      query(collection(db, "questions"), where("examName", "==", examName))
+    );
+
+    // 2. Fetch playlists
+    const playlistSnap = await getDocs(
+      query(collection(db, "playlists"), where("examName", "==", examName))
+    );
+
+    // 3. Map playlistId → info
+    const playlistMap = {};
+    playlistSnap.docs.forEach((doc) => {
+      const data = doc.data();
+      playlistMap[doc.id] = {
+        name: data.name,
+        type: data.type || "Others",
+      };
+    });
+
+    // 4. Group questions
+    const grouped = {};
+
+    questionSnap.docs.forEach((doc) => {
+      const data = doc.data();
+
+      (data.playlists || []).forEach((playlistId) => {
+        if (!playlistMap[playlistId]) return;
+
+        const { name, type } = playlistMap[playlistId];
+
+        if (!grouped[type]) grouped[type] = {};
+        if (!grouped[type][playlistId]) {
+          grouped[type][playlistId] = {
+            id: playlistId,
+            name,
+            type,
+            itemsData: [],
+          };
+        }
+
+        grouped[type][playlistId].itemsData.push({
+          id: doc.id,
+          ...data,
+        });
+      });
+    });
+
+    // 5. Format for UI
+    return Object.entries(grouped).map(([title, playlists]) => ({
+      title,
+      data: Object.values(playlists).map((p) => ({
+        ...p,
+        itemCount: p.itemsData.length,
+        updatedAt: "N/A",
+      })),
+    }));
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+};
