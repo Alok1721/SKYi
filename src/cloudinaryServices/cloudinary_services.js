@@ -1,26 +1,33 @@
-const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL//"https://api.cloudinary.com/v1_1/dfjudeatw/image/upload";
-const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET//"dp_url"; // Replace with your Cloudinary preset name
+const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
+const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 
 export const uploadToCloudinary = async (file, resourceType = "auto") => {
+  if (!CLOUDINARY_URL || !UPLOAD_PRESET) {
+    throw new Error("Cloudinary is not configured. Set VITE_CLOUDINARY_URL and VITE_UPLOAD_PRESET.");
+  }
+
+  if (!(file instanceof File)) {
+    throw new Error("Choose an image file to upload.");
+  }
+
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", UPLOAD_PRESET);
-  formData.append("resource_type", resourceType); // Allow all file types
 
-  try {
-    const response = await fetch(CLOUDINARY_URL, {
-      method: "POST",
-      body: formData,
-    });
+  const endpoint = CLOUDINARY_URL.replace(/\/+$/, "").replace(/\/image\/upload$/, `/${resourceType}/upload`);
+  const response = await fetch(endpoint, {
+    method: "POST",
+    body: formData,
+  });
 
-    if (!response.ok) {
-      throw new Error(`Cloudinary Upload Failed: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.secure_url; // URL of uploaded file
-  } catch (error) {
-    console.error("Upload Error:", error);
-    return null;
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error?.message || `Cloudinary upload failed (${response.status}).`);
   }
+
+  if (!data.secure_url) {
+    throw new Error("Cloudinary did not return an image URL.");
+  }
+
+  return data.secure_url;
 };

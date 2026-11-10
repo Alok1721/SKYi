@@ -55,6 +55,7 @@ const UserPractise = () => {
           <p>No practice questions available for {examName}.</p>
         </div>
       ) : (
+        
         sections.map((section, index) => (
           <div key={index} className="section">
             <h3 className="section-title">{section.title}</h3>

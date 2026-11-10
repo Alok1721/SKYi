@@ -12,6 +12,11 @@ function App() {
     // Initialize theme when app starts
     const currentTheme = getCurrentTheme();
     setTheme(currentTheme);
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch((error) => {
+        console.error("Unable to register image sharing support:", error);
+      });
+    }
   }, []);
 
   return (

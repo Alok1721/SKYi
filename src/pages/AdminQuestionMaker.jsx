@@ -136,11 +136,14 @@ const AdminQuestionMaker = () => {
 
   const handleImageUpload = async (index, field, file) => {
     if (!file) return;
-    const imageUrl = await uploadToCloudinary(file);
-    if (imageUrl) {
+    try {
+      const imageUrl = await uploadToCloudinary(file);
       const newQuestions = [...questions];
       newQuestions[index][field] = imageUrl;
       setQuestions(newQuestions);
+    } catch (error) {
+      console.error("Unable to upload question image:", error);
+      window.alert(`Image upload failed: ${error.message}`);
     }
   };
 

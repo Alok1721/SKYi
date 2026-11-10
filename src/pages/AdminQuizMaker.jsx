@@ -88,10 +88,12 @@ const AdminQuizMaker = () => {
 
   const handleImageUpload = async (index, field, file) => {
     if (!file) return;
-    const imageUrl = await uploadToCloudinary(file);
-    console.log("image url", imageUrl);
-    if (imageUrl) {
+    try {
+      const imageUrl = await uploadToCloudinary(file);
       handleChange(index, field, imageUrl);
+    } catch (error) {
+      console.error("Unable to upload quiz image:", error);
+      window.alert(`Image upload failed: ${error.message}`);
     }
   };
 

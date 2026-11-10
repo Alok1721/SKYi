@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FiX, FiUser, FiUsers, FiFileText, FiHelpCircle, FiBookOpen, FiBarChart2 ,FiCodesandbox,FiLogOut, FiSettings} from "react-icons/fi";
+import { FiX, FiUser, FiUsers, FiFileText, FiHelpCircle, FiBookOpen, FiBarChart2 ,FiCodesandbox,FiLogOut, FiSettings, FiImage} from "react-icons/fi";
 import "./userSidebar.css";
 import {signOut} from "firebase/auth"
 import {auth} from "../../firebaseConfig"
@@ -35,6 +35,9 @@ const UserSidebar = ({ isOpen, toggleSidebar ,userName,userEmail}) => {
         <li onClick={() => navigate("/userPractise")}>
           <FiBookOpen className="user-icon" /> Practice
         </li> 
+        <li onClick={() => navigate("/userImageLibrary")}>
+          <FiImage className="user-icon" /> Image Library
+        </li>
         <li onClick={() => navigate("/userSubscriptions")}>
           <FiCodesandbox className="user-icon" /> Subscriptions
         </li> 

@@ -15,6 +15,7 @@ import AllActiveBacklogs from './pages/AllActiveBacklogs';
 import UserProfilePage from './pages/UserProfilePage';
 import UserSubscriptions from './pages/UserSubscriptions';
 import UserPractise from './pages/UserPractise';
+import UserImageLibrary from './pages/UserImageLibrary';
 import ListOfPractises from './pages/ListOfPractises';
 import AdminQuestionMaker from './pages/AdminQuestionMaker';
 import AdminCAMaker from './pages/AdminCAMaker';
@@ -34,6 +35,7 @@ const UserQuizzes = WithUserHeader(AllActiveQuizzes, "All Quizzes");
 const UserBacklogs = WithUserHeader(AllActiveBacklogs, "Backlogs");
 const UserChallenges = WithUserHeader(TodayChallenges, "Today's Challenges");
 const UserPractice = WithUserHeader(UserPractise, "Practice");
+const UserImages = WithUserHeader(UserImageLibrary, "Image Library");
 const UserPdfs = WithUserHeader(ListOfPdfs, "PDF Resources");
 const UserPracticeList = WithUserHeader(ListOfPractises, "Practice List");
 const UserSettings = WithUserHeader(ListUserSettings, "User Setting");
@@ -61,6 +63,7 @@ function AppRoutes() {
       <Route path="/allActiveBacklogs" element={<UserBacklogs />} />
       <Route path="/todayChallenges" element={<UserChallenges />} />
       <Route path="/userPractise" element={<UserPractice />} />
+      <Route path="/userImageLibrary" element={<UserImages />} />
       <Route path="/listOfPdfs" element={<UserPdfs />} />
       <Route path="/listOfPractise" element={<UserPracticeList />} />
       <Route path="/userSettings" element={<UserSettings />} />
