@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import UserDashboardHeader from '../dashboard/dashboardHeader';
 import UserSidebar from '../dashboard/userSidebar';
 import { useDashboard } from '../dashboard/DashboardContext';
@@ -26,6 +26,7 @@ const WithUserHeader = (WrappedComponent, pageTitle) => {
           toggleSidebar={toggleSidebar} 
           userName={userName} 
           userEmail={userEmail} 
+          userDpURL={userDpURL}
         />
         <div className={`content-wrapper ${isSidebarOpen ? "shift" : ""}`}>
           <WrappedComponent {...props} />

@@ -5,6 +5,7 @@ import { addDoc, collection, getDocs, query, serverTimestamp, where } from "fire
 import { FiFolder, FiImage, FiPlus, FiSearch, FiUpload, FiX } from "react-icons/fi";
 import { auth, db } from "../firebaseConfig";
 import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";
+import { USER_STORAGE_LIMIT_BYTES } from "../components/storage/UserStorageQuota";
 import "../styles/userImageLibrary.css";
 
 const SHARE_DB = "skyi-image-shares";
@@ -239,6 +240,20 @@ const UserImageLibrary = () => {
     setIsSaving(true);
     setError("");
     try {
+      const storedImages = await getDocs(query(
+        collection(db, "saved_images"),
+        where("userId", "==", user.uid)
+      ));
+      const usedStorageBytes = storedImages.docs.reduce((total, imageDoc) => {
+        const image = imageDoc.data();
+        const imageBytes = Number(image.storageBytes ?? image.fileSizeBytes);
+        return total + (Number.isFinite(imageBytes) && imageBytes > 0 ? imageBytes : 0);
+      }, 0);
+      if (usedStorageBytes + currentFile.size > USER_STORAGE_LIMIT_BYTES) {
+        setError("This image would exceed your 50 MB image storage limit. Remove an image or choose a smaller file.");
+        return;
+      }
+
       const imageUrl = await uploadToCloudinary(currentFile, "image");
       await addDoc(collection(db, "saved_images"), {
         userId: user.uid,
@@ -248,6 +263,7 @@ const UserImageLibrary = () => {
         folder: (isCreatingFolder ? newFolder : folder).trim() || "Unfiled",
         subject: (isCreatingSubject ? newSubject : subject).trim(),
         imageUrl,
+        storageBytes: currentFile.size,
         createdAt: serverTimestamp(),
       });
 
