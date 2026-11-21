@@ -401,6 +401,7 @@
 }
 
 .image-library-modal-body input,
+.image-library-modal-body select,
 .image-library-modal-body textarea {
   width: 100%;
   box-sizing: border-box;
@@ -408,9 +409,36 @@
   border-radius: 8px;
 }
 
+.image-library-modal-body select {
+  border: 1px solid var(--border-color);
+  background: var(--card-background-color);
+  color: var(--text-color);
+  font: inherit;
+}
+
 .image-library-modal-body textarea {
   resize: vertical;
   font: inherit;
+}
+
+.image-library-tag-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.image-library-tag-option {
+  padding: 5px 9px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--card-hover-background);
+  color: var(--text-secondary-color);
+  font-size: 12px;
+}
+
+.image-library-tag-option:hover {
+  border-color: #d63447;
+  color: #d63447;
 }
 
 .image-library-field-row {

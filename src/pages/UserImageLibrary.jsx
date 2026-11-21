@@ -9,6 +9,7 @@ import "../styles/userImageLibrary.css";
 
 const SHARE_DB = "skyi-image-shares";
 const SHARE_STORE = "inbound";
+const CREATE_NEW_OPTION = "__create_new__";
 
 function readSharedImages() {
   return new Promise((resolve, reject) => {
@@ -68,7 +69,11 @@ const UserImageLibrary = () => {
   const [heading, setHeading] = useState("");
   const [description, setDescription] = useState("");
   const [folder, setFolder] = useState("Unfiled");
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [newFolder, setNewFolder] = useState("");
   const [subject, setSubject] = useState("");
+  const [isCreatingSubject, setIsCreatingSubject] = useState(false);
+  const [newSubject, setNewSubject] = useState("");
   const [tagsText, setTagsText] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const fileInputRef = useRef(null);
@@ -156,6 +161,8 @@ const UserImageLibrary = () => {
   }, [searchParams, setSearchParams]);
 
   const folders = useMemo(() => [...new Set(images.map((image) => image.folder || "Unfiled"))].sort(), [images]);
+  const folderOptions = useMemo(() => [...new Set(["Unfiled", ...folders])].sort(), [folders]);
+  const availableSubjects = useMemo(() => [...new Set(images.map((image) => image.subject?.trim()).filter(Boolean))].sort(), [images]);
   const availableTags = useMemo(() => [...new Set(images.flatMap((image) => image.tags || []))].sort(), [images]);
   const visibleImages = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -178,7 +185,11 @@ const UserImageLibrary = () => {
     setHeading(file.name?.replace(/\.[^.]+$/, "") || "");
     setDescription("");
     setFolder(selectedFolder === "All images" ? "Unfiled" : selectedFolder);
+    setIsCreatingFolder(false);
+    setNewFolder("");
     setSubject("");
+    setIsCreatingSubject(false);
+    setNewSubject("");
     setTagsText("");
     setIsModalOpen(true);
   };
@@ -234,8 +245,8 @@ const UserImageLibrary = () => {
         heading: heading.trim(),
         description: description.trim(),
         tags: [...new Set(tagsText.split(",").map((tag) => tag.trim()).filter(Boolean))],
-        folder: folder.trim() || "Unfiled",
-        subject: subject.trim(),
+        folder: (isCreatingFolder ? newFolder : folder).trim() || "Unfiled",
+        subject: (isCreatingSubject ? newSubject : subject).trim(),
         imageUrl,
         createdAt: serverTimestamp(),
       });
@@ -249,7 +260,11 @@ const UserImageLibrary = () => {
           setDescription("");
           setTagsText("");
           setSubject("");
+          setIsCreatingSubject(false);
+          setNewSubject("");
           setFolder("Unfiled");
+          setIsCreatingFolder(false);
+          setNewFolder("");
           setNotice(`${sharedFiles.length} shared image${sharedFiles.length === 1 ? "" : "s"} saved. Add details to the next one.`);
         } else {
           await clearSharedImages();
@@ -419,10 +434,95 @@ const UserImageLibrary = () => {
               <label>Heading <span>*</span><input value={heading} onChange={(event) => setHeading(event.target.value)} required maxLength={120} /></label>
               <label>Description <small>Optional</small><textarea value={description} onChange={(event) => setDescription(event.target.value)} rows="3" maxLength={1000} /></label>
               <div className="image-library-field-row">
-                <label>Folder<input value={folder} onChange={(event) => setFolder(event.target.value)} maxLength={80} placeholder="e.g. Travel ideas" /></label>
-                <label>Subject<input value={subject} onChange={(event) => setSubject(event.target.value)} maxLength={80} placeholder="e.g. Biology" /></label>
+                <label>
+                  Folder
+                  <select
+                    value={isCreatingFolder ? CREATE_NEW_OPTION : folder}
+                    onChange={(event) => {
+                      if (event.target.value === CREATE_NEW_OPTION) {
+                        setIsCreatingFolder(true);
+                        setNewFolder("");
+                      } else {
+                        setFolder(event.target.value);
+                        setIsCreatingFolder(false);
+                      }
+                    }}
+                  >
+                    {folderOptions.map((name) => <option key={name} value={name}>{name}</option>)}
+                    <option value={CREATE_NEW_OPTION}>+ Create new folder</option>
+                  </select>
+                  {isCreatingFolder && (
+                    <input
+                      value={newFolder}
+                      onChange={(event) => setNewFolder(event.target.value)}
+                      maxLength={80}
+                      placeholder="Enter a new folder name"
+                      aria-label="New folder name"
+                    />
+                  )}
+                </label>
+                <label>
+                  Subject
+                  <select
+                    value={isCreatingSubject ? CREATE_NEW_OPTION : subject}
+                    onChange={(event) => {
+                      if (event.target.value === CREATE_NEW_OPTION) {
+                        setIsCreatingSubject(true);
+                        setNewSubject("");
+                      } else {
+                        setSubject(event.target.value);
+                        setIsCreatingSubject(false);
+                      }
+                    }}
+                  >
+                    <option value="">Select a subject</option>
+                    {availableSubjects.map((name) => <option key={name} value={name}>{name}</option>)}
+                    <option value={CREATE_NEW_OPTION}>+ Create new subject</option>
+                  </select>
+                  {isCreatingSubject && (
+                    <input
+                      value={newSubject}
+                      onChange={(event) => setNewSubject(event.target.value)}
+                      maxLength={80}
+                      placeholder="Enter a new subject"
+                      aria-label="New subject"
+                    />
+                  )}
+                </label>
               </div>
-              <label>Tags <small>Separate with commas; existing tags are suggested</small><input list="image-library-existing-tags" value={tagsText} onChange={(event) => setTagsText(event.target.value)} placeholder="ideas, notes, reference" maxLength={300} /><datalist id="image-library-existing-tags">{availableTags.map((tag) => <option key={tag} value={tag} />)}</datalist></label>
+              <label>
+                Tags <small>Separate new tags with commas, or select an existing tag below</small>
+                <input
+                  value={tagsText}
+                  onChange={(event) => setTagsText(event.target.value)}
+                  placeholder="ideas, notes, reference"
+                  maxLength={300}
+                />
+                {availableTags.length > 0 && (
+                  <div className="image-library-tag-picker" aria-label="Existing tags">
+                    {availableTags.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        className="image-library-tag-option"
+                        onClick={() => {
+                          const existingTags = tagsText.split(",").map((value) => value.trim().toLowerCase());
+                          if (existingTags.includes(tag.toLowerCase())) return;
+                          const currentTags = tagsText.trim().replace(/,\s*$/, "");
+                          const nextTagsText = currentTags ? `${currentTags}, ${tag}` : tag;
+                          if (nextTagsText.length > 300) {
+                            setError("Tags are limited to 300 characters.");
+                            return;
+                          }
+                          setTagsText(nextTagsText);
+                        }}
+                      >
+                        #{tag}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </label>
               <p className="image-library-date">Saved date and time: {new Date().toLocaleString()} (automatically recorded)</p>
               {error && <p className="image-library-error" role="alert">{error}</p>}
             </div>
