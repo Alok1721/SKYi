@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "../styles/adminQuestionMaker.css";
-import { db } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 import { collection, getDocs, doc, query, where, writeBatch, arrayUnion } from "firebase/firestore";
-import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";
+import { uploadToCloudinaryWithMetadata } from "../cloudinaryServices/cloudinary_services";
 import { getAdminDefaultExam } from "../firebaseServices/admin_service";
 import LoadingScreen from "../components/loadingScreen/LoadingScreen";
 
@@ -18,6 +18,8 @@ const AdminQuestionMaker = () => {
       solution: "",
       questionImage: "",
       solutionImage: "",
+      questionImageBytes: 0,
+      solutionImageBytes: 0,
     },
   ]);
   const [allPlaylists, setAllPlaylists] = useState([]);
@@ -112,6 +114,8 @@ const AdminQuestionMaker = () => {
         solution: "",
         questionImage: "",
         solutionImage: "",
+        questionImageBytes: 0,
+        solutionImageBytes: 0,
       },
     ]);
   };
@@ -137,9 +141,10 @@ const AdminQuestionMaker = () => {
   const handleImageUpload = async (index, field, file) => {
     if (!file) return;
     try {
-      const imageUrl = await uploadToCloudinary(file);
+      const { url: imageUrl, bytes } = await uploadToCloudinaryWithMetadata(file);
       const newQuestions = [...questions];
       newQuestions[index][field] = imageUrl;
+      newQuestions[index][`${field}Bytes`] = bytes;
       setQuestions(newQuestions);
     } catch (error) {
       console.error("Unable to upload question image:", error);
@@ -204,8 +209,11 @@ const AdminQuestionMaker = () => {
           solution: formatToBulletHTML(question.solution),
           questionImage: question.questionImage || "",
           solutionImage: question.solutionImage || "",
+          questionImageBytes: question.questionImageBytes || 0,
+          solutionImageBytes: question.solutionImageBytes || 0,
           playlists: question.playlists,
           examName, // Include examName
+          createdBy: auth.currentUser?.uid || "",
         });
 
         for (const playlistId of question.playlists) {
@@ -232,6 +240,8 @@ const AdminQuestionMaker = () => {
           solution: "",
           questionImage: "",
           solutionImage: "",
+          questionImageBytes: 0,
+          solutionImageBytes: 0,
         },
       ]);
     } catch (error) {

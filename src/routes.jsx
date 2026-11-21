@@ -26,6 +26,7 @@ import PdfViewer from './pages/PdfViewer';
 import AdminExamMigration from './pages/AdminExamMigration';
 import SubscriberDetailsPage from "./pages/SubscriberDetailsPage";
 import AdminSubscriberList from "./pages/AdminSubscriberList";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 
 // Wrap user pages with WithUserHeader
 const UserDashboard = WithUserHeader(Dashboard, "Dashboard");
@@ -49,6 +50,7 @@ const AdminExamMigrationPage = WithAdminHeader(AdminExamMigration, "Exam Migrati
 const Settings = WithAdminHeader(ListSettings, "Admin Setting");
 const AAdminSubscriberList = WithAdminHeader(AdminSubscriberList, "Subscribers List");
 const SSubscriberDetailsPage = WithAdminHeader(SubscriberDetailsPage, "Subscribers Details");
+const SuperAdminDashboardPage = WithAdminHeader(SuperAdminDashboard, "Super Admin Overview");
 
 function AppRoutes() {
   return (
@@ -70,6 +72,7 @@ function AppRoutes() {
       
       {/* Admin Routes */}
       <Route path="/adminDashboard" element={<AdminDashboardPage />} />
+      <Route path="/superAdminDashboard" element={<SuperAdminDashboardPage />} />
       <Route path="/adminQuizMaker" element={<AdminQuizMakerPage />} />
       <Route path="/adminQuestionMaker" element={<AdminQuestionMakerPage />} />
       <Route path="/adminCAMaker" element={<AdminCAMakerPage />} />

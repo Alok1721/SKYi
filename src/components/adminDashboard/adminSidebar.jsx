@@ -9,6 +9,7 @@ import {
   FiBarChart2,
   FiLogOut,
   FiSettings,
+  FiShield,
 } from "react-icons/fi";
 import "./adminSidebar.css";
 import { signOut } from "firebase/auth";
@@ -20,6 +21,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
 
   const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
+  const isSuperAdmin = admin?.role === "superadmin" || admin?.role === "super_admin";
 
   /* -------- LOAD ADMIN PROFILE -------- */
   useEffect(() => {
@@ -55,6 +57,11 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
       </div>
 
       <ul>
+        {isSuperAdmin && (
+          <li onClick={() => navigate("/superAdminDashboard")}>
+            <FiShield className="admin-icon" /> Super Admin Overview
+          </li>
+        )}
         <li onClick={() => navigate("/adminDashboard")}>
           <FiBarChart2 className="admin-icon" /> Dashboard
         </li>

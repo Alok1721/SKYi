@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../styles/adminQuizMaker.css";
 import { db, auth } from "../firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
-import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";
+import { uploadToCloudinaryWithMetadata } from "../cloudinaryServices/cloudinary_services";
 import { sendBrevoEmail } from "../emailServices/emailFunctions";
 import { getSubscribedUsers } from "../firebaseServices/firestoreUtils";
 import { QuizEmailTemplate } from "../emailServices/emailTemplates";
@@ -14,10 +14,12 @@ const AdminQuizMaker = () => {
     {
       question: "",
       questionImage: "",
+      questionImageBytes: 0,
       options: ["", "", "", ""],
       correctOption: "",
       solution: "",
       solutionImage: "",
+      solutionImageBytes: 0,
     },
   ]);
   const subjectTimeMap = {
@@ -89,8 +91,11 @@ const AdminQuizMaker = () => {
   const handleImageUpload = async (index, field, file) => {
     if (!file) return;
     try {
-      const imageUrl = await uploadToCloudinary(file);
-      handleChange(index, field, imageUrl);
+      const { url: imageUrl, bytes } = await uploadToCloudinaryWithMetadata(file);
+      const updatedQuestions = [...questions];
+      updatedQuestions[index][field] = imageUrl;
+      updatedQuestions[index][`${field}Bytes`] = bytes;
+      setQuestions(updatedQuestions);
     } catch (error) {
       console.error("Unable to upload quiz image:", error);
       window.alert(`Image upload failed: ${error.message}`);
@@ -103,10 +108,12 @@ const AdminQuizMaker = () => {
       {
         question: "",
         questionImage: "",
+        questionImageBytes: 0,
         options: ["", "", "", ""],
         correctOption: "",
         solution: "",
         solutionImage: "",
+        solutionImageBytes: 0,
       },
     ]);
   };
@@ -170,9 +177,14 @@ const AdminQuizMaker = () => {
           ? `<ul>${formatToBulletHTML(question.solution)}</ul>`
           : "",
       }));
+      const storageBytes = formattedQuestions.reduce(
+        (total, question) => total + (question.questionImageBytes || 0) + (question.solutionImageBytes || 0),
+        0
+      );
 
       await addDoc(collection(db, "quizzes"), {
         questions: formattedQuestions,
+        storageBytes,
         createdAt: new Date(),
         subject: questionSubject,
         quizDescription: quizDescription,
@@ -196,10 +208,12 @@ const AdminQuizMaker = () => {
         {
           question: "",
           questionImage: "",
+          questionImageBytes: 0,
           options: ["", "", "", ""],
           correctOption: "",
           solution: "",
           solutionImage: "",
+          solutionImageBytes: 0,
         },
       ]);
       setTimeAllocated(0);

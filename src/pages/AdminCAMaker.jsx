@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "../styles/adminCAMaker.css";
-import { db } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 import { collection, addDoc, updateDoc, doc, arrayUnion, getDocs, query, where } from "firebase/firestore";
-import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";
+import { uploadToCloudinaryWithMetadata } from "../cloudinaryServices/cloudinary_services";
 import { sendBrevoEmail } from "../emailServices/emailFunctions";
 import { getSubscribedUsers } from "../firebaseServices/firestoreUtils";
 import { PDFEmailTemplate } from "../emailServices/emailTemplates";
@@ -172,7 +172,7 @@ const AdminCAMaker = () => {
       for (let i = 0; i < pdfs.length; i++) {
         const pdf = pdfs[i];
         console.log(`Uploading ${i + 1}/${pdfs.length}: ${pdf.pdfName}`);
-        const pdfUrl = await uploadToCloudinary(pdf.pdfFile);
+        const { url: pdfUrl, bytes } = await uploadToCloudinaryWithMetadata(pdf.pdfFile);
 
         if (!pdfUrl) {
           newErrors[i].pdfFile = `Failed to upload "${pdf.pdfName}". Please try again.`;
@@ -186,10 +186,12 @@ const AdminCAMaker = () => {
         const pdfRef = await addDoc(collection(db, "pdfs"), {
           pdfName: pdf.pdfName,
           pdfLink: pdfUrl,
+          storageBytes: bytes,
           pdfThumbnail: pdfThumbnail,
           type: pdf.type,
           examName, // Include examName
           createdAt: new Date(),
+          createdBy: auth.currentUser?.uid || "",
           readBy: [],
         });
 

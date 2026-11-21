@@ -15,7 +15,7 @@ import {
 import { onAuthStateChanged, updatePassword, updateProfile } from "firebase/auth";
 import { collection, doc, getCountFromServer, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig";
-import { uploadToCloudinary } from "../cloudinaryServices/cloudinary_services";
+import { uploadToCloudinaryWithMetadata } from "../cloudinaryServices/cloudinary_services";
 import { getCurrentTheme, toggleTheme } from "../utils/themeUtils";
 import UserStorageQuota from "../components/storage/UserStorageQuota";
 import "../styles/userProfilePage.css";
@@ -132,10 +132,17 @@ const UserProfilePage = () => {
     setMessage("");
     setError("");
     try {
-      const photoURL = imageFile
-        ? await uploadToCloudinary(imageFile, "image")
-        : profilePic;
-      const updates = { name: name.trim(), displayName: name.trim(), username: username.trim(), photoURL };
+      const uploadedPhoto = imageFile
+        ? await uploadToCloudinaryWithMetadata(imageFile, "image")
+        : null;
+      const photoURL = uploadedPhoto?.url || profilePic;
+      const updates = {
+        name: name.trim(),
+        displayName: name.trim(),
+        username: username.trim(),
+        photoURL,
+        ...(uploadedPhoto ? { photoStorageBytes: uploadedPhoto.bytes } : {}),
+      };
       await updateDoc(doc(db, "users", user.uid), updates);
       await updateProfile(user, { displayName: name.trim(), photoURL });
 

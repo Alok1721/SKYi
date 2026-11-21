@@ -1,7 +1,7 @@
 const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 
-export const uploadToCloudinary = async (file, resourceType = "auto") => {
+export const uploadToCloudinaryWithMetadata = async (file, resourceType = "auto") => {
   if (!CLOUDINARY_URL || !UPLOAD_PRESET) {
     throw new Error("Cloudinary is not configured. Set VITE_CLOUDINARY_URL and VITE_UPLOAD_PRESET.");
   }
@@ -29,5 +29,11 @@ export const uploadToCloudinary = async (file, resourceType = "auto") => {
     throw new Error("Cloudinary did not return an image URL.");
   }
 
-  return data.secure_url;
+  return {
+    url: data.secure_url,
+    bytes: Number(data.bytes) || file.size,
+  };
 };
+
+export const uploadToCloudinary = async (file, resourceType = "auto") =>
+  (await uploadToCloudinaryWithMetadata(file, resourceType)).url;

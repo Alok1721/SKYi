@@ -149,7 +149,11 @@ const AuthPage = () => {
   useEffect(() => {
     const cachedUser = JSON.parse(localStorage.getItem("user"));
     if (cachedUser) {
-      navigate(cachedUser.role === "admin" ? "/adminDashboard" : "/userDashboard");
+      navigate(
+        cachedUser.role === "superadmin" || cachedUser.role === "super_admin"
+          ? "/superAdminDashboard"
+          : cachedUser.role === "admin" ? "/adminDashboard" : "/userDashboard"
+      );
     }
   }, [navigate]);
 
@@ -211,7 +215,11 @@ const AuthPage = () => {
           const userData = userDoc.data();
           localStorage.setItem("user", JSON.stringify(userData));
           setUserOnline(user.uid);
-          navigate(userData.role === "admin" ? "/adminDashboard" : "/userDashboard");
+          navigate(
+            userData.role === "superadmin" || userData.role === "super_admin"
+              ? "/superAdminDashboard"
+              : userData.role === "admin" ? "/adminDashboard" : "/userDashboard"
+          );
         } else {
           setError("User data not found!");
         }
